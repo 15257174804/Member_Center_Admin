@@ -125,6 +125,7 @@
         <el-form-item>
           <el-button type="primary" @click="submitForm('form')">注册</el-button>
           <el-button @click="resetForm('form')">重置</el-button>
+           <el-button @click="goback">返回</el-button>
         </el-form-item>
           
       </el-form>
@@ -197,6 +198,10 @@ export default {
     }
   },
   methods:{
+    // 返回按钮
+    goback(){
+      this.$router.back(-1);
+    },
     //添加证照
     // 选择图片
     handleAvatarSuccess(response, file, fileList){

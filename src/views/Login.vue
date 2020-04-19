@@ -30,10 +30,10 @@
         <el-button type="primary" @click="sendform('ruleForm')">登录</el-button>
         <vcode :show="isShow" @onSuccess="onSuccess" @onClose="onClose" />
       </el-form-item>
-      <!-- <div class="reg">
-        <div style="margin-right:10px;">用户注册</div>
+      <div class="reg">
+        <!-- <div style="margin-right:10px;">用户注册</div> -->
         <div @click="regcompany">企业注册</div>
-      </div> -->
+      </div>
     </el-form>
   </div>
 </template>

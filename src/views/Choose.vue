@@ -96,10 +96,10 @@ export default {
         _option.push(obj);
       }
       this.options=_option;
-      // if(this.options.length==1){
-      //   this.formData.value=this.options[0].value
-      //   this.submitForm(this.formData.value)
-      // }
+      if(this.options.length==1){
+        this.formData.value=this.options[0].value
+        // this.submitForm(this.formData.value)
+      }
       console.log(this.options)
     })
   }
