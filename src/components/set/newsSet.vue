@@ -55,14 +55,18 @@
       >
       <el-table-column type="index" label="序号" width="60"></el-table-column>
       <el-table-column prop="createTime" label="发布时间" width="180"></el-table-column>
-      <el-table-column prop="title" label="标题" width="150"></el-table-column>
+      <el-table-column prop="title" label="标题"></el-table-column>
       <el-table-column prop="type" label="公告类型" width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.type==1">行业资讯</span>
           <span v-if="scope.row.type==2">招商信息</span>
         </template>
       </el-table-column>
-      <el-table-column prop="context" label="内容"></el-table-column>
+      <!-- <el-table-column label="内容">
+        <template slot-scope="scope">
+          <p v-html="scope.row.context"></p>
+        </template>
+      </el-table-column> -->
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.status==1">启用</span>
@@ -203,7 +207,9 @@ export default {
             if(this.dataList[i].context.length>20){
               this.dataList[i].context=this.dataList[i].context.substr(0,20)+'...'
             }
+            console.log(typeof this.dataList[i].context)
           }
+          
         }
       })
     }

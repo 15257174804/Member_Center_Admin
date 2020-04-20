@@ -47,7 +47,7 @@
       </el-table-column>
       <el-table-column prop="goodName" label="商品名称"></el-table-column>
       <el-table-column prop="goodPrice" label="商品价格"></el-table-column>
-      <el-table-column prop="orderCount" label="数量"></el-table-column>
+      <!-- <el-table-column prop="orderCount" label="数量"></el-table-column> -->
       <el-table-column prop="orderAmount" label="订单金额" sortable></el-table-column>
       <el-table-column prop="rebateAmount" label="返利金额" sortable></el-table-column>
       <!-- <el-table-column prop="rebateRate" label="返利比例" sortable></el-table-column> -->

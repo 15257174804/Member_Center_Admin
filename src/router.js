@@ -43,8 +43,6 @@ const router = new Router({
         //商品管理
         { path: "/good", name: "good", meta: { title: '商品列表' ,keepAlive: true}, component: () => import('./components/good/good.vue') },
         { path: "/goodadd" , name: "goodadd", meta: { title: '商品编辑',keepAlive: false }, component: () => import('./components/good/good-add.vue') },
-        // { path: "/presell", name: "presell", meta: { title: '商品预售' }, component: () => import('./components/good/presell.vue') },
-        // { path: "/preselladd", name: "preselladd", meta: { title: '新建预售' }, component: () => import('./components/good/presellAdd.vue') },
         // 商品预售重写样式
         { path: "/goodpresell", name: "goodpresell", meta: { title: '商品预售',keepAlive: true }, component: () => import('./components/good/good-presell.vue') },
         { path: "/goodpreselldetail", name: "goodpreselldetail", meta: { title: '预售编辑' ,keepAlive: false}, component: () => import('./components/good/good-preselldetail.vue') },
@@ -72,9 +70,9 @@ const router = new Router({
         { path: "/classify", name: "roleset", meta: { title: '商品分类' ,keepAlive: true}, component: () => import('./components/set/classify.vue') },
         { path: "/markset", name: "markset", meta: { title: '标签管理' ,keepAlive: true}, component: () => import('./components/set/mark.vue') },
         { path: "/bannerlist", name: "bannerlist", meta: { title: '广告管理' ,keepAlive: true}, component: () => import('./components/set/bannerList.vue') },
-        { path: "/adfloor", name: "adfloor", meta: { title: '广告楼层编辑',keepAlive: true }, component: () => import('./components/set/adfloor.vue') },
+        { path: "/adfloor", name: "adfloor", meta: { title: '广告楼层编辑',keepAlive: false }, component: () => import('./components/set/adfloor.vue') },
         { path: "/newslist", name: "newslist", meta: { title: '公告管理' ,keepAlive: true}, component: () => import('./components/set/newsSet.vue') },
-        { path: "/addnews", name: "addnews", meta: { title: '公告编辑' ,keepAlive: true}, component: () => import('./components/set/addnews.vue') },
+        { path: "/addnews", name: "addnews", meta: { title: '公告编辑' ,keepAlive: false}, component: () => import('./components/set/addnews.vue') },
 
         //积分设置
         { path: "/integralset", name: "integralset", meta: { title: '积分设置' ,keepAlive: true}, component: () => import('./components/integral//integralset.vue') },
@@ -123,7 +121,16 @@ router.beforeEach((to, from, next) => {
     isLogin ? next() : next('/login')
   }
   //判断是否需要缓存
+  // 商品编辑->商品列表
   if(to.path === '/good' && from.path === '/goodadd'){
+    to.meta.keepAlive = true;  // 让 列表页 缓存，即不刷新
+    next();
+  }else {
+    to.meta.keepAlive = false;  // 让 列表页 即不缓存，刷新
+    next();
+  }
+  // 企业编辑->企业列表
+  if(to.path === '/company' && from.path === '/companyadd'){
     to.meta.keepAlive = true;  // 让 列表页 缓存，即不刷新
     next();
   }else {

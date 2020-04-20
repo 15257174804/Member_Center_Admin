@@ -156,11 +156,11 @@
               <router-link to="/newslist">
                 <el-menu-item index="16-4">公告管理</el-menu-item>
               </router-link>
+              <router-link to="/markset">
+                <el-menu-item index="16-5">标签管理</el-menu-item>
+              </router-link>
               <!-- <router-link to="/roleset">
                 <el-menu-item index="16-3">角色管理</el-menu-item>
-              </router-link> -->
-              <!-- <router-link to="/markset">
-                <el-menu-item index="16-4">标签管理</el-menu-item>
               </router-link> -->
             </el-menu-item-group>
           </el-submenu>

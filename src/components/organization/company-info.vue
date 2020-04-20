@@ -178,7 +178,7 @@
       // 选择图片
       handleAvatarSuccess(response, file, fileList){
         this.licenses[this.uploadImageIndex].picture = response.msg.title;
-        console.log(this.form.licenses);
+        // console.log(this.form.licenses);
       },
       getImageTypeIndex(i) {
         this.uploadImageIndex = i;

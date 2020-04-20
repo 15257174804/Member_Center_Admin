@@ -193,8 +193,8 @@
         }
         this.axios.get('/b2c/classify/list')
         .then(res=>{
-          console.log('获取树形数据')
-          console.log(res.data.msg.datas)
+          // console.log('获取树形数据')
+          // console.log(res.data.msg.datas)
           this.classList=res.data.msg.datas;
         })
       },

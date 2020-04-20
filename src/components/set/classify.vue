@@ -45,7 +45,7 @@
       border 
       style="width: 100%"
       row-key="id"
-      default-expand-all
+      lazy
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column type="index" label="序号"></el-table-column>
       <el-table-column prop="name" label="类别名称"></el-table-column>
@@ -137,7 +137,7 @@ export default {
         // status:1
       },
       dataList: [],
-      pagesize: 20, //页面一次展示多少数据
+      pagesize: 5, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
       loading: false,
@@ -196,6 +196,7 @@ export default {
         code:'',
         name:'',
         level:'',
+        logo:'',
         type:1,
         parentId:'',
         parentName:''
@@ -347,7 +348,7 @@ export default {
       .then(res=>{
         if(this.searchParams.keyword==''&&this.searchParams.level==''){
           this.totalCount=res.data.msg.totalCount;
-          this.pagesize=20;
+          this.pagesize=res.data.msg.totalCount;
           this.currentPage=1;
         }else{
           this.dataList=res.data.msg.datas;

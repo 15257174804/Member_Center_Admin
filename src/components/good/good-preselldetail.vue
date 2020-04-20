@@ -125,7 +125,7 @@
                 label="操作"
                 width="150">
                 <template slot-scope="scope">
-                  <el-button type="text" @click="add(scope.row)" :disabled="JSON.stringify(ruleForm.details).indexOf(scope.row.goodCode)!=-1"><i class="el-icon-edit"></i>添加</el-button>
+                  <el-button type="text" @click="add(scope.row)" :disabled="JSON.stringify(ruleForm.details).indexOf(scope.row.id)!=-1"><i class="el-icon-edit"></i>添加</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -217,8 +217,7 @@ export default {
       numform:{   //点击修改弹出的表单的信息
         totalQuantity:0,
         sort:1,
-        purchasingQuantity:0,
-        remainingQuantity:0 
+        purchasingQuantity:0
       },
       ruleForm:{
         status:0,
@@ -310,9 +309,12 @@ export default {
     // 点击修改弹出可以修改数据的弹出框
     edit(row){
       this.dialogVisible2=true;
-      // console.log('点击修改，获取该行数据信息')
-      // console.log(row)
+      console.log('点击修改，获取该行数据信息')
+      console.log(row)
       this.numform=row;
+      if(!this.numform.totalQuantity){
+        this.numform.purchasingQuantity=0;
+      }
     },
     submit2(formName){
       this.$refs[formName].validate((valid) => {

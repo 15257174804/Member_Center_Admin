@@ -50,6 +50,12 @@
         </el-button>
       </div>
       <div class="searchbox">
+        <el-button @click="exportTemp">
+          <i class="el-icon-download"></i>
+          模板下载
+        </el-button>
+      </div>
+      <div class="searchbox">
         <div>
           <el-upload
             :action="axios.defaults.baseURL +'/b2c/product/good/importdata?token=' + token"
@@ -57,8 +63,7 @@
             :multiple='false'
             :limit='1'
             ref="upload"
-            show-file-list
-            :file-list="fileList"
+            :show-file-list="false"
             :on-success='uploadSuccess'
             :on-error='uploadErr'
             :before-upload="beforeAvatarUpload"
@@ -69,12 +74,7 @@
         </div>
       </div>
       
-      <div class="searchbox">
-        <el-button @click="exportTemp">
-          <i class="el-icon-download"></i>
-          模板下载
-        </el-button>
-      </div>
+      
       
     </div>
 
@@ -124,7 +124,7 @@
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page.sync="currentPage"
       :page-sizes="[5, 10, 15, 20]"
       :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
@@ -155,26 +155,32 @@ export default {
     };
   },
   mounted() {
-    console.log('mounted11111')
-    this.pagesize=this.$route.query.pagesize;
-    this.currentPage=this.$route.query.currentPage;
+    // console.log('mounted11111')
+    if(this.$route.query.pagesize){
+      this.pagesize=Number(this.$route.query.pagesize);
+      this.currentPage=Number(this.$route.query.currentPage);
+    }else{
+      this.pagesize=5;
+      this.currentPage=1;
+    }
+    
     this.getDataList();
   },
   activated(){
-    console.log('acticated222222222')
+    // console.log('acticated222222222')
   },
   deactivated(){
-    console.log('deactivated33333333333')
+    // console.log('deactivated33333333333')
   },
   methods: {
     exportTemp(){
-      console.log(1)
+      // console.log(1)
       window.open('http://health.alink365.cn/temp/goodInfoTemp.xlsx')
     },
      // 上传成功
     uploadSuccess (response, file, fileList) {
-      console.log('成功')
-      console.log(file)
+      // console.log('成功')
+      // console.log(file)
       this.$message.success('文件上传成功');
       this.getDataList();
       //if (response.code === 0) {
@@ -184,15 +190,15 @@ export default {
     },
     // 上传失败
     uploadErr (err, file, fileList) {
-      console.log('失败')
-      console.log(file)
+      // console.log('失败')
+      // console.log(file)
       this.$message.error('文件上传失败');
       //this.row.materialUrl = ''
     },
     // 上传之前 (类型检测)
     beforeAvatarUpload (file) {
-      console.log('上传之前检测')
-      console.log(file)
+      // console.log('上传之前检测')
+      // console.log(file)
       /*
       let arr = [ `image/png`, `image/jpeg` ]
       let isType = arr.includes(file.type)
@@ -213,7 +219,7 @@ export default {
     },
     // 商品上下架
     change(row){
-      console.log(row)
+      // console.log(row)
       let params={
         id:row.id
       }
@@ -288,10 +294,11 @@ export default {
       let params = this.searchParams;
       params.pageindex = this.currentPage;
       params.pagesize = this.pagesize;
+      // console.log(params)
       this.axios
         .get("/b2c/product/good/list",{params})
         .then(res => {
-          console.log(res.data)
+          // console.log(res.data)
           this.loading = false;
           if(res.data.code < 0){
             this.$notify.error({

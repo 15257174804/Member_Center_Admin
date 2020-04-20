@@ -32,7 +32,7 @@
       </el-form-item>
       <div class="reg">
         <!-- <div style="margin-right:10px;">用户注册</div> -->
-        <div @click="regcompany">企业注册</div>
+        <!-- <div @click="regcompany">企业注册</div> -->
       </div>
     </el-form>
   </div>

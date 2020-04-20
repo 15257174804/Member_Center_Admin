@@ -260,9 +260,16 @@ export default {
     // 获取数据
     getDataList() {
       this.loading = true;
-      let params = this.searchParams;
+      // console.log(1)
+      // console.log(this.searchParams)
+      let params =JSON.parse(JSON.stringify(this.searchParams));
       params.pageindex = this.currentPage;
       params.pagesize = this.pagesize;
+      if(params.status===''){
+        params.showAll=true;
+      }
+      // console.log(2)
+      // console.log(params)
       this.axios
         .get("/crm/corporation/list",{params})
         .then(res => {

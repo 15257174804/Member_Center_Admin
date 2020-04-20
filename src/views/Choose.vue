@@ -41,7 +41,11 @@ export default {
   },
   methods:{
     regcompany(){
-      this.$router.push('/regcompany')
+      const that=this;
+      // console.log(1)
+      // console.log(this.)
+      that.$router.push({path:'/regcompany'})
+      // console.log(2)
     },
     submitForm(corpId) {
       // console.log(corpId);

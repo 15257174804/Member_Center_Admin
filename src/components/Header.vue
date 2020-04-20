@@ -172,7 +172,7 @@ export default {
     },
     getBreadcrumb() {
       let matched = this.$route.matched;
-      console.log(matched)
+      // console.log(matched)
       this.hisRouteList = this.hisRouteList.concat(matched[1]);
       //如果不是首页
       if (!this.isHome(matched[0])) {

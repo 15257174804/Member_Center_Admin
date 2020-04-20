@@ -55,7 +55,13 @@
           重置
         </el-button>
       </div>
-      <el-button style="padding:12px 20px;background:#fdc52d;border:1px solid #fdc52d;float:right;" type="info" @click="exportExcel">导出</el-button>
+      <div class="searchbox">
+        <el-button @click="exportExcel()">
+          <i class="el-icon-document-checked"></i>
+          导出
+        </el-button>
+      </div>
+      <!-- <el-button style="padding:12px 20px;background:#fdc52d;border:1px solid #fdc52d;float:right;" type="info" @click="exportExcel">导出</el-button> -->
       <br>
       <div class="searchbox">
         起始时间：
