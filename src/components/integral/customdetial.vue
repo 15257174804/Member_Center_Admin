@@ -43,6 +43,13 @@
           <el-form-item class="half-form" label="是否启用">
             <el-switch active-color="#13ce66" v-model="form.baseInfo.isValid"></el-switch>
           </el-form-item>
+          <!-- <el-form-item class="half-form" label="会员标签">
+            <el-button type="text" @click="addLabel"><i class="el-icon-plus"></i>添加</el-button>
+            <br/>
+            <el-tag>标签一</el-tag>
+          </el-form-item> -->
+          
+
         </el-tab-pane>
         <el-tab-pane label="积分明细" name="assistInfo">
           <el-table
@@ -57,7 +64,6 @@
           </el-table>
           <!-- 分页 -->
           <el-pagination
-            @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :current-page="curP"
             :page-size="pageSize"
@@ -77,6 +83,7 @@ export default {
   name:'customdetial',
   data(){
     return {
+      
       tabName: 'basicInfo',//默认选项卡
       details:[],  //积分明细
       pageSize:5,
@@ -106,18 +113,13 @@ export default {
     //tab切换
     handleClick(tab, event) {
     },
-    // 每页多少条
-    handleSizeChange(size) {
-      this.pageSize = size;
-      this.getData();
-    },
     // 第几页
     handleCurrentChange(curP) {
       this.curP = curP;
-      this.getData();
+      this.getScore();
     },
     onSubmit(form){
-      console.log('保存')
+      // console.log('保存')
       this.$refs[form].validate((valid) =>{
         if (valid){
           this.$confirm('是否提交保存?', '提示', {
@@ -127,7 +129,7 @@ export default {
           }).then(()=>{
             this.axios.post('/crm/custom/update',this.form)
             .then(res=>{
-              console.log(res.data)
+              // console.log(res.data)
               if(res.data.code>0){
                 this.$message({
                   type: 'success',
@@ -157,18 +159,22 @@ export default {
       }
       this.axios.get('/crm/custom/detail',{params})
       .then(res=>{
-        console.log('加载页面数据')
-        console.log(res.data)
+        // console.log('加载页面数据')
+        // console.log(res.data)
         this.form=res.data.msg;
-        console.log(this.form.baseInfo.sex)
+        // console.log(this.form.baseInfo.sex)
       })
     },
     //获取积分明细
     getScore(){
-      this.axios.get('crm/scoreRecord/my')
+      let params={
+        pageindex:this.curP,
+        pagesize:this.pageSize
+      }
+      this.axios.get('crm/scoreRecord/my',{params})
       .then(res=>{
-        console.log('积分列表')
-        console.log(res.data)
+        // console.log('积分列表')
+        // console.log(res.data)
         this.details=res.data.msg.datas;
         for(var i=0;i<this.details.length;i++){
           if(this.details[i].recordType==1){

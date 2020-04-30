@@ -45,8 +45,14 @@
       v-loading="loading"
       border
       :data="tableData"
+      stripe
       style="width: 100%">
       <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(curP - 1) * pageSize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="name" label="活动名称" ></el-table-column>
       <el-table-column prop="warmUpTime" label="预热时间" sortable></el-table-column>
       <el-table-column prop="startTime" label="抢购开始时间" sortable></el-table-column>
@@ -104,8 +110,8 @@ export default {
   methods:{
     // 跳转到对应预约活动的详情
     edit(row){
-      console.log('点击详情，改行的row')
-      console.log(row)
+      // console.log('点击详情，改行的row')
+      // console.log(row)
       // console.log(row.id)
       this.$router.push({
         name:'limiteddetail',
@@ -117,7 +123,7 @@ export default {
     },
     // 停止活动状态
     stop(row){
-      console.log('这是修改活动状态')
+      // console.log('这是修改活动状态')
       this.$confirm('确定要停止/启动该活动吗？','提示',{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -182,18 +188,19 @@ export default {
       this.getData();
     },
     getData(){
-      console.log('获取页面数据')
+      // console.log('获取页面数据')
       this.loading = true;
       let params = this.searchParams;
       params.pageindex = this.curP;
       params.pagesize = this.pageSize;
-      console.log(params)
+      // console.log(params)
       this.axios.get('/b2c/discount/list',{params})
       .then(res=>{
         this.loading = false;
-        console.log(res.data)
+        // console.log(res.data)
         if(res.data.code>0){
           this.tableData=res.data.msg.datas;
+          this.totalCount=res.data.msg.totalCount;
         }else{
           this.$notify.error({
             title: '错误',
@@ -218,5 +225,8 @@ export default {
 
 .el-table .success-row {
   background: #f0f9eb;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

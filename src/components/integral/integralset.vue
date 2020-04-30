@@ -10,7 +10,7 @@
           <el-input v-model="ruleForm.scoreRate" placeholder="消费1元获取多少积分"></el-input>
         </el-form-item> -->
         <el-form-item label="兑换比例" prop="scoreRate">
-          <span style="color:#606266;">消费 <input type="text" v-model="ruleForm.scoreRate">元，获取1个积分</span>
+          <span style="color:#606266;">消费 <input type="number" v-model="ruleForm.scoreRate">元，获取1个积分</span>
         </el-form-item>
         <!-- 预约方式控制个人和企业的预约数量的显示隐藏 -->
         <el-form-item label="小数舍入方式" prop="roundType">
@@ -70,18 +70,19 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          let params=this.ruleForm;
-          // if(params.roundType=="舍去小数点"){
-          //   params.roundType=1
-          // }else if(params.roundType=="进位"){
-          //   params.roundType=2
-          // }else{
-          //   params.roundType=3
-          // }
+          // console.log(this.ruleForm)
+          let params=JSON.parse(JSON.stringify(this.ruleForm));
+          if(params.roundType=="舍去小数点"){
+            params.roundType=1
+          }else if(params.roundType=="进位"){
+            params.roundType=2
+          }else if(params.roundType=="四舍五入"){
+            params.roundType=3
+          }
           this.axios.post('/crm/scoreStrategy/save',params)
           .then(res => {
-            console.log('这是积分策略保存')
-            console.log(res.data)
+            // console.log('这是积分策略保存')
+            // console.log(res.data)
             if(res.data.code > 0){
               this.$message({
                 type: 'success',
@@ -101,8 +102,8 @@ export default {
     getData(){
       this.axios.get('/crm/scoreStrategy/list',{})
       .then(res=>{
-        console.log('获取页面数据')
-        console.log(res.data)
+        // console.log('获取页面数据')
+        // console.log(res.data)
         if(res.data.msg.datas.length==0){
           return
         }else{
@@ -131,7 +132,7 @@ export default {
 input{
   padding-left:15px;
   border:1px solid #DCDFE6;
-  width:50px;
+  width:66px;
   border-radius: 3px;
 }
 </style>

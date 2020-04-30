@@ -6,12 +6,13 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     driverkey: 0,
-    user_name: localStorage.getItem('user_name')?localStorage.getItem('user_name'):"",
-    group_name:sessionStorage.getItem('group_name')?sessionStorage.getItem('group_name'):"",
+    user_name: localStorage.getItem('user_name')?localStorage.getItem('user_name'):"请重新登录",
+    group_name:sessionStorage.getItem('group_name')?sessionStorage.getItem('group_name'):"请重新登录",
     token:"",
     flodKey: 0,
     clientId:'',
-    groupId:''
+    groupId:'',
+    isAdmin:''
   },
   getters: {
     change(state) {
@@ -35,6 +36,9 @@ export default new Vuex.Store({
     },
     setGroupId(state,groupid){
       state.groupId=groupid;
+    },
+    setAdmin(state,isAdmin){
+      state.isAdmin=isAdmin;
     }
   },
   actions: {

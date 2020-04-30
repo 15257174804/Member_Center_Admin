@@ -7,11 +7,11 @@
         <el-input v-model="form.abbreviation" placeholder="请输入企业简称"></el-input>
       </el-form-item>
       <el-form-item label="企业类型" prop="type">
-        <el-select v-model="form.type" placeholder="请选择企业类型" @change="changeCompanyType($event)">
+        <el-select v-model="form.type" placeholder="请选择企业类型" @change="changeCompanyType($event)" :disabled="title!='新建企业'">
           <el-option v-for="item in companyTypeList" :key="item.id" :label="item.name" :value="item.id"></el-option> 
         </el-select>
       </el-form-item>
-      <div :class="form.realLevel == 1?'hide':''">
+      <div v-if="form.realLevel&&form.realLevel!=1">
         <el-form-item label="所属企业" prop="parentId">
           <!-- v-model="form.parentId=0?'':form.parentId" -->
           <el-select v-model="form.parentId" placeholder="请选择所属企业" :disabled="form.realLevel == 1 ||form.type==''">
@@ -33,7 +33,7 @@
       <el-form-item label="联系方式">
         <el-input v-model="form.contactNumber" placeholder="请输入联系方式"></el-input>
       </el-form-item>
-      <el-form-item label="营业时间" required prop="businessHours">
+      <el-form-item label="营业时间" prop="businessHours">
         <el-input v-model="form.businessHours" placeholder="请输入营业时间"></el-input>
       </el-form-item>
       <city @addrData="getCity" :addrData="form"></city>  
@@ -45,7 +45,7 @@
         <el-button>取消</el-button>
       </el-form-item> -->
       <el-form-item label="企业logo" prop="logo">
-        <el-upload
+        <el-upload :class="{'hide':hideUpload}"
           :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
           list-type="picture-card"
           :on-preview="handlePictureCardPreview"
@@ -72,11 +72,11 @@ export default {
   name: "basic",
   data() {
     return {
+      hideUpload: false,
       token: localStorage.getItem('loginToken'),
       fileName:'',
       dialogImageUrl: '',
       dialogVisible: false,
-      hideUpload: false,
       fileList:[],
       limitCount:1,
       companyTypeList:[],//企业类型
@@ -91,29 +91,24 @@ export default {
         ],
         lawMan:[
           { required: true, message: '请输入企业法人信息', trigger: 'blur' }
-        ],
-        address:[
-          { required: true, message: '请输入详细地址', trigger: 'blur' }
-        ],
-        businessHours:[
-          { required: true, message: '请输入企业营业时间', trigger: 'blur' }
         ]
       }
     };
   },
-  props: ["form"],//从父组件接受的数据
-  mounted() {
+  props: ["form","title"],//从父组件接受的数据
+  created() {
     this.getCity(this.form);
-    this.getCompanyTypeList();
     this.getCompanyDataList();
+    this.getCompanyTypeList();
     // console.log(1)
     // console.log(this.form.logo)
-    if(this.form.logo!=''){
+    if(this.form.logo&&this.form.logo!=''){
       this.fileName=this.form.logo;
       this.fileList.push({
         name: this.form.logo,
         url: global_.baseURL + '/b2c/image/' + this.form.logo
       })
+      this.hideUpload=this.fileList.length>=1;
     }
   },
   watch:{
@@ -137,24 +132,21 @@ export default {
     handleRemove(file,fileList) {
       // console.log('移除之后的回调')
       // console.log(file);
+      this.fileName='';
+      this.hideUpload = fileList.length >= 1;
     },
     handleAvatarSuccess(file,fileList){
       // console.log('上传成功之后的回调')
       // console.log(file)
       // console.log(fileList)
+      // console.log(this.fileList)
       this.fileName=file.msg.fileName;
+      this.hideUpload = this.fileList.length >= 1;
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    // handleChange(file, fileList) {
-    //   console.log('change之后的回调')
-    //   console.log(file)
-    //   console.log(fileList)
-    //   // this.fileName=file.msg.fileName;
-    //   this.fileList = fileList;
-    // },
     // 从子组件获取省市区
     getCity(data) {
       this.province = data.province;
@@ -173,31 +165,38 @@ export default {
     //获取店铺列表
     getCompanyDataList() {
       var params = {
-        level: this.form.level-1
+        level: 0
+      }
+      if(this.form.realLevel==''){
+        params.level=0
+      }else{
+        params.level=this.form.realLevel-1
       }
       this.axios
-        .get("/crm/corporation/list", {params})
-        .then(res => {
-          this.companyDataList = res.data.msg.datas;
-          // console.log('查看所属企业')
-          // console.log(this.companyDataList)
-        })
-        .catch(err => {
-        });
+      .get("/crm/corporation/list", {params})
+      .then(res => {
+        this.companyDataList = res.data.msg.datas;
+        // console.log('查看所属企业')
+        // console.log(this.companyDataList)
+      })
+      .catch(err => {
+      });
     },
     //切换企业类型
     changeCompanyType(i){
+      // console.log(i)
       this.form.parentId = "";
-      this.form.level = this.companyTypeList[i-1].virtualLevel;
+      this.form.realLevel = this.companyTypeList[i-1].currentLevel;
       // console.log(this.form)
       this.getCompanyDataList();
-    }
+    },
+    
   }
 };
 </script>
 <style>
-.hide .el-upload--picture-card {
-    display: none;
+.hide .el-upload--picture-card{
+  display: none;
 }
 .avatar-uploader .el-upload {
   border: 0px;

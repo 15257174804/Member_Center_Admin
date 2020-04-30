@@ -21,8 +21,8 @@
           <el-select v-model="ruleForm.floorType" placeholder="请选择">
             <el-option
               v-for="item in options"
-              :key="item.value"
-              :label="item.label"
+              :key="item.id"
+              :label="item.name"
               :value="item.value">
             </el-option>
           </el-select>
@@ -34,7 +34,9 @@
           <colorPicker v-model="ruleForm.backColor" />
         </el-form-item>
         <el-form-item label="背景图" prop="backImg">
-          <el-upload
+          <span style="color:#909399;background-color: #f4f4f5;">广告位图片优先级高于背景图片</span>
+          <!-- 之前的样式,没有删除按钮的样式 -->
+          <!-- <el-upload
             class="avatar-uploader"
             :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
             :show-file-list="false"
@@ -43,12 +45,30 @@
             <img v-if="imgUrl" :src="imgUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+          <el-dialog :visible.sync="dialogVisibleImg">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog> -->
+          <el-upload :class="{'hide':hideUpload}"
+            :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
+            list-type="picture-card"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+            :file-list="fileList"
+            :limit="1">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisibleImg">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
+
         </el-form-item>
       
 
       <h1>广告位信息 <span style="color:#909399;background-color: #f4f4f5;">(楼层类型为商品板块时可选择商品，楼层类型为企业板块时可选择企业)</span></h1>
         <el-row>
-          <el-button v-if="ruleForm.floorType==5" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choose">选择产品<i class="el-icon-plus el-icon--right"></i></el-button>
+          <el-button v-if="ruleForm.floorType==5||ruleForm.floorType==1" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choose">选择产品<i class="el-icon-plus el-icon--right"></i></el-button>
           <el-button v-else-if="ruleForm.floorType==2" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choosec">选择企业<i class="el-icon-plus el-icon--right"></i></el-button>
           <el-button v-else-if="ruleForm.floorType==8" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="chooseclass">选择分类<i class="el-icon-plus el-icon--right"></i></el-button>
           <el-button v-else style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choosepicture">选择图片<i class="el-icon-plus el-icon--right"></i></el-button>
@@ -253,7 +273,7 @@
           <el-table-column prop="cellGoodId" label="商品ID"  v-if="ruleForm.floorType==5"  width="100"></el-table-column>
           <el-table-column prop="cellCorpId" label="企业ID" v-if="ruleForm.floorType==2"  width="100"></el-table-column>
           <el-table-column prop="goodClassId" label="类别ID" v-if="ruleForm.floorType==8"  width="100"></el-table-column>
-          <el-table-column prop="cellName" label="名称"  width="200" v-if="ruleForm.floorType==5||ruleForm.floorType==2||ruleForm.floorType==8"></el-table-column>
+          <el-table-column prop="cellName" label="名称"  width="200" ></el-table-column>
           <el-table-column prop="img" label="图片"  width="100">
             <template slot-scope="scope">
               <img v-if="scope.row.img" height="100" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.img"  class="imgsize"/>
@@ -290,7 +310,7 @@
               <el-input :disabled="numform.isLink=='否'" v-model="numform.cellLink" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="图片" prop="img">
-              <el-upload
+              <!-- <el-upload
                 class="avatar-uploader"
                 :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
                 :show-file-list="false"
@@ -298,7 +318,18 @@
                 :before-upload="beforeAvatarUpload">
                 <img v-if="imgUrl2" :src="imgUrl2" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload> -->
+
+              <el-upload :class="{'hide':hideUpload}"
+                :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
+                list-type="picture-card"
+                :on-remove="handleRemove2"
+                :on-success="handleAvatarSuccess2"
+                :file-list="fileList2"
+                :limit="1">
+                <i class="el-icon-plus"></i>
               </el-upload>
+
             </el-form-item>
             <el-form-item >
               <el-button type="primary" @click="submit2('numform')">保存</el-button>
@@ -328,34 +359,46 @@ export default {
       imgUrl:'',
       imgUrl2:'',
       options: [{
+          id:0,
           value: 1,
-          label: 'banner板块'
+          name: 'banner板块'
         }, {
+          id:1,
           value: 2,
-          label: '企业板块'
+          name: '企业板块'
         }, {
+          id:2,
           value: 3,
-          label: '活动板块'
+          name: '活动板块'
+        },{
+          id:3,
+          value: 4,
+          name: '热卖商品'
         },
-        //  {
-        //   value: 4,
-        //   label: '热卖商品板块'
-        // }, 
         {
+          id:4,
           value: 5,
-          label: '商品板块'
+          name: '商品板块'
         },{
+          id:5,
           value: 6,
-          label: '秒杀板块'
+          name: '秒杀板块'
         },{
+          id:6,
           value: 7,
-          label: '预售板块'
+          name: '预售板块'
         },{
+          id:7,
           value: 8,
-          label: '商品分类板块'
+          name: '商品分类板块'
         },{
+          id:8,
           value: 9,
-          label: '优惠券板块'
+          name: '优惠券板块'
+        },{
+          id:9,
+          value: 10,
+          name: '公告'
         }
       ],
       dialogVisible:false,    //选择产品
@@ -365,6 +408,12 @@ export default {
       goodlist:[],  //保存查询到的所有的商品列表
       companylist:[],  //保存企业列表
       classList:[],
+      // 背景图相关
+      dialogImageUrl: '',
+      dialogVisibleImg: false,
+      fileList:[],
+      fileList2:[],
+      hideUpload: false,
       searchParams:{
         keyword:''
       },
@@ -395,11 +444,11 @@ export default {
         floorName: [
           { required: true, message: '请输入楼层名称', trigger: 'blur' }
         ],
-        floorLink: [
-          { required: true, message: '请输入楼层链接', trigger: 'blur' }
-        ],
         floorType: [
           { required: true, message: '请选择楼层类型', trigger: 'change' }
+        ],
+        adSort:[
+          { required: true, message: '请输入楼层序号', trigger: 'blur' }
         ]
       }
     }
@@ -439,12 +488,13 @@ export default {
     },
     //添加分类
     addclass(row){
-      console.log('点击添加')
-      console.log(row)
+      // console.log('点击添加')
+      // console.log(row)
       let obj={
         goodClassId:row.id,
         cellName:row.name,
-        img:row.logo
+        img:row.logo,
+        cellType:8
       }
       this.ruleForm.cells=this.ruleForm.cells.concat(obj)
     },
@@ -495,12 +545,13 @@ export default {
     },
     //添加企业
     addc(row){
-      console.log('点击添加')
-      console.log(row)
+      // console.log('点击添加')
+      // console.log(row)
       let obj={
         cellCorpId:row.id,
         cellName:row.name,
-        img:row.logo
+        img:row.logo,
+        cellType:2
       }
       this.ruleForm.cells=this.ruleForm.cells.concat(obj)
     },
@@ -569,32 +620,41 @@ export default {
     },
     //添加商品
     add(row){
-      console.log('点击添加')
-      console.log(row)
+      // console.log('点击添加')
+      // console.log(row)
       let obj={
         cellGoodId:row.id,
-        cellName:row.goodName
+        cellName:row.goodName,
+        cellType:5
       }
       this.ruleForm.cells=this.ruleForm.cells.concat(obj)
     },
     // 广告位编辑
     edit(row){
-      console.log('编辑')
-      console.log(row)
+      // console.log('编辑')
+      // console.log(row)
+      this.fileList2=[];
       this.dialogVisible2=true;
       this.edittitle='编辑'
       this.numform=row;
       if(row.img && row.img!=''){
-        this.imgUrl2=this.axios.defaults.baseURL + '/b2c/image/' + this.numform.img;
+        // this.imgUrl2=this.axios.defaults.baseURL + '/b2c/image/' + this.numform.img;
+        this.fileList2.push({
+          name: this.numform.img,
+          url: this.axios.defaults.baseURL + '/b2c/image/' + this.numform.img
+        })
+        this.hideUpload = this.fileList2.length >= 1;
       }else{
-        this.imgUrl2='';
+        // this.imgUrl2='';
+        this.fileList2=[]
+        this.hideUpload = this.fileList2.length >= 1;
       }
       // console.log(this.numform)
     },
     delgood(row){
-      console.log('删除')
-      console.log(this.ruleForm.cells)
-      console.log(row)
+      // console.log('删除')
+      // console.log(this.ruleForm.cells)
+      // console.log(row)
       this.$confirm('确定要删除该条广告位吗？','提示',{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -618,7 +678,7 @@ export default {
             }
           } 
         }
-        console.log(this.ruleForm.cells)
+        // console.log(this.ruleForm.cells)
 
       }).catch(()=>{
         this.$message({
@@ -628,19 +688,21 @@ export default {
       })
 
     },
+    // 添加图片
     choosepicture(){
-      console.log('添加图片')
-      console.log(this.ruleForm.cells)
+      // console.log('添加图片')
+      // console.log(this.ruleForm.cells)
       this.edittitle='新增'
       this.dialogVisible2=true;
       this.numform.cellSort='';
       this.numform.cellLink='';
       this.numform.img='';
       this.imgUrl2='';
+      this.fileList2=[];
       this.numform.cellName='';
     },
     submit2(formName){
-      console.log(this.numform)
+      // console.log(this.numform)
       this.dialogVisible2 = false;
       if(this.edittitle=='编辑'){
         for(var i=0;i<this.ruleForm.cells.length;i++){
@@ -652,37 +714,55 @@ export default {
         let obj=JSON.parse(JSON.stringify(this.numform));
         this.ruleForm.cells=this.ruleForm.cells.concat(obj)
       }
+      this.fileList2=[]
     },
     // 上传图片成功之后的回调2
-    handleAvatarSuccess2(res, file) {
-      console.log('图片2上传成功')
+    handleAvatarSuccess2(res, file,fileList) {
+      // console.log('图片2上传成功')
       this.numform.img=res.msg.fileName;
       this.imgUrl2 = URL.createObjectURL(file.raw);
-
-      console.log(file);
-      console.log(res)
+      this.hideUpload = fileList.length >= 1;
+      // console.log(file);
+      // console.log(res)
+    },
+    handleRemove2(file,fileList) {
+      // console.log('移除之后的回调')
+      // console.log(fileList);
+      // console.log(2)
+      this.numform.img=''
+      // console.log(this.ruleForm.backImg)
+      this.hideUpload = fileList.length >= 1;
+    },
+    // 图片预览
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisibleImg = true;
+    },
+    handleRemove(file,fileList) {
+      // console.log('移除之后的回调')
+      // console.log(fileList);
+      // console.log(2)
+      this.ruleForm.backImg=''
+      // console.log(this.ruleForm.backImg)
+      this.hideUpload = fileList.length >= 1;
     },
     // 上传背景图成功之后的回调
-    handleAvatarSuccess(res, file) {
-      console.log('图片上传成功')
+    handleAvatarSuccess(res, file,fileList) {
+      // console.log('图片上传成功')
       this.ruleForm.backImg=res.msg.fileName;
       this.imgUrl = URL.createObjectURL(file.raw);
-      console.log(file);
-      console.log(res)
+      // console.log(file);
+      // console.log(res);
+      // console.log(this.fileList)
+      this.hideUpload = fileList.length >= 1;
     },
     // 背景图上传之前的回调
     beforeAvatarUpload(file) {
-      console.log(file)
-      // const isJPG = file.type === 'image/jpeg';
-      // const isLt2M = file.size / 1024 / 1024 < 2;
-
-      // if (!isJPG) {
-      //   this.$message.error('上传头像图片只能是 JPG 格式!');
+      // console.log(file)
+      // console.log(this.fileList)
+      // if(this.fileList.length>0){
+      //   this.$message.warning('只允许上传一张图片')
       // }
-      // if (!isLt2M) {
-      //   this.$message.error('上传头像图片大小不能超过 2MB!');
-      // }
-      // return isJPG && isLt2M;
     },
     // 返回按钮
     goback(){
@@ -702,8 +782,8 @@ export default {
           let params=this.ruleForm;
           this.axios.post('/b2c/adFloor/save',params)
           .then(res => {
-            console.log('这是保存提交是返回的数据')
-            console.log(res.data)
+            // console.log('这是保存提交是返回的数据')
+            // console.log(res.data)
             if(res.data.code > 0){
               this.$message({
                 type: 'success',
@@ -729,10 +809,15 @@ export default {
       }
       this.axios.get('/b2c/adFloor/findOne',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.ruleForm=res.data.msg;
         if(this.ruleForm.backImg!=''){
           this.imgUrl =this.axios.defaults.baseURL + '/b2c/image/' + this.ruleForm.backImg;
+          this.fileList.push({
+            name: this.ruleForm.backImg,
+            url: this.axios.defaults.baseURL + '/b2c/image/' + this.ruleForm.backImg
+          })
+          this.hideUpload = this.fileList.length >= 1;
         }
         for(var i=0;i<this.ruleForm.cells.length;i++){
           if(this.ruleForm.cells[i].isLink){
@@ -740,6 +825,18 @@ export default {
           }else{
             this.ruleForm.cells[i].isLink='否'
           }
+        }
+      })
+    },
+    // 获取楼层
+    getOption(){
+      let params={
+        status:1
+      }
+      this.axios.get('/b2c/floorType/list',{params})
+      .then(res=>{
+        if(res.data.msg.datas.length>0){
+          this.options=res.data.msg.datas;
         }
       })
     }
@@ -750,11 +847,15 @@ export default {
       this.title=this.$route.query.title;
       this.getData();
     }
+    this.getOption();
   }
 }
 </script>
 
 <style lang="scss">
+  .hide .el-upload--picture-card{
+    display: none;
+  }
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
@@ -789,4 +890,10 @@ export default {
     height:50px;
     border-radius: 5px;
   }
+  .m-colorPicker .colorBtn[data-v-11842410]{
+    border:1px solid #DCDFE6;
+  }
+  .searchbox{
+  font-size: 14px;
+}
 </style>

@@ -36,6 +36,8 @@ for (let key in filters) {
 import vcolorpicker from 'vcolorpicker'
 Vue.use(vcolorpicker)
 
+import 'jquery'
+
 //base64加密
 const Base64 = require('js-base64').Base64
 

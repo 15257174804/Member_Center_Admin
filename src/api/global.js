@@ -1,4 +1,4 @@
-const baseURL = 'http://healthtest.alink365.cn'
+const baseURL = 'http://health.alink365.cn'
 
 // http://healthtest.alink365.cn
 

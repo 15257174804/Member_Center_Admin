@@ -148,7 +148,7 @@ export default {
       let params=this.form;
       this.axios.get('/crm/roles/save',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         if(res.data.code > 0){
           this.$message({
             type: 'success',
@@ -187,8 +187,8 @@ export default {
       this.axios
         .get("/crm/roles",{params})
         .then(res => {
-          console.log("角色列表查询")
-          console.log(res.data)
+          // console.log("角色列表查询")
+          // console.log(res.data)
           this.loading = false;
           if(res.data.code < 0){
             this.$notify.error({
@@ -212,5 +212,7 @@ export default {
 </script>
 
 <style>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

@@ -86,6 +86,7 @@
           <el-dialog :visible.sync="dialogVisible">
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
+
         </el-tab-pane>
         <el-tab-pane label="扩展信息" name="assistInfo">
           <el-form-item class="half-form" label="主治功能">
@@ -181,8 +182,8 @@ export default {
       }
       this.axios.get('/b2c/classify/tree',{params})
       .then(res=>{
-        console.log('获取树形数据')
-        console.log(res.data.msg)
+        // console.log('获取树形数据')
+        // console.log(res.data.msg)
         this.classList=res.data.msg;
       })
     },
@@ -191,32 +192,70 @@ export default {
       },
       //图片处理
       handleRemove(file, fileList) {
-        // console.log( _.pluck(fileList, 'name'));
-        // console.log( _.pluck(this.pictures, 'name'));
-        // return 
-        let _list = [];
-        this.pictures.forEach(row => {
-          fileList.forEach(row1 => {
-            if(row.name == row1.name){
-              _list.push({
-                isMain: row.isMain,
-                imgUrl: row.url
-              })
+        // let _list = [];
+        // this.pictures.forEach(row => {
+        //   fileList.forEach(row1 => {
+        //     if(row.name == row1.name){
+        //       _list.push({
+        //         isMain: row.isMain,
+        //         imgUrl: row.url
+        //       })
+        //     }
+        //   })
+        // })
+        // this.pictures = _list;
+        for(var i=0;i<this.pictures.length;i++){
+          if(this.pictures[i].id===file.id){
+            this.pictures.splice(i,1)
+          }
+        }
+        console.log(file)
+        if(file.id){
+          let params={
+            id:file.id
+          }
+          this.axios.get('/b2c/product/good/picture/delete',{params})
+          .then(res=>{
+            if(res.data.code>0){
+              this.$message.success('删除成功')
+            }else{
+              this.$message.error(res.data.msg)
             }
           })
-        })
-        this.pictures = _list;
+        }
       },
       handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
       },
       handleSuccess(response, file, fileList){
-        this.pictures.push({
-          name: response.msg.originName,
-          isMain: false,
-          imgUrl: response.msg.title
-        })
+        // this.pictures.push({
+        //   name: response.msg.originName,
+        //   isMain: false,
+        //   imgUrl: response.msg.title
+        // })
+        if(this.form.id!==''){
+          let params={
+            goodId:this.form.id,
+            imgUrl:response.msg.title,
+            isMain:false
+          }
+          this.axios.post('/b2c/product/good/picture/save',params)
+          .then(res=>{
+            if(res.data.code>0){
+              this.$message.success('上传成功')
+            }else{
+              this.$message.error(res.data.msg)
+            }
+          })
+        }else{
+          this.pictures.push({
+            name: response.msg.originName,
+            isMain: false,
+            imgUrl: response.msg.title
+          })
+        }
+
       },
       // 获取数据
       getData() {
@@ -252,17 +291,21 @@ export default {
           .get("/b2c/product/good/picture/list", {params})
           .then(res => {
             let data = res.data.msg.datas;
+            console.log(data)
             data.forEach(row => {
               this.fileList.push({
+                id:row.id,
                 name: row.imgUrl,
                 url: global_.baseURL + '/b2c/image/' + row.imgUrl
               })
               this.pictures.push({
+                id:row.id,
                 name: row.imgUrl,
                 isMain: row.isMain,
                 imgUrl: row.imgUrl
               })
             })
+
           })
           .catch(err => {
             console.log(err);

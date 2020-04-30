@@ -133,7 +133,7 @@ export default {
       this.axios
         .get("/crm/custom/list",{params})
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
           this.pagingtable = res.data.msg.datas;
         })
         .catch(err => {
@@ -159,6 +159,9 @@ td {
   background: rgb(240, 243, 244);
   width: 100%;
   height: 50px;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>
 

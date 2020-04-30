@@ -33,27 +33,27 @@
       <div class="orderList">
         <h3>待办订单</h3>
         <div>
-          <div>
+          <div @click="goOrder(1)">
             <p :class="{'blue':delievey!='0'}">{{delievey}}</p>
             <p>待发货订单</p>
           </div>
-          <div>
+          <div @click="goOrder(2)">
             <p :class="{'blue':pickup!='0'}">{{pickup}}</p>
             <p>待自提订单</p>
           </div>
-          <div>
+          <div @click="goOrder(3)">
             <p :class="distribute!='0'?'blue':''">{{distribute}}</p>
             <p>待分配订单</p>
           </div>
-          <div>
+          <div @click="goOrder(4)">
             <p :class="{'blue':preExamine!='0'}">{{preExamine}}</p>
             <p>待审核订单</p>
           </div>
-          <div>
+          <div @click="goOrder(5)">
             <p :class="{'blue':pickConfirmed!='0'}">{{pickConfirmed}}</p>
             <p>待确认订单</p>
           </div>
-          <div>
+          <div @click="goOrder(6)">
             <p :class="{'blue':afterSaleReview!='0'}">{{afterSaleReview}}</p>
             <p>待退款</p>
           </div>
@@ -95,20 +95,21 @@
         </div>
         <!-- 主体内容 -->
           <div v-if="show">
+
             <div v-if="newslist[0].titlePic!=''" class="firstlabel">
               <img :src="axios.defaults.baseURL + '/b2c/image/' + newslist[0].titlePic" />
               <div style="cursor: pointer;" @click="goNews">
                 <span>{{newslist[0].title|titleFormate}}</span>
-                <span style="color:#909399;font-size:12px;">{{newslist[0].context|titleFormate}}</span>
+                <span style="color:#909399;font-size:12px;">{{newslist[0].createTime|timeFormate}}</span>
               </div>
             </div>
-            <ul v-if="newslist[0].titlePic!=''">
-              <li v-for="(item,i) of newslist" :key="i" style="cursor: pointer;" @click="goNews">
+            <ul>
+              <li v-for="(item,i) of newslist.slice(1)" :key="i" style="cursor: pointer;" @click="goNews">
                 <span>{{item.title|titleFormate}}</span>
                 <span style="color:#909399;font-size:12px;margin-top:4px;">{{item.createTime|timeFormate}}</span>
               </li>
             </ul>
-            <div style="padding:50px;" v-if="newslist[0].titlePic==''">暂无公告</div>
+            <div style="padding:50px;" v-if="newslist.length==0">暂无公告</div>
           </div>
       </div>
       <!-- 销量排行 -->
@@ -281,6 +282,21 @@ export default {
     }
   },
   methods: {
+    goOrder(val){
+      if(val==1){
+        this.$router.push({path:'/order',query: {flag:true,status:'2'}})
+      }else if(val==2){
+        this.$router.push({path:'/order',query: {flag:true,status:'2'}})
+      }else if(val==3){
+        this.$router.push({path:'/order',query: {flag:true,pickupWay:'1'}})
+      }else if(val==4){
+        this.$router.push({path:'/preorder',query: {flag:true,status:'5'}})
+      }else if(val==5){
+        this.$router.push({path:'/order',query: {flag:true,clientConfirm:'0'}})
+      }else{
+        this.$router.push({path:'/refund'})
+      }
+    },
     // tab被选中时触发的事件 今日 7日 按月
     today(){
       this.activeName='今日';
@@ -455,7 +471,7 @@ export default {
         // console.log('获取自提待分配订单')
         // console.log(res.data)
         this.distribute=res.data.msg.count;
-        console.log(this.distribute!='0')
+        // console.log(this.distribute!='0')
       })
     },
     // 获取自提待确认订单
@@ -505,8 +521,8 @@ export default {
       }
       this.axios.get('/crm/user/loginLog/group',{params})
       .then(res=>{
-        console.log('获取UV')
-        console.log(res.data)
+        // console.log('获取UV')
+        // console.log(res.data)
         let _xdata=res.data.msg.datas;
         let _xAxis=[];
         let _series=[]
@@ -533,8 +549,8 @@ export default {
         
         this.option.xAxis.data=_xAxis
         this.option.series[1].data=_series
-        console.log(this.option.xAxis.data)
-        console.log(this.option.series[1].data)
+        // console.log(this.option.xAxis.data)
+        // console.log(this.option.series[1].data)
       })
     },
     // 获取公告列表
@@ -556,7 +572,7 @@ export default {
             this.newslist.push(obj);
           }
         }
-        console.log(this.newslist)
+        // console.log(this.newslist)
       })
     },
     goNews(){
@@ -565,8 +581,12 @@ export default {
   },
   mounted(){
     // 获取订单数量和预约订单数量
-    this.today();
+    
     this.getmychart();
+    
+  },
+  created(){
+    this.today();
     this.getNews();
   }
 };
@@ -574,7 +594,6 @@ export default {
  
 <style lang="scss">
   .iCountUp{
-    
     width:100%;height:100%;
     display: flex;
     flex-direction: row;
@@ -653,6 +672,7 @@ export default {
         .blue{color:#1964d8 !important;}
         h3{margin:0 0 33px 0;color:#303133;}
         div{
+          cursor: pointer;
           display: flex;
           justify-content: space-around;
           font-size: 14px;
@@ -684,22 +704,7 @@ export default {
           background-color: #fafafa;
           border-radius: 13px;
           h3{margin:0 0 33px 0;color:#303133;}
-          .content{
-            // div{
-            //   display: flex;
-            //   justify-content: space-between;
-            //   div{
-            //     padding:5px 18px 15px 0;
-            //     font-size: 14px;
-            //     color:#303133;
-            //     line-height: 30px;
-            //     .el-icon-plus{
-            //       width:30px;height:30px;
-            //     }
-            //   }
-            // }
-            
-          }
+          
         }
         .linechart{
           width:69%;

@@ -20,7 +20,7 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm(formData.value)">确定</el-button>
+          <el-button type="primary" @click="submitForm(formData.value)" :disabled="options.length==0">确定</el-button>
         </el-form-item>
         <div class="reg">还没有企业账号？<span @click="regcompany">注册</span></div>
       </el-form>
@@ -71,12 +71,16 @@ export default {
             this.$store.dispatch("setGroupInfoFun",this.options[i].label);
           }
         }
+        if(res.data.msg.emp.isAdmin){
+          this.$store.commit('setAdmin','isAdmin');
+        }
+        
         localStorage.setItem("loginToken", token);
         this.$router.push('/display');
         this.$store.commit('setClientId',res.data.msg.emp.clientId)
         this.$store.commit('setGroupId',res.data.msg.emp.groupId)
-        console.log(this.$store.state.clientId)
-        console.log(this.$store.state.groupId)
+        // console.log(this.$store.state.clientId)
+        // console.log(this.$store.state.groupId)
       })
       .catch(err=>{
         console.log(err)
@@ -104,7 +108,7 @@ export default {
         this.formData.value=this.options[0].value
         // this.submitForm(this.formData.value)
       }
-      console.log(this.options)
+      // console.log(this.options)
     })
   }
 }

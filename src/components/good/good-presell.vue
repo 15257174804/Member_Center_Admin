@@ -46,8 +46,13 @@
       border
       :data="tableData"
       style="width: 100%"
-      :row-class-name="tableRowClassName">
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      stripe>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(curP - 1) * pageSize + 1}} </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="预约名称" ></el-table-column>
       <el-table-column prop="limitType" label="预约类型" sortable></el-table-column>  
       <el-table-column prop="forPurchasing" label="是否限购" sortable></el-table-column>  
@@ -126,12 +131,13 @@ export default {
     reset(){
       this.searchParams.keyword="";
       this.searchParams.status="";
+      this.getData();
       // 这里可以加个恢复数据的功能
     },
     // 修改预约活动的状态，开启或关闭预约活动
     change(row){
-      console.log('看看row中有没有状态')
-      console.log(row)
+      // console.log('看看row中有没有状态')
+      // console.log(row)
       this.$confirm('确定要修改该条预约记录吗？','提示',{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -141,8 +147,8 @@ export default {
         if(row.status==1){   //如果status==1，就是是开启状态的话，就发送关闭预约请求
           this.axios.post('/b2c/preSell/stop',params)
           .then(res=>{
-            console.log('当status为1时')
-            console.log(res.data)
+            // console.log('当status为1时')
+            // console.log(res.data)
             if(res.data.code>0){
               this.$message({
                 type: 'success',
@@ -156,8 +162,8 @@ export default {
         }else{   //如果状态是关闭的话，就发送开启预约请求
           this.axios.post('/b2c/preSell/start',params)
           .then(res=>{
-            console.log('当status为0时')
-            console.log(res.data)
+            // console.log('当status为0时')
+            // console.log(res.data)
             if(res.data.code>0){
               this.$message({
                 type: 'success',
@@ -180,8 +186,8 @@ export default {
     },
     // 跳转到对应预约活动的详情
     edit(row){
-      console.log('这是表格中的row')
-      console.log(row)
+      // console.log('这是表格中的row')
+      // console.log(row)
       // console.log(row.id)
       this.$router.push({
         name:'goodpreselldetail',
@@ -231,8 +237,8 @@ export default {
       this.axios
         .get("/b2c/preSell/list",{params})
         .then(res => {
-          console.log("预约列表查询")
-          console.log(res.data)
+          // console.log("预约列表查询")
+          // console.log(res.data)
           this.loading = false;
           if(res.data.code < 0){
             this.$notify.error({
@@ -241,8 +247,8 @@ export default {
             })
           }else{
             this.tableData = res.data.msg.datas;
-            console.log('这是tableData中的数据，预约列表中的数据')
-            console.log(this.tableData)
+            // console.log('这是tableData中的数据，预约列表中的数据')
+            // console.log(this.tableData)
             this.totalCount = res.data.msg.totalCount;
             for(var i=0;i<this.tableData.length;i++){
               var item=this.tableData[i];
@@ -314,5 +320,8 @@ export default {
 .el-dropdown-link {
   cursor: pointer;
   
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

@@ -33,7 +33,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.companyType)
+    // console.log(this.companyType)
     this.getCompanyList();
   }
 };

@@ -49,6 +49,7 @@
     <el-table
       v-loading="loading"
       border
+      stripe
       :data="dataList"
       style="width: 100%">
       <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
@@ -128,14 +129,19 @@ export default {
     },
     // 保存弹框中表单信息
     save(){
-      this.dialogVisible = false;
       // 发送请求，保存数据
-      console.log(this.$refs.getform.ruleForm)
+      // console.log(this.$refs.getform.ruleForm)
       let params=this.$refs.getform.ruleForm;
+      if(params.name==''){
+        this.$message.error('请填写模板名称信息')
+        this.$refs.getform.ruleForm.name=""
+        return
+      }
+      this.dialogVisible = false;
       this.axios.post('/b2c/postage/policy/save',params)
       .then(res=>{
-        console.log('保存新建的模板信息')
-        console.log(res.data)
+        // console.log('保存新建的模板信息')
+        // console.log(res.data)
         if(res.data.code>0){
           this.$message({
             type: 'success',
@@ -170,7 +176,7 @@ export default {
     },
     // 查看详情
     edit(row){
-      console.log('查看详情')
+      // console.log('查看详情')
       this.title='运费详情';
       this.dialogVisible=true;
       
@@ -179,8 +185,8 @@ export default {
       }
       this.axios.get('/b2c/postage/policy/findbyid',{params})
       .then(res=>{
-        console.log('这是查看当个策略明细的数据')
-        console.log(res.data)
+        // console.log('这是查看当个策略明细的数据')
+        // console.log(res.data)
         this.parentform=Object.assign({},res.data.msg)
       }).catch(err=>{
         console.log(err)
@@ -188,7 +194,7 @@ export default {
     },
     // 删除模板
     del(row){
-      console.log('delete')
+      // console.log('delete')
       let params={
         id:row.id
       }
@@ -225,6 +231,7 @@ export default {
     //重置
     reset(){
       this.searchParams.name = "";
+      this.getData();
     },
     // 每页展示多少条数据
     handleSizeChange(size) {
@@ -238,14 +245,14 @@ export default {
     },
     //获取页面数据
     getData(){
-      console.log('获取页面数据')
+      // console.log('获取页面数据')
       let params=this.searchParams;
       params.pageindex = this.currentPage;
       params.pagesize = this.pagesize;
-      console.log(params)
+      // console.log(params)
       this.axios.get('/b2c/postage/policy/list',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         let obj=res.data.msg.datas;
         for(var key in obj){
           if(obj[key].valuationMethods==1){
@@ -260,6 +267,7 @@ export default {
           }
         }
         this.dataList=res.data.msg.datas;
+        this.totalCount=res.data.msg.totalCount;
       }).catch(err=>{
         console.log(err)
       })
@@ -277,5 +285,8 @@ export default {
   background: rgb(240, 243, 244);
   width: 100%;
   height: 50px;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

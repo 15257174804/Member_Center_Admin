@@ -2,7 +2,7 @@
   <div>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
       <el-form-item label="模板名称" prop="name" placeholder="请输入模板名称">
-        <el-input v-model="ruleForm.name"></el-input>
+        <el-input v-model="ruleForm.name" placeholder="请输入模板名称"></el-input>
       </el-form-item>
       <el-form-item label="发货时间" prop="sendInDays">
         <el-select v-model="ruleForm.sendInDays" placeholder="请选择发货时间">
@@ -29,9 +29,9 @@
       <div :class="ruleForm.weatherItIsFree==2?'isShow':''">
 
         <el-form-item label="计价方式" prop="valuationMethods">
-          <el-radio-group v-model="ruleForm.weatherItIsFree">
+          <el-radio-group v-model="ruleForm.valuationMethods">
             <el-radio :label="1">按件数</el-radio>
-            <el-radio :label="2" disabled>按数量</el-radio>
+            <el-radio :label="2">按重量</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-button type="primary" @click="add1" style="margin:10px 0 10px 0;">请设置区域运费计价方式 <i class="el-icon-plus"></i></el-button>
@@ -44,9 +44,9 @@
           style="width: 100%">
           <el-table-column type="index" label="序号" width="60"></el-table-column>
           <el-table-column prop="effectiveAreaName" label="运送区域"></el-table-column>
-          <el-table-column prop="defaultQuantity" label="首件数"></el-table-column>
+          <el-table-column prop="defaultQuantity" label="首件数/首重kg"></el-table-column>
           <el-table-column prop="defaultPrice" label="首费"></el-table-column>
-          <el-table-column prop="increaseQuantity" label="续件数"></el-table-column>
+          <el-table-column prop="increaseQuantity" label="续件数/续重kg"></el-table-column>
           <el-table-column prop="increasePrice" label="续费" ></el-table-column>
           <el-table-column
             label="操作"
@@ -59,9 +59,9 @@
         </el-table>
         <!-- 弹出框1 -->
         <el-dialog :visible.sync="dialogFormVisible1" append-to-body width="35%">
-          <el-form :model="form1" label-width="80px" ref="form1">
+          <el-form :model="form1" label-width="120px" ref="form1">
             <el-form-item label="配送区域" prop="effectiveArea">
-              <el-select v-model="form1.effectiveArea" multiple placeholder="请选择">
+              <el-select v-model="form1.effectiveArea" multiple placeholder="请选择" style="width:100%;">
                 <el-option
                   v-for="item in options"
                   :key="item.id"
@@ -70,13 +70,13 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="首件数" prop="defaultQuantity">
+            <el-form-item label="首件数/首重kg" prop="defaultQuantity">
               <el-input v-model="form1.defaultQuantity" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="首费" prop="defaultPrice">
               <el-input v-model="form1.defaultPrice" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="续件数" prop="increaseQuantity">
+            <el-form-item label="续件数/续重kg" prop="increaseQuantity">
               <el-input v-model="form1.increaseQuantity" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="续费" prop="increasePrice">
@@ -180,9 +180,6 @@ export default {
         name: [
           { required: true, message: '请输入模板名称', trigger: 'blur' }
         ],
-        // sendInDays: [
-        //   { required: true, trigger: 'change' ,message: '请输入发货时间'}
-        // ],
         weatherItIsFree: [
           { required: true, trigger: 'change' }
         ]
@@ -206,9 +203,9 @@ export default {
     },
     getparentform(){
       this.$nextTick(function(){
-        console.log('监听父组件是否有参数传过来')
+        // console.log('监听父组件是否有参数传过来')
         if(this.parentform.id){
-          console.log(this.parentform)
+          // console.log(this.parentform)
           this.ruleForm=this.parentform;
         }
         else{
@@ -221,28 +218,6 @@ export default {
             postageFreeList:[]   //免邮条件
           }
         }
-          // // console.log(Array.isArray(this.ruleForm.postageCalculateList[0].effectiveArea))
-          // console.log(this.ruleForm.postageCalculateList)
-          // console.log(this.ruleForm.postageFreeList)
-          // for(var i=0;i<this.ruleForm.postageCalculateList.length;i++){
-          //   this.ruleForm.postageCalculateList[i].effectiveArea=this.ruleForm.postageCalculateList[i].effectiveArea.split('"')
-          //   this.ruleForm.postageCalculateList[i].effectiveArea=this.ruleForm.postageCalculateList[i].effectiveArea.slice(1)
-          //   this.ruleForm.postageCalculateList[i].effectiveArea.pop()
-          //   this.ruleForm.postageCalculateList[i].effectiveArea=this.ruleForm.postageCalculateList[i].effectiveArea.filter((elem,index,arr)=>{
-          //     return elem!=','
-          //   })
-          //   console.log(this.ruleForm.postageCalculateList[i].effectiveArea)
-          // }
-          // for(var j=0;j<this.ruleForm.postageFreeList.length;j++){
-          //   this.ruleForm.postageFreeList[j].effectiveArea=this.ruleForm.postageFreeList[j].effectiveArea.split('"')
-          //   this.ruleForm.postageFreeList[j].effectiveArea=this.ruleForm.postageFreeList[j].effectiveArea.slice(1)
-          //   this.ruleForm.postageFreeList[j].effectiveArea.pop()
-          //   this.ruleForm.postageFreeList[j].effectiveArea=this.ruleForm.postageFreeList[j].effectiveArea.filter((elem,index,arr)=>{
-          //     return elem!=','
-          //   })
-          //   console.log(this.ruleForm.postageFreeList[j].effectiveArea)
-          // }
-
       })
     },
     // 获取省
@@ -258,7 +233,7 @@ export default {
           if (res.data.code > 0) {//请求成功
             this.options = res.data.msg.datas;//将获取的数据赋值
           } 
-          console.log(this.options)
+          // console.log(this.options)
       })
       .catch(err => {
           console.log(err);
@@ -282,7 +257,7 @@ export default {
     save1(formName){
       this.dialogFormVisible1=false;
       let index=this.form1.id;
-      console.log(11111)
+      // console.log(11111)
       this.form1.effectiveAreaName=''
       for(var i=0;i<this.form1.effectiveArea.length;i++){
         for(var j=0;j<this.options.length;j++){
@@ -292,9 +267,9 @@ export default {
           }
         }
       }
-      console.log(this.form1.effectiveArea)
-      console.log(this.form1.effectiveAreaName)
-      console.log(2222222222)
+      // console.log(this.form1.effectiveArea)
+      // console.log(this.form1.effectiveAreaName)
+      // console.log(2222222222)
 
       this.ruleForm.postageCalculateList[index].effectiveArea=this.form1.effectiveArea.join();
       this.ruleForm.postageCalculateList[index].effectiveAreaName=this.form1.effectiveAreaName;
@@ -303,12 +278,12 @@ export default {
       this.ruleForm.postageCalculateList[index].defaultPrice=this.form1.defaultPrice;
       this.ruleForm.postageCalculateList[index].increaseQuantity=this.form1.increaseQuantity;
       this.ruleForm.postageCalculateList[index].increasePrice=this.form1.increasePrice;
-      console.log(this.ruleForm.postageCalculateList[index])
+      // console.log(this.ruleForm.postageCalculateList[index])
 
       // this.$refs[formName].resetFields();
     },
     del1(index,row){
-      console.log(row)
+      // console.log(row)
       this.$confirm('确定要删除该条记录吗？','提示',{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -337,8 +312,8 @@ export default {
     save2(formName){
       this.dialogFormVisible2=false;
       let index=this.form2.id;
-      console.log('save2')
-      console.log(11111)
+      // console.log('save2')
+      // console.log(11111)
       this.form2.effectiveAreaName=''
       for(var i=0;i<this.form2.effectiveArea.length;i++){
         for(var j=0;j<this.options.length;j++){
@@ -353,7 +328,7 @@ export default {
       this.ruleForm.postageFreeList[index].transportMethod=1;
       this.ruleForm.postageFreeList[index].packageMailConditions=1;
       this.ruleForm.postageFreeList[index].quantity=this.form2.quantity;
-      console.log(this.ruleForm.postageFreeList[index])
+      // console.log(this.ruleForm.postageFreeList[index])
 
       // this.$refs[formName].resetFields();
     },

@@ -27,7 +27,7 @@
       </div>
       <div class="searchbox">
         提货方式：
-        <el-select v-model="searchParams.pickupWay" :style="{width:'120px',height:'40px'}">
+        <el-select v-model="searchParams.pickupWay" :style="{width:'120px',height:'40px'}" @change="changepick($event)">
           <el-option label="所有" value=""></el-option>
           <el-option label="到店自取" value="1"></el-option>
           <el-option label="快递" value="2"></el-option>
@@ -35,7 +35,7 @@
       </div> 
       <div class="searchbox">
         自提确认：
-        <el-select v-model="searchParams.clientConfirm" :style="{width:'120px',height:'40px'}">
+        <el-select v-model="searchParams.clientConfirm" :style="{width:'120px',height:'40px'}" :disabled="searchParams.pickupWay=='2'">
           <el-option label="所有" value=""></el-option>
           <el-option label="待自提确认" value="0"></el-option>
           <el-option label="确认接单" value="1"></el-option>
@@ -63,14 +63,20 @@
       </div>
       <!-- <el-button style="padding:12px 20px;background:#fdc52d;border:1px solid #fdc52d;float:right;" type="info" @click="exportExcel">导出</el-button> -->
       <br>
-      <div class="searchbox">
-        起始时间：
-        <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}"></el-date-picker>
-      </div>
-      <div class="searchbox">
-        截止日期：
-        <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
-      </div>
+      <el-form status-icon :rules="rules2">
+        <el-form-item  style="display:inline-block;">
+          <div class="searchbox">
+            起始时间：
+            <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}" :picker-options='pickerOptions'></el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item prop="endTime" style="display:inline-block;">
+          <div class="searchbox">
+            截止日期：
+            <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
+          </div>
+        </el-form-item>
+      </el-form>
       
     </div>
 
@@ -78,10 +84,10 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe
       style="width: 100%"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55"></el-table-column>
+      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
       <el-table-column prop="orderNo" label="订单编号"></el-table-column>
       <el-table-column prop="clientName" label="下单门店"></el-table-column>
       <el-table-column prop="createTime" label="下单时间"></el-table-column>
@@ -104,11 +110,11 @@
       <el-table-column prop="amount" label="金额"></el-table-column>
       <el-table-column prop="status" label="付款状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.payed ==true" type="brand" disable-transitions>已付款</el-tag>
-          <el-tag v-if="scope.row.payed ==false" type="brand" disable-transitions>未付款</el-tag>
+          <span v-if="scope.row.payed ==true" disable-transitions>已付款</span>
+          <span v-if="scope.row.payed ==false" disable-transitions>未付款</span>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="订单状态" width="180">
+      <el-table-column prop="status" label="订单状态">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status =='-1'" type="info" disable-transitions>已取消</el-tag>
             <el-tag v-if="scope.row.status =='0'" type="warning" disable-transitions>待付款</el-tag>
@@ -121,12 +127,18 @@
           </template>
         </el-table-column>
         <!-- 自提待审核状态，0 待审核  1 确认接单 2 拒绝接单 没有分配门店默认没有值 -->
-      <el-table-column width="160" prop="clientConfirm" label="门店分配状态">
+      <el-table-column prop="clientConfirm" label="门店分配状态" align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.clientConfirm =='0'">待自提确认</span>
           <span v-else-if="scope.row.clientConfirm =='1'">确认接单</span>
           <span v-else-if="scope.row.clientConfirm =='2'">拒绝接单</span>
-          <span v-else>未分配门店</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="orderMemo" label="备注">
+        <template slot-scope="scope">
+          <span v-if="scope.row.orderMemo" style="display:block;">{{scope.row.orderMemo|titleFormate}}</span>
+          <el-button type="text" @click="memo(scope.row)" >{{scope.row.orderMemo?'修改':'添加'}}</el-button>
         </template>
       </el-table-column>
       <!-- <el-table-column prop="address" label="地址"></el-table-column> -->
@@ -155,7 +167,7 @@
                 <p class="pbutton" v-if="scope.row.clientConfirm=='1' &&(scope.row.status == '2' && scope.row.pickupWay == '1')" @click="cancelVerification(scope.row)">确认提货</p>
               </el-dropdown-item>
               <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.status=='0' && scope.row.clientConfirm =='1' && scope.row.payType=='0'" @click="changepay(scope.row)">转线下支付</p> 
+                <p class="pbutton" v-if="scope.row.status=='0' && scope.row.clientConfirm =='1' && scope.row.payType=='0'" @click="changepay(scope.row)">转线下支付</p>  
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -188,7 +200,15 @@
           <el-input v-model="dform.expressCode" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="快递公司" prop="expressCorp">
-          <el-input v-model="dform.expressCorp" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></el-input>
+          <!-- <el-input v-model="dform.expressCorp" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></!--> -->
+          <el-select v-model="dform.expressCorp" placeholder="请选择" :disabled="deliverytitle=='货运单信息'">
+            <el-option
+              v-for="item in deliveryoptions"
+              :key="item.id"
+              :label="item.label"
+              :value="item.label">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -236,7 +256,18 @@
         <el-button type="primary" @click="ischangepay">确 定</el-button>
       </div>
     </el-dialog>
-
+    <!-- 点击添加备注 -->
+    <el-dialog title="订单备注" :visible.sync="dialogVisible6">
+      <el-form :model="dform" :rules="rules" label-width="100px">
+        <el-form-item label-width="0">
+          <el-input type="textarea" v-model="memoForm.memo"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible6 = false">取 消</el-button>
+        <el-button type="primary" @click="saveMemo">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -245,7 +276,75 @@
 export default {
   name: "company",
   data() {
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+        if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
+          callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+    };
     return {
+      deliveryoptions:[
+        {
+          id:1,
+          label:'顺丰快递'
+        },
+        {
+          id:2,
+          label:'EMS'
+        },
+        {
+          id:3,
+          label:'申通快递'
+        },
+        {
+          id:4,
+          label:'韵达快递'
+        },
+        {
+          id:5,
+          label:'中通快递'
+        },
+        {
+          id:6,
+          label:'圆通快递'
+        },
+        {
+          id:7,
+          label:'汇通快递'
+        },
+        {
+          id:8,
+          label:'天天快递'
+        },
+        {
+          id:9,
+          label:'宅急送'
+        },
+        {
+          id:10,
+          label:'丹鸟快递'
+        },
+        {
+          id:11,
+          label:'京东快递'
+        },
+        {
+          id:12,
+          label:'其他快递'
+        },
+      ],
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      },
+      rules2:{
+        endTime:[
+          { validator: validatePass, trigger: 'change' }
+        ]
+      },
       all:0,
       all1:0,
       all2:0,
@@ -273,6 +372,7 @@ export default {
       dialogFormVisible:false,
       dialogVisible5:false,
       dialogVisible4:false,
+      dialogVisible6:false,
       rowid:'',  //点击企业预约确认，吧改行id暂存，等点击pass事件作为参数
       rowid2:'',  //点击自提确认，吧该行订单id暂存，等点击receive和noreceive事件作为参数
       payform:{
@@ -288,6 +388,10 @@ export default {
         expressCode:'',
         expressCorp:''
       },
+      memoForm:{
+        id:'',
+        memo:''
+      },
       multipleSelection: [],  //多选
       rules:{
         expressCode: [
@@ -301,10 +405,50 @@ export default {
   },
   // 页面渲染前拿到数据
   mounted() {
+    if(this.$route.query.flag){
+      if(this.$route.query.status){
+        this.searchParams.status=this.$route.query.status
+        this.isCollapse=this.$route.query.status
+      }
+      if(this.$route.query.pickupWay){
+        this.searchParams.pickupWay=this.$route.query.pickupWay
+      }
+      if(this.$route.query.clientConfirm){
+        this.searchParams.clientConfirm=this.$route.query.clientConfirm
+      }
+    }
     this.getDataList();
     this.getAllNum();
   },
   methods: {
+    memo(row){
+      console.log(row)
+      this.dialogVisible6=true;
+      this.memoForm.id=row.id;
+      this.memoForm.memo=row.orderMemo;
+    },
+    saveMemo(){
+      this.dialogVisible6=false;
+      let params={
+        id:this.memoForm.id,
+        orderMemo:this.memoForm.memo
+      }
+      this.axios.post('/b2c/order/save',params)
+      .then(res=>{
+        if(res.data.code>0){
+          this.$message.success('添加成功')
+          this.getDataList();
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      })
+    },
+    changepick(i){
+      // console.log(i)
+      if(i==2){
+        this.searchParams.clientConfirm=''
+      }
+    },
     // 导出订单
     exportExcel(){
       let params={
@@ -313,13 +457,15 @@ export default {
         startTime:this.searchParams.startTime,
         endTime:this.searchParams.endTime,
         id:this.searchParams.orderNo,
+        pickupWay:this.searchParams.pickupWay,
+        clientConfirm:this.searchParams.clientConfirm,
         orderTypeFlag:0
       }
       this.axios.get('b2c/order/export',{params})
       .then(res=>{
-        console.log(res)
+        // console.log(res)
         var blob = new Blob([res.data], {type: 'application/vnd.ms-excel;charset=utf-8'}); //application/vnd.openxmlformats-officedocument.wordprocessingml.document这里表示doc类型
-        console.log(blob)
+        // console.log(blob)
         // var contentDisposition = res.headers['Content-Disposition'];  //从response的headers中获取filename, 后端response.setHeader("Content-disposition", "attachment; filename=xxxx.docx") 设置的文件名;
         // console.log(contentDisposition)
         // var patt = new RegExp("filename=([^;]+\\.[^\\.;]+);*");
@@ -330,7 +476,7 @@ export default {
         var downloadElement = document.createElement('a');
         // var href = window.URL.createObjectURL(blob); //创建下载的链接
         var href=res.request.responseURL;
-        console.log(href)
+        // console.log(href)
 
         downloadElement.style.display = 'none';
         downloadElement.href = href;
@@ -383,8 +529,8 @@ export default {
       }
       this.axios.get('/b2c/order/group',{params})
       .then(res=>{
-        console.log('统计')
-        console.log(res.data)
+        // console.log('统计')
+        // console.log(res.data)
         let obj=res.data.msg.datas;
         this.all=0;
         for(var i=0;i<obj.length;i++){
@@ -455,8 +601,8 @@ export default {
     },
     // 门店自提审核确认
     clientConfirm(row){
-      console.log('自提审核确认')
-      console.log(row)
+      // console.log('自提审核确认')
+      // console.log(row)
       this.dialogVisible5 =true;
       this.rowid2=row.id;
     },
@@ -500,8 +646,8 @@ export default {
     },
     // 发送通知,
     notice(row){
-      console.log(this.multipleSelection)
-      console.log(row)
+      // console.log(this.multipleSelection)
+      // console.log(row)
       let orderIds=[];
       if(this.multipleSelection.length>0){
         for(let i=0;i<this.multipleSelection.length;i++){
@@ -535,8 +681,8 @@ export default {
     },
     // 如果快递的且待发货的显示发货
     delivery(row){
-      console.log('发货')
-      console.log(row)
+      // console.log('发货')
+      // console.log(row)
       if(row.expressCode && row.expressCorp){
         this.deliverytitle='货运单信息'
       }else{
@@ -569,7 +715,7 @@ export default {
       let params=this.form
       this.axios.get('/b2c/order/pickUpStore',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         if(res.data.code>0){
           this.$message({
             message: res.data.msg,
@@ -583,8 +729,8 @@ export default {
     },
     // 管理订单
     manage(row){
-      console.log('分配门店row')
-      console.log(row)
+      // console.log('分配门店row')
+      // console.log(row)
       this.form.orderId=row.orderId;
       this.dialogFormVisible = true;
       let params={
@@ -593,8 +739,8 @@ export default {
       }
       this.axios.get('/crm/corporation/list',{params})
       .then(res=>{
-        console.log('查询企业列表')
-        console.log(res.data)
+        // console.log('查询企业列表')
+        // console.log(res.data)
         this.companyDataList = res.data.msg.datas;    //数据需要核对，是否只展示相关门店数据
       })
     },
@@ -659,15 +805,29 @@ export default {
             
             for(var i=0;i<this.dataList.length;i++){
               var item=this.dataList[i]
+              if(item.payType==0){
+                item.payType='其他'
+              }else if(item.payType==10){
+                item.payType='支付宝'
+              }else if(item.payType==20){
+                item.payType='微信'
+              }
               // if(item.pickupWay==1){
               //   item.creatorName=item.creatorName+'<br/>'+item.customMobile
               // }else if(item.pickupWay==2){
               //   item.receiver=item.receiver+'<br/>'+item.customMobile+'<br/>'+item.city+item.county+item.address;
               // }
               if(item.receiver){
-                item.creatorName=item.receiver+'<br/>'+item.customerPhone+'<br/>'+item.city+item.county+item.address;
+                if(item.linkCall){
+                  item.creatorName=item.receiver+'<br/>'+item.linkCall+'<br/>'+item.city+item.county+item.address;
+                }else{
+                  item.creatorName=item.receiver+'<br/>'+item.customerPhone+'<br/>'+item.city+item.county+item.address;
+                }
+                
+              }else if(item.creatorName){
+                item.creatorName=item.creatorName+'<br/>'+item.customerPhone
               }else{
-                item.creatorName=item.creatorName+'<br/>'+item.customMobile
+                item.creatorName=item.customerPhone
               }
               item.amount=item.amount.toFixed(2);
             }
@@ -725,6 +885,9 @@ td {
 .el-dropdown-link {
   cursor: pointer;
   
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>
 

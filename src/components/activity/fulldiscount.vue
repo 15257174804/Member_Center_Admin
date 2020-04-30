@@ -55,8 +55,14 @@
       v-loading="loading"
       border
       :data="tableData"
+      stripe
       style="width: 100%">
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(curP - 1) * pageSize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="ticketName" label="名称" ></el-table-column>
       <el-table-column prop="startTime" label="领取开始时间"></el-table-column>
       <el-table-column prop="endTime" label="领取结束时间"></el-table-column>
@@ -117,8 +123,8 @@ export default {
   methods:{
     // 跳转到对应预约活动的详情
     edit(row){
-      console.log('点击详情，改行的row')
-      console.log(row)
+      // console.log('点击详情，改行的row')
+      // console.log(row)
       // console.log(row.id)
       this.$router.push({
         name:'fulldetail',
@@ -130,7 +136,7 @@ export default {
     },
     // 停止开启活动状态
     publish(row){
-      console.log('这是修改活动状态')
+      // console.log('这是修改活动状态')
       this.$confirm('确定要发布/废弃该优惠券吗？','提示',{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -200,7 +206,7 @@ export default {
       this.getData();
     },
     getData(){
-      console.log('获取页面数据')
+      // console.log('获取页面数据')
       this.loading = true;
       let params = this.searchParams;
       params.pageindex = this.curP;
@@ -208,7 +214,7 @@ export default {
       this.axios.get('/b2c/discountTicket/list',{params})
       .then(res=>{
         this.loading = false;
-        console.log(res.data)
+        // console.log(res.data)
         if(res.data.code>0){
           this.tableData=res.data.msg.datas;
           this.totalCount=res.data.msg.totalCount;
@@ -228,5 +234,7 @@ export default {
 </script>
 
 <style>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

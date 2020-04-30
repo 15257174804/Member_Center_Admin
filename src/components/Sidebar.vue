@@ -46,13 +46,13 @@
             </el-submenu>
           </router-link>
 
-          <router-link to="/driver">
+          <!-- <router-link to="/driver">
             <el-submenu index="2">
               <template slot="title">
                 <i class="el-icon-s-flag"></i>引导指南
               </template>
             </el-submenu>
-          </router-link>
+          </router-link> -->
 
           <el-submenu index="11">
             <template slot="title">
@@ -159,6 +159,9 @@
               <router-link to="/markset">
                 <el-menu-item index="16-5">标签管理</el-menu-item>
               </router-link>
+              <router-link to="/floortype" v-if="this.$store.state.group_name=='平台管理员'">
+                <el-menu-item index="16-6">楼层类型</el-menu-item>
+              </router-link>
               <!-- <router-link to="/roleset">
                 <el-menu-item index="16-3">角色管理</el-menu-item>
               </router-link> -->
@@ -185,7 +188,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <router-link to="/complain" v-if="this.$store.state.user_name=='admin'">
+          <router-link to="/complain" v-if="this.$store.state.group_name=='平台管理员'">
             <el-submenu index="18">
               <template slot="title">
                 <i class="el-icon-s-comment"></i>意见反馈

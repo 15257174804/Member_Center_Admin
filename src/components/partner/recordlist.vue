@@ -32,7 +32,7 @@
       border
       :data="dataList"
       style="width: 100%"
-      :row-class-name="tableRowClassName">
+      stripe>
       <el-table-column prop="id" label="编号"></el-table-column>
       <el-table-column prop="extractDate" label="申请时间"></el-table-column>
       <el-table-column prop="partnerId" label="合伙人"></el-table-column>
@@ -118,7 +118,7 @@ export default {
   },
   methods:{
     record(row){
-      console.log(row)
+      // console.log(row)
       this.$confirm('确定执行提现操作吗？','提示',{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -253,5 +253,7 @@ export default {
 </script>
 
 <style>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

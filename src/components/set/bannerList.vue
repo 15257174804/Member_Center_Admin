@@ -16,14 +16,14 @@
         广告位名称：
         <el-input v-model="searchParams.keyword" placeholder="请输入广告位名称" :style="{width:'180px',height:'40px'}"></el-input>
       </div>
-      <div class="searchbox">
+      <!-- <div class="searchbox">
         状态：
         <el-select v-model="searchParams.status" :style="{width:'100px',height:'40px'}">
           <el-option label="所有" value=""></el-option>
           <el-option label="启用" value="1"></el-option>
           <el-option label="停用" value="0"></el-option>
         </el-select>
-      </div> 
+      </div>  -->
       <!-- 按钮 -->
       <div class="searchbox">
         <el-button type="primary" @click="search()">
@@ -37,14 +37,20 @@
           重置
         </el-button>
       </div>
+      <div class="searchbox">
+        <!-- 链接暂时是测试环境的，后期需要更改 -->
+        <el-button @click="showIframe('http://health.alink365.cn/#/showHomePage?groupId='+groupId)" class="showIframe">
+          <i class="el-icon-view"></i>
+          预览
+        </el-button>
+      </div>
     </div>
     <el-table
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
-      style="width: 100%"
-      >
+      stripe 
+      style="width: 100%">
       <el-table-column prop="adSort" label="序号" width="60"></el-table-column>
       <el-table-column prop="floorType" label="楼层类型">
         <template slot-scope="scope">
@@ -108,6 +114,7 @@ export default {
   name:'bannerlist',
   data(){
     return {
+      groupId:this.$store.state.groupId,
       searchParams:{
         keyword:"",
         status:'',
@@ -121,6 +128,21 @@ export default {
     }
   },
   methods:{
+    showIframe(url){
+      $("<div id='showMobilePreview'>" +
+          "<div class='mobile_preview_header'><i class='mobile_preview_header_icon'></i></div>" +
+          "<div class='mobile_preview_frame'><iframe id='YuFrameMobilePreview' name='YuFrameMobilePreview' ></iframe></div>" + 
+          "<div class='mobile_preview_footer'><i class='mobile_preview_footer_icon'></i></div>" +
+      "</div>").prependTo('body');
+       $("#YuFrameMobilePreview").attr("src", url);  
+      //添加背景遮罩
+      $("<div id='YuFrameMobilePreviewBg' style='cursor:pointer;width:100%;height:100%;background-color: Gray;display:block;z-index:9998;position:absolute;left:0px;top:0px;filter:Alpha(Opacity=30);/* IE */-moz-opacity:0.4;/* Moz + FF */opacity: 0.4; '/>").prependTo('body'); 
+      //点击背景遮罩移除iframe和背景
+      $("#YuFrameMobilePreviewBg").click(function() {
+        $("#showMobilePreview").remove();
+        $("#YuFrameMobilePreviewBg").remove();
+      });
+    },
     del(row){
       let params={
         id:row.id
@@ -148,7 +170,7 @@ export default {
       
     },
     edit(row){
-      console.log(row)
+      // console.log(row)
       this.$router.push({
         name:'adfloor',
         query:{
@@ -156,22 +178,6 @@ export default {
           title:row.floorName+'楼层编辑'
         }
       })
-    },
-    // 每页展示多少条数据
-    tableRowClassName({row, rowIndex}) {
-      if (rowIndex == 0){
-        return '';
-      }
-      else if (rowIndex % 3 == 0) {
-        return 'success-row';
-      }
-      else if (rowIndex % 2 == 0){
-        return '';
-      } 
-      else if (rowIndex % 1 == 0){
-        return 'warning-row';
-      }
-      return '';
     },
     handleSizeChange(size) {
       this.pagesize = size;
@@ -193,14 +199,14 @@ export default {
       this.getDataList();
     },
     getDataList(){
-      console.log('获取页面数据')
+      // console.log('获取页面数据')
       this.loading=true;
       let params=this.searchParams;
       params.pageindex = this.currentPage;
       params.pagesize = this.pagesize;
       this.axios.get('/b2c/adFloor/list',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.loading=false;
         if(res.data.code < 0){
           this.$notify.error({
@@ -225,5 +231,105 @@ export default {
   width:20px;
   height:20px;
   border:1px solid black;
+}
+#showMobilePreview{
+  z-index: 9999;
+  width:391px;
+  height:768px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  opacity: 1;
+  text-align: center;
+}
+.mobile_preview_header{
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  width: 387px;
+  background: #eeeff2;
+  text-align: center;
+  line-height: 40px;
+  border-top-right-radius: 50px;
+  border-top-left-radius: 50px;
+}
+.mobile_preview_header_icon {
+  display: inline-block;
+  width: 65px;
+  height: 10px;
+  background: #c8c9cc;
+  border-radius: 9px;
+  vertical-align: middle;
+  margin-top: 18px; 
+}
+.mobile_preview_frame {
+  width: 375px;
+  min-height: 294px;
+  height: 667px;
+  max-height: calc(100vh - 166px);
+  top: 40px;
+  left: 0;
+  border: 6px solid #eeeff2;
+  position: relative;
+  background-color: #fff;
+  display: block;
+}
+#YuFrameMobilePreview {
+  border: none;
+  width: 375px;
+  height: 100%;
+}
+.mobile_preview_header_icon {
+  display: inline-block;
+  width: 65px;
+  height: 10px;
+  background: #c8c9cc;
+  border-radius: 9px;
+  vertical-align: middle;
+  margin-top: 18px;
+}
+.mobile_preview_frame {
+  width: 375px;
+  min-height: 294px;
+  height: 667px;
+  max-height: calc(100vh - 166px);
+  top: 40px;
+  left: 0;
+  border: 6px solid #eeeff2;
+  position: relative;
+  background-color: #fff;
+  display: block;
+}
+#YuFrameMobilePreview {
+  border: none;
+  width: 375px;
+  height: 100%;
+}
+.mobile_preview_footer {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 52px;
+  width: 387px;
+  background: #eeeff2;
+  text-align: center;
+  line-height: 45px;
+  border-bottom-right-radius: 50px;
+  border-bottom-left-radius: 50px;
+}
+.mobile_preview_footer_icon {
+  display: inline-block;
+  width: 43px;
+  height: 43px;
+  background: #c8c9cc;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

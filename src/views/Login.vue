@@ -11,17 +11,17 @@
       <div class="logo">
         <img src="../assets/logo.png" width="142">
       </div>
-      <el-form-item prop="username">
+      <el-form-item prop="username" :error="errorMsg1">
         <div class="icon">
           <img src="../assets/design/account.png">
         </div>
-        <el-input type="text" v-model="ruleForm.username" autocomplete="off" placeholder="手机号"></el-input>
+        <el-input type="text" v-model="ruleForm.username" autocomplete="off" placeholder="手机号" @keyup.enter.native="sendform('ruleForm')"></el-input>
       </el-form-item>
-      <el-form-item prop="password">
+      <el-form-item prop="password" :error="errorMsg2">
         <div class="icon">
           <img src="../assets/design/password.png">
         </div>
-        <el-input type="password" v-model="ruleForm.password" autocomplete="off" placeholder="密码"></el-input>
+        <el-input type="password" v-model="ruleForm.password" autocomplete="off" placeholder="密码" @keyup.enter.native="sendform('ruleForm')"></el-input>
       </el-form-item>
       <!-- <el-form-item>
         
@@ -67,6 +67,8 @@ export default {
       }
     };
     return {
+      errorMsg1:'',
+      errorMsg2:'',
       isShow: false, // 验证码模态框是否出现
       key: 0, //开关
       // 表单
@@ -88,10 +90,10 @@ export default {
   methods: {
     regcompany(){
       const that=this;
-      console.log(1)
+      // console.log(1)
       // console.log(this.)
       that.$router.push({path:'/regcompany'})
-      console.log(2)
+      // console.log(2)
     },
     reguser(){
       this.$router.push('/reguer')
@@ -125,14 +127,20 @@ export default {
           this.axios
             .post("/crm/user/login", params)
             .then(res => {
-              console.log('登录时获取的数据')
-              console.log(res.data)
+              // console.log('登录时获取的数据')
+              // console.log(res.data)
               const token = res.data.msg.token;
               if(res.data.code < 0){
                 this.$notify.error({
                   title: '错误',
                   message: res.data.msg
                 })
+                // debugger
+                if(res.data.msg=="密码不正确"){
+                  this.errorMsg2=res.data.msg;
+                }else if(res.data.msg=="账号不存在"){
+                  this.errorMsg1=res.data.msg;
+                }
                 return
               }
               if(!res.data.msg.isValid){
@@ -144,12 +152,15 @@ export default {
               }
               localStorage.setItem("loginToken", token);
               localStorage.setItem("userInfo", JSON.stringify(res.data.msg));
+              // console.log(res.data.msg)
+              // console.log(this.$store.state.user_name)
               this.$store.dispatch("setUserInfoFun",res.data.msg.username);
               this.global.token = token;
               this.$store.getters.change;
               if(res.data.msg.systemAdministrator){
                 this.$router.push("/display");
-                this.$store.commit('setGroupInfo','')
+                this.$store.commit('setGroupInfo','平台管理员')
+                this.$store.commit('setAdmin','systemAdmin')
               }else{
                 this.$router.push("/choose");
               }
@@ -224,7 +235,7 @@ export default {
   /* background: #fff;
   border-radius: 20px;
   padding: 50px; */
-  height: 45%;
+  height: 30%;
   width:52%;
 }
 h1 {

@@ -83,7 +83,12 @@
             height="300"
             border
             style="width: 100%">
-            <el-table-column type="index" label="序号" width="60"></el-table-column>
+            <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+            <el-table-column type="index" label="序号" width="50" align="center">
+              <template slot-scope="scope">
+                <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+              </template>
+            </el-table-column> 
             <el-table-column prop="goodCode" label="商品编号"></el-table-column>
             <el-table-column prop="goodName" label="商品名称"></el-table-column>
             <el-table-column prop="retailPrice" label="价格"></el-table-column>
@@ -93,7 +98,7 @@
               label="操作"
               width="150">
               <template slot-scope="scope">
-                <el-button type="text" @click="add(scope.row)" :disabled="JSON.stringify(Form.details).indexOf(scope.row.goodCode)!=-1"><i class="el-icon-edit"></i>添加</el-button>
+                <el-button type="text" @click="add(scope.row)" :disabled="JSON.stringify(Form.details).indexOf(scope.row.id)!=-1"><i class="el-icon-edit"></i>添加</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -189,7 +194,26 @@
 export default {
   name:'limiteddetail',
   data(){
+    var checkStareTime = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('开始日期不能为空'));
+      }else{
+        this.tempTime=value;
+        callback();
+      }
+    };
+    var checkValidDate = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('截止日期不能为空'));
+      }
+      if (Date.parse(value)<Date.parse(this.tempTime)) {
+        callback(new Error('截止日期不能早于开始日期'));
+      }else{
+        callback();
+      }
+    };
     return{
+      tempTime:'',
       title:'新建活动',
       dialogVisible: false,  //控制弹框的隐藏显示
       dialogVisible2:false,
@@ -224,13 +248,13 @@ export default {
           { required: true, message: '请输入活动名称', trigger: 'blur' }
         ],
         startTime: [
-          { type: 'string', required: true, message: '请选择开始日期时间', trigger: 'change' }
+         { validator: checkStareTime, trigger: 'blur' }
         ],
         endTime: [
-          { type: 'string', required: true, message: '请选择结束日期时间', trigger: 'change' }
+          { validator: checkValidDate, trigger: 'blur' }
         ],
         warmUpTime: [
-          { type: 'string', required: true, message: '请选择预约日期时间', trigger: 'change' }
+          { type: 'string', required: true, message: '请选择预约日期时间', trigger: 'blur' }
         ],
         discountPrice:[
           { required: true, message: '请输入产品抢购价', trigger: 'blur' }
@@ -261,8 +285,8 @@ export default {
           let params=this.Form;
           this.axios.post('/b2c/discount/save',params)
           .then(res => {
-            console.log('这是保存提交是返回的数据')
-            console.log(res.data)
+            // console.log('这是保存提交是返回的数据')
+            // console.log(res.data)
             if(res.data.code > 0){
               this.$message({
                 type: 'success',
@@ -322,6 +346,7 @@ export default {
     //重置
     reset(){
       this.searchParams.keyword = "";
+      this.getDataList();
     },
     // 获取完整详情列表。点击添加产品
     getDataList(){
@@ -331,8 +356,8 @@ export default {
       params.pagesize = this.pagesize;
       this.axios.get("/b2c/product/good/list",{params})
       .then(res => {
-        console.log('这是选择产品点开弹框')
-        console.log(res.data)
+        // console.log('这是选择产品点开弹框')
+        // console.log(res.data)
         this.loading = false;
         if(res.data.code < 0){
           this.$notify.error({
@@ -350,8 +375,8 @@ export default {
     },
     //添加商品
     add(row){
-      console.log('点击添加')
-      console.log(row)
+      // console.log('点击添加')
+      // console.log(row)
       
       // let params={
       //   id:row.id
@@ -410,7 +435,7 @@ export default {
     },
     // 修改商品信息
     edit(row){
-      console.log(row)
+      // console.log(row)
       this.dialogVisible2=true;
       this.numform=row;
       this.numform.goodId=row.goodId;
@@ -421,7 +446,7 @@ export default {
       }
       this.axios.get('/b2c/discount/list',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         if(res.data.code>0){
 // ****************************************************************************************要修改的保存数据和页面数据处理
           
@@ -456,5 +481,7 @@ export default {
 </script>
 
 <style>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

@@ -50,10 +50,15 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe 
       style="width: 100%"
       >
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="createTime" label="发布时间" width="180"></el-table-column>
       <el-table-column prop="title" label="标题"></el-table-column>
       <el-table-column prop="type" label="公告类型" width="100">
@@ -69,8 +74,8 @@
       </el-table-column> -->
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="scope">
-          <span v-if="scope.row.status==1">启用</span>
-          <span v-if="scope.row.status==0">停用</span>
+          <el-tag type="success" v-if="scope.row.status==1">启用</el-tag>
+          <el-tag type="danger" v-if="scope.row.status==0">停用</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -142,7 +147,7 @@ export default {
       
     },
     edit(row){
-      console.log(row)
+      // console.log(row)
       this.$router.push({
         name:'addnews',
         query:{
@@ -187,7 +192,7 @@ export default {
       this.getDataList();
     },
     getDataList(){
-      console.log('获取页面元素')
+      // console.log('获取页面元素')
       this.loading=true;
       let params=this.searchParams;
       params.pageindex = this.currentPage;
@@ -207,7 +212,7 @@ export default {
             if(this.dataList[i].context.length>20){
               this.dataList[i].context=this.dataList[i].context.substr(0,20)+'...'
             }
-            console.log(typeof this.dataList[i].context)
+            // console.log(typeof this.dataList[i].context)
           }
           
         }
@@ -221,5 +226,7 @@ export default {
 </script>
 
 <style>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

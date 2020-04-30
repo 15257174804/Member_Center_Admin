@@ -58,8 +58,8 @@
         </el-button>
       </div>
       <div class="searchbox">
-        <el-button>
-          <i class="el-icon-refresh-right" @click="reset()"></i>
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right" ></i>
           重置
         </el-button>
       </div>
@@ -69,10 +69,15 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe
       style="width: 100%"
       >
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="username" label="用户名"></el-table-column>
       <el-table-column prop="workNo" label="工号"></el-table-column>
       <el-table-column prop="mobilephone" label="手机号码"></el-table-column>
@@ -145,7 +150,7 @@ export default {
   methods: {
     // 成为合伙人
     partner(row){
-      console.log(row)
+      // console.log(row)
       this.$confirm(`确定将员工${row.username}转为合伙人吗？`,{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -258,6 +263,7 @@ export default {
       this.searchParams.enterStartTime = "";
       this.searchParams.enterEndTime = "";
       this.searchParams.isValid = "";
+      this.getDataList();
     }
   }
 };
@@ -274,6 +280,9 @@ td {
   background: rgb(240, 243, 244);
   width: 100%;
   height: 50px;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>
 

@@ -67,11 +67,11 @@
         <!-- <div class="tip"><span style="color:#F56C6C;">*</span> 如果是限购活动请填写间隔天数和下单次数，如果是非限购活动，请忽略</div> -->
         <!-- 间隔天数 -->
         <el-form-item label="下单间隔天数" prop="intervalDays">
-          <el-input v-model="ruleForm.intervalDays" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入下单间隔天数"></el-input>
+          <el-input v-model="ruleForm.intervalDays" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入下单间隔天数" type='number'></el-input>
         </el-form-item>
         <!-- 单次 -->
         <el-form-item label="间隔天数内下单次数" prop="orderNumber">
-          <el-input v-model="ruleForm.orderNumber" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入间隔天数内允许下单的次数"></el-input>
+          <el-input v-model="ruleForm.orderNumber" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入间隔天数内允许下单的次数" type='number'></el-input>
         </el-form-item>
       
       
@@ -176,15 +176,15 @@
           width="45%"
           :before-close="handleClose">
           <el-form :model="numform" status-icon :rules="rules" ref="numform" label-width="200px" >
-            <el-form-item label="输入该产品序号" prop="sort">
-              <el-input v-model="numform.sort" autocomplete="off"></el-input>
+            <el-form-item label="产品序号" prop="sort">
+              <el-input v-model="numform.sort" autocomplete="off" type='number' placeholder="请输入该产品序号"></el-input>
             </el-form-item>
-            <el-form-item label="输入该产品预约总数量" prop="totalQuantity">
-              <el-input v-model="numform.totalQuantity" autocomplete="off"></el-input>
+            <el-form-item label="预约总数量" prop="totalQuantity">
+              <el-input v-model="numform.totalQuantity" autocomplete="off" type='number' placeholder="请输入该产品预约总数量"></el-input>
             </el-form-item>
             <!-- <div class="tip"><span style="color:#F56C6C;">*</span> 如果是限购活动请填写产品限购数量，如果是非限购活动，请忽略</div> -->
-            <el-form-item label="输入该产品限购数量" prop="purchasingQuantity">
-              <el-input :disabled="ruleForm.forPurchasing=='否'" v-model="numform.purchasingQuantity" autocomplete="off"></el-input>
+            <el-form-item label="产品限购数量" prop="purchasingQuantity">
+              <el-input :disabled="ruleForm.forPurchasing=='否'" v-model="numform.purchasingQuantity" autocomplete="off" type='number' placeholder="请输入该产品限购数量"></el-input>
             </el-form-item>
             <el-form-item >
               <el-button type="primary" @click="submit2('numform')">保存</el-button>
@@ -200,7 +200,6 @@
       </el-form-item>
       
     </el-form>
-
   </div>
 </template>
 
@@ -208,6 +207,17 @@
 export default {
   name:'goodpreselldetail',
   data(){
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+      // if(!value){
+      //   callback(new Error('请选择结束日期时间'))
+      // }
+        if (Date.parse(this.ruleForm.endTime)<Date.parse(this.ruleForm.startTime)) {
+          callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+    };
     return{
       title:'新建预售活动',
       dialogVisible: false,  //控制弹框的隐藏显示
@@ -245,20 +255,21 @@ export default {
           { required: true, message: '请选择开始日期时间', trigger: 'blur' }
         ],
         endTime: [
-          { required: true, message: '请选择结束日期时间', trigger: 'blur' }
+          { required: true, message: '请选择结束日期时间', trigger: 'blur' },
+          { validator: validatePass, trigger: 'change' }
         ],
         // warmUpStartTime: [
         //   { type: 'stdatetimering', required: true, message: '请选择预约日期时间', trigger: 'change' }
         // ],
         deliveryTime: [
-          { required: true, message: '请选择结束日期', trigger: 'blur' }
+          { required: true, message: '请选择预计发货日期', trigger: 'blur' }
         ],
         limitType: [
           { required: true, message: '请选择预约方式', trigger: 'change' }
         ],
-        totalQuantity:[
-          { required: true, message: '请输入预约总数量', trigger: 'blur'}
-        ],
+        // totalQuantity:[
+        //   { required: true, message: '请输入预约总数量', trigger: 'blur'}
+        // ],
         forPurchasing:[
           { required: true, message: '请选择是否限购', trigger: 'change'}
         ]
@@ -278,10 +289,10 @@ export default {
     // 是否限购改变时，控制下单天数和下单次数和产品限购数量
     isPurchasing(i){
       if(i=='否'){
-        this.ruleForm.intervalDays=0;
-        this.ruleForm.orderNumber=0;
+        this.ruleForm.intervalDays='';
+        this.ruleForm.orderNumber='';
         for(var item=0;item<this.ruleForm.details.length;item++){
-          this.ruleForm.details[item].purchasingQuantity=0;
+          this.ruleForm.details[item].purchasingQuantity='';
         }
       }
     },
@@ -296,7 +307,7 @@ export default {
             this.ruleForm.details.splice(i,1)
           } 
         }
-        console.log(this.ruleForm.details)
+        // console.log(this.ruleForm.details)
 
       }).catch(()=>{
         this.$message({
@@ -309,23 +320,20 @@ export default {
     // 点击修改弹出可以修改数据的弹出框
     edit(row){
       this.dialogVisible2=true;
-      console.log('点击修改，获取该行数据信息')
-      console.log(row)
+      // console.log('点击修改，获取该行数据信息')
+      // console.log(row)
       this.numform=row;
-      if(!this.numform.totalQuantity){
-        this.numform.purchasingQuantity=0;
-      }
     },
     submit2(formName){
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          console.log('这是填写排序和总限售数量之后保存获得的numform')
-          console.log(this.numform)
+          // console.log('这是填写排序和总限售数量之后保存获得的numform')
+          // console.log(this.numform)
           this.dialogVisible2 = false;
           for(let i=0;i<this.ruleForm.details.length;i++){
             let item=this.ruleForm.details[i];
-            console.log(this.ruleForm.details)
-            console.log(item.goodId)
+            // console.log(this.ruleForm.details)
+            // console.log(item.goodId)
             if(item.goodId==this.numform.goodId){
               item.totalQuantity=Number(this.numform.totalQuantity);
               item.sort=this.numform.sort;
@@ -342,8 +350,8 @@ export default {
     },
     //添加商品
     add(row){
-      console.log('点击添加')
-      console.log(row)
+      // console.log('点击添加')
+      // console.log(row)
       
       let params={
         id:row.id
@@ -362,7 +370,7 @@ export default {
         // console.log('这是保存到goodform中的单个商品的数据')
         // console.log(this.goodform)
         this.ruleForm.details=this.ruleForm.details.concat(goodform);
-        console.log(this.ruleForm.details)
+        // console.log(this.ruleForm.details)
       })
     },
     // 搜索商品
@@ -373,6 +381,7 @@ export default {
     //重置
     reset(){
       this.searchParams.keyword = "";
+      this.getDataList();
     },
     handleSizeChange(size) {
       this.pagesize = size;
@@ -445,15 +454,15 @@ export default {
           let params=this.ruleForm;
           this.axios.post('/b2c/preSell/save',params)
           .then(res => {
-            console.log('这是保存提交是返回的数据')
-            console.log(res.data)
+            // console.log('这是保存提交是返回的数据')
+            // console.log(res.data)
             if(res.data.code > 0){
               this.$message({
                 type: 'success',
                 message: res.data.msg
               });
             }else{
-              this.$message.error(res.data.msg);
+              this.$message.error('出错啦！请重试！');
             }
             this.$router.push('/goodpresell')
           })
@@ -475,8 +484,8 @@ export default {
       }
       this.axios.get("/b2c/preSell/list",{params})
       .then(res => {
-        console.log("这是预约详情里面的返回值")
-        console.log(res.data)
+        // console.log("这是预约详情里面的返回值")
+        // console.log(res.data)
         if(res.data.code < 0){
           this.$notify.error({
             title: '错误',
@@ -497,7 +506,7 @@ export default {
           }
           this.ruleForm=_ruleForm;
           this.numform=this.ruleForm.details;
-          console.log(this.ruleForm)
+          // console.log(this.ruleForm)
         }
       })
       .catch(err => {
@@ -546,4 +555,7 @@ export default {
     background-color: #f4f4f5;
     margin:0 0 20px 25px;
   }
+  .searchbox{
+  font-size: 14px;
+}
 </style>

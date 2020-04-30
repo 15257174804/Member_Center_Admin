@@ -22,8 +22,9 @@
             </el-option>
           </el-select>
         </el-form-item>
+
         <el-form-item label="标题图片" prop="titlePic">
-          <el-upload
+          <!-- <el-upload
             class="avatar-uploader"
             :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
             :show-file-list="false"
@@ -31,8 +32,24 @@
             :before-upload="beforeAvatarUpload">
             <img v-if="imgUrl" :src="imgUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload> -->
+          <!-- 修改 -->
+          <el-upload :class="{'hide':hideUpload}"
+            :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
+            list-type="picture-card"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+            :file-list="fileList"
+            :limit="1">
+            <i class="el-icon-plus"></i>
           </el-upload>
+          <el-dialog :visible.sync="dialogVisibleImg">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
         </el-form-item>
+
         <!-- 后期有要求可使用富文本编辑器  https://www.jianshu.com/p/d0c1884505f1 -->
         <el-form-item label="内容" prop="context">
           <!-- <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model="ruleForm.context" placeholder="请输入公告内容"></el-input> -->
@@ -83,6 +100,8 @@
               <select class="ql-align" value="align" title="对齐"></select>
               <button class="ql-clean" title="还原"></button>
               <!-- You can also add your own -->
+              <button class="ql-image" title="图片"></button>
+              <button class="ql-link" title="链接"></button>
             </div>
           </quill-editor>
         </el-form-item>
@@ -160,32 +179,61 @@ export default {
         context: [
           { required: true, message: '请输入公告内容', trigger: 'blur' }
         ]
-      }
+      },
+      dialogImageUrl: '',
+      dialogVisibleImg: false,
+      fileList:[],
+      hideUpload:false
     }
   },
   methods:{
     // 上传背景图成功之后的回调
-    handleAvatarSuccess(res, file) {
-      console.log('图片上传成功')
+    handleAvatarSuccess(res, file,fileList) {
+      // console.log('图片上传成功')
       this.ruleForm.titlePic=res.msg.fileName;
       this.imgUrl = URL.createObjectURL(file.raw);
-      console.log(file);
-      console.log(res)
+      // console.log(file);
+      // console.log(res)
+      this.hideUpload = fileList.length >= 1;
     },
     // 背景图上传之前的回调
     beforeAvatarUpload(file) {
-      console.log(file)
-      // const isJPG = file.type === 'image/jpeg';
+      // console.log(file)
       const isLt2M = file.size / 1024 / 1024 < 2;
-
-      // if (!isJPG) {
-      //   this.$message.error('上传头像图片只能是 JPG 格式!');
-      // }
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 2MB!');
+        return false
+      }else{
+        const isSize = new Promise((resolve, reject) => {
+          const _URL = window.URL || window.webkitURL;
+          const img = new Image();
+          img.onload = () => {
+            const valid = img.width/img.height==1.875;
+            valid ? resolve() : reject();
+          };
+          img.src = _URL.createObjectURL(file);
+        }).then(() => {
+            return file;
+          },() => {
+            this.$message.error('建议图片比例应为750:400');
+            return Promise.reject();
+          }
+        )
+        return isSize
       }
-      // return isJPG && isLt2M;
-      return isLt2M
+    },
+    // 图片预览
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisibleImg = true;
+    },
+    handleRemove(file,fileList) {
+      // console.log('移除之后的回调')
+      // console.log(fileList);
+      // console.log(2)
+      this.ruleForm.titlePic=''
+      // console.log(this.ruleForm.titlePic)
+      this.hideUpload = fileList.length >= 1;
     },
     // 返回按钮
     goback(){
@@ -198,8 +246,8 @@ export default {
           let params=this.ruleForm;
           this.axios.post('/b2c/news/save',params)
           .then(res => {
-            console.log('这是保存提交是返回的数据')
-            console.log(res.data)
+            // console.log('这是保存提交是返回的数据')
+            // console.log(res.data)
             if(res.data.code > 0){
               this.$message({
                 type: 'success',
@@ -217,7 +265,7 @@ export default {
       });
     },
     getData(){
-      console.log('获取页面元素')
+      // console.log('获取页面元素')
       let params={
         id:this.ruleForm.id
       }
@@ -234,11 +282,38 @@ export default {
       this.title=this.$route.query.title;
       this.getData();
     }
+    // console.log(this.$store.state.groupId)
   }
 }
 </script>
 
 <style lang='scss'>
+.hide .el-upload--picture-card{
+  display: none;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
 .el-textarea__inner{
   width:50%;
 }

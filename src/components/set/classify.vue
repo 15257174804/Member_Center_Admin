@@ -159,15 +159,15 @@ export default {
   methods:{
     // 上传背景图成功之后的回调
     handleAvatarSuccess(res, file) {
-      console.log('图片上传成功')
+      // console.log('图片上传成功')
       this.form.logo=res.msg.fileName;
       this.imgUrl = URL.createObjectURL(file.raw);
-      console.log(file);
-      console.log(res)
+      // console.log(file);
+      // console.log(res)
     },
     // 背景图上传之前的回调
     beforeAvatarUpload(file) {
-      console.log(file)
+      // console.log(file)
       // const isJPG = file.type === 'image/jpeg';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -203,7 +203,7 @@ export default {
       }
     },
     edit(row){
-      console.log(row)
+      // console.log(row)
       this.dialogFormVisible=true;
       this.title=row.name;
       this.form.id=row.id;
@@ -228,7 +228,7 @@ export default {
       let params=this.form;
       this.axios.post('/b2c/classify/save',params)
       .then(res=>{
-        console.log(res.data);
+        // console.log(res.data);
         if(res.data.code > 0){
           this.$message({
             type: 'success',
@@ -252,7 +252,7 @@ export default {
       }).then(()=>{
         this.axios.get('b2c/classify/delete',{params})
         .then(res=>{
-          console.log(res.data)
+          // console.log(res.data)
           if(res.data.code>0){
             this.$message.success('删除成功')
             this.getDataList();
@@ -370,24 +370,24 @@ export default {
       this.axios.get('/b2c/classify/list',{params})
       .then(res=>{
         this.parentList=res.data.msg.datas;
-        console.log('获取parentList')
-        console.log(this.parentList)
+        // console.log('获取parentList')
+        // console.log(this.parentList)
       })
     },
     // 改变层级
     changeLevel(i){
-      console.log(i)
+      // console.log(i)
       this.getparentList();
     },
     // 改变所属类别
     changeType($event){
-      console.log($event)
+      // console.log($event)
       let obj={};
       obj=this.parentList.find(item=>{
         return item.id===$event
       })
-      console.log('obj')
-      console.log(obj)
+      // console.log('obj')
+      // console.log(obj)
       this.form.parentName=obj.name;
     }
   },
@@ -403,5 +403,8 @@ export default {
   width:50px;
   height:50px;
   border-radius: 5px;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

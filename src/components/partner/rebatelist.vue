@@ -9,14 +9,29 @@
         订单号：
         <el-input v-model="searchParams.orderNo" placeholder="请输入订单号" :style="{width:'160px',height:'40px'}"></el-input>
       </div>
-      <div class="searchbox">
+      <!-- <div class="searchbox">
         起始时间：
         <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}"></el-date-picker>
       </div>
       <div class="searchbox">
         截止日期：
         <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
-      </div>
+      </div> -->
+      <el-form status-icon :rules="rules2" style="display:inline-block;">
+        <el-form-item  style="display:inline-block;">
+          <div class="searchbox">
+            起始时间：
+            <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}" :picker-options='pickerOptions'></el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item prop="endTime" style="display:inline-block;">
+          <div class="searchbox">
+            截止日期：
+            <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
+          </div>
+        </el-form-item>
+      </el-form>
+
       <div class="searchbox">
         <el-button type="primary" @click="search()">
           <i class="el-icon-zoom-in"></i>
@@ -36,7 +51,7 @@
       border
       :data="product"
       style="width: 100%"
-      :row-class-name="tableRowClassName">
+      stripe>
       <el-table-column prop="orderCode" label="订单编号"></el-table-column>
       <el-table-column prop="orderTime" label="创建时间"></el-table-column>
       <el-table-column prop="goodsPic" label="商品图片">
@@ -47,10 +62,17 @@
       </el-table-column>
       <el-table-column prop="goodName" label="商品名称"></el-table-column>
       <el-table-column prop="goodPrice" label="商品价格"></el-table-column>
-      <!-- <el-table-column prop="orderCount" label="数量"></el-table-column> -->
+      <el-table-column prop="isCompute" label="是否已核算"></el-table-column>
       <el-table-column prop="orderAmount" label="订单金额" sortable></el-table-column>
       <el-table-column prop="rebateAmount" label="返利金额" sortable></el-table-column>
-      <!-- <el-table-column prop="rebateRate" label="返利比例" sortable></el-table-column> -->
+      <el-table-column
+      fixed="right"
+      label="操作"
+      width="150">
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.isCompute=='否'" type="text" @click="compute(scope.row)" style="margin-right:13px;">核算</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- 分页 -->
@@ -71,7 +93,25 @@
 export default {
   name:'rebatelist',
   data(){
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+        if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
+          callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+    };
     return {
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      },
+      rules2:{
+        endTime:[
+          { validator: validatePass, trigger: 'change' }
+        ]
+      },
       searchParams:{
         orderNo:'',
         startTime:'',
@@ -85,21 +125,30 @@ export default {
     }
   },
   methods:{
-    // 行的背色
-    tableRowClassName({row, rowIndex}) {
-      if (rowIndex == 0){
-        return '';
-      }
-      else if (rowIndex % 3 == 0) {
-        return 'success-row';
-      }
-      else if (rowIndex % 2 == 0){
-        return '';
-      } 
-      else if (rowIndex % 1 == 0){
-        return 'warning-row';
-      }
-      return '';
+    compute(row){
+      this.$confirm(`确定返利佣金为${row.rebateAmount}元吗？`,{
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+      }).then(()=>{
+        let params=[{
+          id:row.id,
+          computeAmount:row.rebateAmount
+        }]
+        this.axios.post('/b2c/rebateOrder/compute',params)
+        .then(res=>{
+          // console.log(res.data)
+          if(res.data.code>0){
+            this.$message.success('佣金核算成功')
+          }
+        })
+      }).catch(()=>{
+        this.$message({
+          type:'info',
+          message:'已取消操作'
+        })
+      })
+      
     },
     // 每页多少条
     handleSizeChange(size) {
@@ -122,14 +171,14 @@ export default {
       this.getData();
     },
     getData(){
-      console.log('获取所有页面信息')
+      // console.log('获取所有页面信息')
       this.loading=true;
       let params=this.searchParams;
       params.pageindex = this.curP;
       params.pagesize = this.pageSize;
       this.axios.get('/b2c/rebateOrder/list',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.loading=false;
         if(res.data.code < 0){
           this.$notify.error({
@@ -139,6 +188,13 @@ export default {
         }else{
           this.product = res.data.msg.datas;
           this.totalCount = res.data.msg.totalCount;
+          for(var i=0;i<this.product.length;i++){
+            if(this.product[i].isCompute){
+              this.product[i].isCompute="是"
+            }else{
+              this.product[i].isCompute="否"
+            }
+          }
         }
       })
     }
@@ -156,5 +212,8 @@ export default {
 
 .el-table .success-row {
   background: #f0f9eb;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

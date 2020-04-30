@@ -40,7 +40,20 @@
             <el-button @click="resetForm('passForm')">重置</el-button>
           </el-form-item>
         </el-form>
-
+        <el-dialog
+          :visible.sync="dialogVisible"
+          :close-on-click-modal="false"
+          :close-on-press-escape="false"
+          :show-close="false"
+          width="30%">
+          <div style="font-size:18px;">
+            <i class="el-icon-circle-check" style="color:#67C23A;"></i>
+            密码修改成功
+            <br />
+            <div style="padding-left:18px;"><el-button type="text" @click="toLogin">重新登录</el-button></div>
+            
+          </div>
+        </el-dialog>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -55,15 +68,17 @@ export default {
       if (value === '') {
         callback(new Error('请输入密码'));
       } else {
-        const reg=/^\d{6}$/;
+        const reg=/^\w{6,}$/;
         if(reg.test(value)){
           callback();
         }else{
-          callback(new Error('请输入6位数字密码'));
+          callback(new Error('请输入至少6位密码(数字、大小写字母或下划线_)'));
         }
       }
     };
     return {
+      dialogVisible:false,
+      count:3,
       token: localStorage.getItem('loginToken'),
       passForm:{
         oldPassword:'',
@@ -86,18 +101,19 @@ export default {
           let params=this.passForm;
           this.axios({
             method:'post',
-            url:'/crm/user/updatePwd?token='+this.token,
+            url:'/crm/user/updatePwd',
             params:{
               newPassword:this.passForm.newPassword,
               oldPassword:this.passForm.oldPassword
             }
           })
           .then(res=>{
-            console.log('修改密码保存成功')
-            console.log(res.data)
+            // console.log('修改密码保存成功')
+            // console.log(res.data)
             if(res.data.code>0){
-              this.$message.success('密码修改成功')
-              this.$router.push('/login')
+              // 需要退出重新登录
+              this.dialogVisible=true;
+              localStorage.removeItem("loginToken");
             }else{
               this.$message.error(res.data.msg)
             }
@@ -107,6 +123,10 @@ export default {
           return false;
         }
       });
+    },
+    toLogin(){
+      
+      this.$router.push('/login')
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
@@ -144,7 +164,9 @@ export default {
   font-size: 2rem;
   font-weight: bold;
 }
-
+.el-dialog__header{
+  padding:0;
+}
 
 
 

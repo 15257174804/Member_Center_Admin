@@ -224,7 +224,7 @@ export default {
     // 产品明细表单的多选
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(val)
+      // console.log(val)
     },
     // 获取页面数据
     getDetailData(id){
@@ -232,8 +232,8 @@ export default {
       this.axios
         .get("/b2c/order/list", {params})
         .then(res => {
-          console.log('这还页面数据')
-          console.log(res.data)
+          // console.log('这还页面数据')
+          // console.log(res.data)
           this.form = res.data.msg.datas[0];
           this.form.preType=res.data.msg.datas[0].orderDetailModelList[0].preType;
           this.dataList=res.data.msg.datas[0].orderDetailModelList;
@@ -251,8 +251,8 @@ export default {
         .get("/b2c/order/detail/find/by/order/id", {params})
         .then(res => {
           this.loading = false;
-          console.log('这是产品明细')
-          console.log(res.data)
+          // console.log('这是产品明细')
+          // console.log(res.data)
           this.dataList = res.data.msg;
         })
         .catch(err => {
@@ -266,8 +266,8 @@ export default {
       }
       this.axios.get('/b2c/order/enterprise/info/findbyid',{params})
       .then(res=>{
-        console.log('获取预约活动相关信息')
-        console.log(res.data)
+        // console.log('获取预约活动相关信息')
+        // console.log(res.data)
         this.preform=res.data.msg;
       })
     }

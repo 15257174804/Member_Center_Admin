@@ -51,10 +51,15 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe
       style="width: 100%"
       >
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="name" label="企业名称"></el-table-column>
       <el-table-column prop="type" label="企业类型"></el-table-column>
       <el-table-column prop="lawMan" label="法人"></el-table-column>
@@ -87,7 +92,7 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item >
-                <el-button v-if="scope.row.status==2" type="text" @click="audit(scope.row)"><i class="el-icon-coordinate"></i>企业审核</el-button>
+                <el-button v-if="(scope.row.status==2 &&scope.row.realLevel==1 && isAdmin=='systemAdmin') || (scope.row.status==2 &&scope.row.realLevel!=1 && isAdmin=='isAdmin')" type="text" @click="audit(scope.row)"><i class="el-icon-coordinate"></i>企业审核</el-button>
               </el-dropdown-item>
               <el-dropdown-item ><el-button type="text" @click="edit(scope.row,'busiInfo')"><i class="el-icon-shopping-cart-1"></i>经营范围</el-button></el-dropdown-item>
               <el-dropdown-item ><el-button type="text" @click="edit(scope.row,'cardInfo')"><i class="el-icon-picture-outline-round"></i>证照管理</el-button></el-dropdown-item>
@@ -145,6 +150,7 @@ export default {
         status:''
       },
       dataList: [],
+      companyType:[],
       pagesize: 5, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
@@ -155,6 +161,7 @@ export default {
         isPass:'是',
         opinion:''
       },
+      isAdmin:this.$store.state.isAdmin
     };
   },
   methods: {
@@ -196,6 +203,7 @@ export default {
     },
     // 企业审核
     audit(row){
+      // console.log(row)
       this.dialogVisible =true;
       this.companyform.corpId=row.id;
     },
@@ -283,17 +291,15 @@ export default {
             })
           }else{
             let _dataList=res.data.msg.datas;
-            this.axios.get('/crm/corporationType/list')
-            .then(res=>{
-              // console.log('企业列表查询')
-              // console.log(res.data)
-              for(var i=0;i<_dataList.length;i++){
-                let index=_dataList[i].type-1;
-                _dataList[i].type=res.data.msg.datas[index].name;
-              }
-              this.dataList = _dataList;
-              // console.log(_dataList)
+            this.getCompanyType();
+            _dataList.forEach(item=>{
+              this.companyType.forEach(item2=>{
+                if(item.type && item.type==item2.id){
+                  item.type=item2.name;
+                }
+              })
             })
+            this.dataList = _dataList;
             this.totalCount = res.data.msg.totalCount;
             
           }
@@ -301,6 +307,12 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    getCompanyType(){
+      this.axios.get('/crm/corporationType/list')
+      .then(res=>{
+        this.companyType=res.data.msg.datas;
+      })
     },
     search(){
       this.currentPage = 1;
@@ -318,9 +330,10 @@ export default {
     }
   },
   // 页面渲染前拿到数据
-  mounted() {
+  created() {
     // console.log(this.form);
     this.getDataList();
+    // console.log(1)
   }
 };
 </script>
@@ -339,6 +352,9 @@ td {
 }
 .el-dropdown-link {
   cursor: pointer;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>
 

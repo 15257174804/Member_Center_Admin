@@ -17,8 +17,8 @@
         </el-button>
       </div>
       <div class="searchbox">
-        <el-button>
-          <i class="el-icon-refresh-right" @click="reset()"></i>
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right"></i>
           重置
         </el-button>
       </div>
@@ -41,5 +41,7 @@ export default {
 </script>
 
 <style lang="scss">
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

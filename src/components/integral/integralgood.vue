@@ -32,8 +32,8 @@
         </el-button>
       </div>
       <div class="searchbox">
-        <el-button>
-          <i class="el-icon-refresh-right" @click="reset()"></i>
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right"></i>
           重置
         </el-button>
       </div>
@@ -42,10 +42,15 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe
       style="width: 100%"
       >
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="goodCode" label="商品编码"></el-table-column>
       <el-table-column prop="goodName" label="商品名称"></el-table-column>
       <!-- <el-table-column prop="corpName" label="所属企业"></el-table-column> -->
@@ -130,7 +135,7 @@ export default {
       this.axios
         .get("/b2c/product/good/list",{params})
         .then(res => {
-          console.log(res.data)
+          // console.log(res.data)
           this.loading = false;
           if(res.data.code < 0){
             this.$notify.error({
@@ -170,7 +175,7 @@ export default {
     //重置
     reset(){
       this.searchParams.keyword = "";
-      this.searchParams.isshow = "";
+      this.searchParams.isShow = "";
       this.getDataList();
     }
   },
@@ -181,5 +186,7 @@ export default {
 </script>
 
 <style>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

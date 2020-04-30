@@ -37,7 +37,7 @@
         </el-date-picker>
       </el-form-item>
       <!-- 使用时间 -->
-      <el-form-item label="使用开始时间" props='useStartTime'>
+      <el-form-item label="使用开始时间" prop='useStartTime'>
         <el-date-picker
           v-model="Form.useStartTime"
           type="datetime"
@@ -46,7 +46,7 @@
           placeholder="选择预使用开始时间">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="使用结束时间" props='useEndTime'>
+      <el-form-item label="使用结束时间" prop='useEndTime'>
         <el-date-picker
           v-model="Form.useEndTime"
           type="datetime"
@@ -89,8 +89,8 @@
           <el-option label="领取总数限额" value="3"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item v-if="Form.limitType!=0" label="限额数量" prop="limitCount">
-        <el-input v-model="Form.limitCount" placeholder="请输入优惠券限额数量"></el-input>
+      <el-form-item v-if="Form.limitType!=0" label="限领数量" prop="limitCount">
+        <el-input v-model="Form.limitCount" placeholder="请输入优惠券限领数量"></el-input>
       </el-form-item>
       <el-form-item  label="优惠券总数量" prop="ticketTotal" required>
         <el-input v-model="Form.ticketTotal" placeholder="请输入优惠券总数量"></el-input>
@@ -134,7 +134,12 @@
             height="300"
             border
             style="width: 100%">
-            <el-table-column type="index" label="序号" width="60"></el-table-column>
+            <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+            <el-table-column type="index" label="序号" width="50" align="center">
+              <template slot-scope="scope">
+                <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+              </template>
+            </el-table-column> 
             <el-table-column prop="goodCode" label="商品编号"></el-table-column>
             <el-table-column prop="goodName" label="商品名称"></el-table-column>
             <el-table-column prop="retailPrice" label="金额"></el-table-column>
@@ -143,7 +148,7 @@
               label="操作"
               width="150">
               <template slot-scope="scope">
-                <el-button v-if="protitle=='选择活动商品'" type="text" @click="add(scope.row)" :disabled="JSON.stringify(Form.goods).indexOf(scope.row.goodCode)!=-1"><i class="el-icon-edit"></i>添加</el-button>
+                <el-button v-if="protitle=='选择活动商品'" type="text" @click="add(scope.row)" :disabled="JSON.stringify(Form.goods).indexOf(scope.row.id)!=-1"><i class="el-icon-edit"></i>添加</el-button>
                 <el-button v-if="protitle=='选择赠品(住：只允许选择一个商品)'" type="text" @click="addgift(scope.row)" :disabled="Form.giftGoodId==scope.row.id"><i class="el-icon-edit"></i>添加</el-button>
               </template>
             </el-table-column>
@@ -198,7 +203,50 @@
 export default {
   name:'fulldetail',
   data(){
+    var checkStareTime = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('请选择优惠券领取开始时间'));
+      }else{
+        this.tempTime=value;
+        callback();
+      }
+    };
+    var checkValidDate = (rule, value, callback) => {
+      debugger
+      if(!value){
+        return callback(new Error('请选择优惠券领取结束时间'));
+      }
+      if (Date.parse(value)<Date.parse(this.tempTime)) {
+        callback(new Error('截止日期不能早于开始日期'));
+      }else{
+        callback();
+      }
+    };
+    var checkUseStart = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('请选择优惠券使用开始时间'));
+      }
+      if (Date.parse(value)<Date.parse(this.tempTime)) {
+        callback(new Error('使用开始时间不能早于领取开始时间'));
+      }else{
+        this.tempTime=value;
+        callback();
+      }
+    };
+    var checkUseEnd = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('请选择优惠券使用结束时间'));
+      }
+      if (Date.parse(value)<Date.parse(this.tempTime)) {
+        callback(new Error('使用结束时间不能早于使用开始时间'));
+      }else{
+        this.tempTime=value;
+        callback();
+      }
+    };
     return {
+      tempTime:'',
+      flag:false,
       title:'新建优惠券',
       dialogVisible:false,
       protitle:'',
@@ -230,16 +278,16 @@ export default {
           { required: true, message: '请输入优惠券描述', trigger: 'blur' }
         ],
         startTime: [
-          { required: true, message: '请选择优惠券领取开始时间', trigger: 'blur' }
+          { required: true,validator: checkStareTime, trigger: 'blur' }
         ],
         endTime: [
-          { required: true, message: '请选择优惠券领取结束时间', trigger: 'blur' }
+          { required: true,validator: checkValidDate, trigger: 'blur' }
         ],
         useStartTime: [
-          { required: true, message: '请选择优惠券使用开始时间', trigger: 'blur' }
+          { required: true,validator: checkUseStart, trigger: 'blur' }
         ],
         useEndTime: [
-          { required: true, message: '请选择优惠券使用结束时间', trigger: 'blur' }
+          { required: true,validator: checkUseEnd, trigger: 'blur' }
         ],
         ticketType:[
           { required: true, message: '请选择优惠券类型', trigger: 'change'}
@@ -274,6 +322,7 @@ export default {
     choose(){
       this.dialogVisible = true;
       this.protitle='选择活动商品';
+      this.searchParams.keyword = "";
       this.getDataList();
     },
     // 搜索商品
@@ -284,20 +333,55 @@ export default {
     //重置
     reset(){
       this.searchParams.keyword = "";
+      this.getDataList();
     },
     //添加商品
     add(row){
-      // console.log('点击添加')
       // console.log(row)
-      // console.log(Array.isArray(row))
+      let data=[{
+        "goodId":row.id,//商品id
+        "goodName":row.goodName,//商品名
+        "groupId":row.groupId,//集团id
+        "corpId":row.corpId,
+        "clientId":row.clientId,//门店id
+        "goodCode":row.goodCode,//商品编码
+        "retailPrice":row.retailPrice,//商品价格
+        "commonName":row.commonName,//通用名
+        "chemieName":row.chemieName,//化学名
+        "goodsClass":row.goodsClass,//商品分类
+        "spec":row.spec,//规格
+        "producer":row.producer,//生产产家
+        "prodArea":row.prodArea,//产地
+        "useUnit":row.useUnit,//单位
+        "medicalType":row.medicalType,//剂型
+        "ybType":row.ybType,//医保类型
+        "license":row.license,//生产许可证
+        "barcode":row.barcode//条形码
+      }];
+      // data.push(row)
+      // console.log(data)
+      if(this.flag){
+        this.axios({
+          method: 'post',
+          url:'/b2c/discountTicket/addGood?ticketId='+this.Form.id,
+          data
+        })
+        .then(res=>{
+          if(res.data.code>0){
+            this.$message.success('添加成功')
+          }else{
+            this.$message.error('请重试')
+          }
+        })
+      }
       let goodform={}
-        goodform.corpId=row.corpId;
-        goodform.goodId=row.id;
-        goodform.goodCode=row.goodCode;
-        goodform.goodName=row.goodName;
-        goodform.spec=row.spec;
-        goodform.retailPrice=row.retailPrice;
-        this.Form.goods=this.Form.goods.concat(goodform);
+      goodform.corpId=row.corpId;
+      goodform.goodId=row.id;
+      goodform.goodCode=row.goodCode;
+      goodform.goodName=row.goodName;
+      goodform.spec=row.spec;
+      goodform.retailPrice=row.retailPrice;
+      this.Form.goods=this.Form.goods.concat(goodform);
     },
     // 删除商品
     delgood(row){
@@ -306,6 +390,25 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
+        if(this.flag){
+          let params={
+            goodId:row.goodId
+          }
+          this.axios({
+            method: 'post',
+            url:'/b2c/discountTicket/delGood?ticketId='+this.Form.id,
+            data:[{
+              goodId:row.goodId
+            }]
+          })
+          .then(res=>{
+            if(res.data.code>0){
+              this.$message.success('删除成功')
+            }else{
+              this.$message.error('请重试')
+            }
+          })
+        }
         for(let i=0;i<this.Form.goods.length;i++){
           if(this.Form.goods[i].goodId==row.goodId){
             this.Form.goods.splice(i,1)
@@ -436,6 +539,7 @@ export default {
     if(this.$route.query.id){
       this.Form.id = this.$route.query.id;
       this.title=this.$route.query.title;
+      this.flag=true;
       this.getData();
     }
   }
@@ -450,6 +554,9 @@ input{
   
   border:1px solid #DCDFE6;
   width:50px;
+}
+.searchbox{
+  font-size: 14px;
 }
 /* span{
   color:#606266;

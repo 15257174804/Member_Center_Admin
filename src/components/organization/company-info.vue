@@ -8,7 +8,7 @@
     </div>
     <el-tabs v-model="tabName" type="card" @tab-click="handleClick">
       <el-tab-pane label="基础信息" name="basicInfo">
-        <basic v-if="flag" :form="form" ref="getlogo"></basic>
+        <basic v-if="flag" :form="form" :title="title" ref="getlogo"></basic>
       </el-tab-pane>
       <el-tab-pane label="经营范围" name="busiInfo">
         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleBusiScopeAllChange" border>全选</el-checkbox>
@@ -17,7 +17,7 @@
         </el-checkbox-group>
       </el-tab-pane>
       <el-tab-pane label="证照管理" name="cardInfo">
-        <el-button @click="addLicense()">添加证照</el-button>
+        <!-- <el-button @click="addLicense()">添加证照</el-button> -->
         <div class="license-group clearfix" v-for="(v,i) in licenses" :key="i">
           <div @click="getImageTypeIndex(i)" class="img-box">
             <el-upload
@@ -31,19 +31,19 @@
             </el-upload>
           </div>
           <div class="info-box">
-            <el-form ref="form" :model="v" label-width="80px" size="mini">
+            <el-form ref="form" :rules="rules" :model="v" label-width="80px" size="mini">
               <el-form-item label="证照类型">
-                 <el-input v-model="v.typeName" placeholder="可输入许可证或经营许可证"></el-input>
+                 <el-input v-model="v.typeName" placeholder="可输入许可证或经营许可证" disabled></el-input>
               </el-form-item>
               <el-form-item label="证照号码">
                 <el-input v-model="v.memo" placeholder="请输入证件号码"></el-input>
               </el-form-item>
-              <el-form-item label="生效日期">
+              <el-form-item label="生效日期" prop="startTime">
                 <el-col :span="11">
                   <el-date-picker type="date" placeholder="请选择生效日期" v-model="v.startTime"></el-date-picker>
                 </el-col>
               </el-form-item>
-              <el-form-item label="截止日期">
+              <el-form-item label="截止日期" prop="validDate">
                 <el-col :span="11">
                   <el-date-picker type="date" placeholder="请选择截止日期" v-model="v.validDate"></el-date-picker>
                 </el-col>
@@ -64,7 +64,26 @@
     components: { basic },
     name: "companyadd",
     data() {
+      var checkStareTime = (rule, value, callback) => {
+        if(!value){
+          return callback(new Error('开始日期不能为空'));
+        }else{
+          this.tempTime=value;
+          callback();
+        }
+      };
+      var checkValidDate = (rule, value, callback) => {
+        if(!value){
+          return callback(new Error('截止日期不能为空'));
+        }
+        if (Date.parse(value)<Date.parse(this.tempTime)) {
+          callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+      };
       return {
+        tempTime:'',
         title: "新建企业",
         checkAll: false,
         tabName: 'basicInfo',//默认选项卡
@@ -75,23 +94,23 @@
         busiScopeCheckList:[],
         licenses:[
           {
-              corpId:'',
-              type:"1",
-              typeName:'营业执照',
-              startTime:'',
-              validDate:"",
-              memo:"",
-              picture: ""
-            },
-            {
-              corpId:'',
-              type:"2",
-              typeName:'许可证',
-              startTime:'',
-              validDate:"",
-              memo:"",
-              picture: ""
-            }
+            type:'1',
+            picture:'',
+            typeName:'经营许可证',
+            memo:'',
+            startTime:"",
+            validDate:'',
+            whetherMust:true
+          },
+          {
+            type:'2',
+            picture:'',
+            typeName:'许可证',
+            memo:'',
+            startTime:"",
+            validDate:'',
+            whetherMust:false
+          },
         ],
         form: {
           id:'',
@@ -113,16 +132,30 @@
           businessScope:[],
           scopeConfigIdsStr:'',
           level:'',
+          realLevel:'',
           logo:''
+        },
+        rules: {
+          startTime:[
+            { validator: checkStareTime, trigger: 'change' }
+          ],
+          validDate:[
+            { validator: checkValidDate, trigger: 'change' }
+          ],
+          memo:[
+            { required: true,message: '证件号码不能为空', trigger: 'blur' }
+          ]
         },
         dialogVisible: false,
         uploadDisabled: false,
         token: localStorage.getItem('loginToken'),
         uploadImageIndex:"",//当前上传图片的索引
-        flag:false
+        flag:false,
+        companyDataList:''
       }
+
     },
-    mounted() {
+    created() {
       // 路由参数
       if(this.$route.query.id){
         this.form.id = this.$route.query.id;
@@ -133,7 +166,6 @@
         this.flag=true
       }
       this.getBusinessScopeList();//获取所有经营范围类型
-      
     },
     methods: {
       //获取企业信息
@@ -145,6 +177,12 @@
             // console.log('获取单个企业信息')
             // console.log(res.data)
             this.form = res.data.msg[0];
+            if(this.form.province==0){
+              this.form.province='';
+              this.form.city='';
+              this.form.county='';
+            }
+            // console.log(this.form)
             this.busiScopeCheckList = _.pluck(this.form.businessScope, 'id');//初始化经营范围
             this.getCorpLicenses(this.form.id);
             this.flag=true;
@@ -240,6 +278,15 @@
               cancelButtonText: '取消',
               type: 'warning'
             }).then(() => {
+              
+              for(var i=0;i<this.licenses.length;i++){
+                if(this.licenses[i].whetherMust){
+                  if(this.licenses[i].memo=='' || this.licenses[i].startTime=='' || this.licenses[i].validDate==''){
+                    this.$message.error('请完善营业执照信息')
+                    return
+                  }
+                }
+              }
               this.form.licenses = this.licenses;
               this.form.logo=this.$refs.getlogo.fileName;
               //保存

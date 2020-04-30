@@ -32,7 +32,7 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe
       style="width: 100%">
       <el-table-column prop="id" label="编号" width="60"></el-table-column>
       <el-table-column prop="createTime" label="申请时间"></el-table-column>
@@ -130,7 +130,7 @@ export default {
   methods:{
     // 查看合伙人佣金计数记录 接口数据有问题，暂时隐藏功能，后期有需求再进行修改
     edit(row){
-      console.log(row)
+      // console.log(row)
       this.dialogVisible2=true;
       let params={
         groupId:row.groupId,
@@ -143,12 +143,12 @@ export default {
       let params=params;
       this.axios.get('/b2c/rebateOrder/group',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
       })
     },
     // 企业预约订单审核
     agree(row){
-      console.log(row)
+      // console.log(row)
       this.dialogVisible =true;
       this.companyform.id=row.id;
     },
@@ -159,7 +159,7 @@ export default {
         pass:this.companyform.pass=='是'?true:false,
         opinion:this.companyform.opinion
       }
-      console.log(params)
+      // console.log(params)
       this.axios.get('/b2c/partner/audit',{params})
       .then(res=>{
         // console.log(res.data)

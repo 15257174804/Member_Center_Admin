@@ -11,7 +11,8 @@
         商品名称：
         <el-input v-model="searchParams.goodName" placeholder="请输入商品名称" :style="{width:'180px',height:'40px'}"></el-input>
       </div>
-      <div class="searchbox">
+
+      <!-- <div class="searchbox">
         <div class="block">
           起始时间：
           <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期"></el-date-picker>
@@ -22,7 +23,23 @@
           截止日期：
           <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期"></el-date-picker> 
         </div>
-      </div>
+      </div> -->
+
+      <el-form status-icon :rules="rules2" style="display:inline-block;">
+        <el-form-item  style="display:inline-block;">
+          <div class="searchbox">
+            起始时间：
+            <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}" :picker-options='pickerOptions'></el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item prop="endTime" style="display:inline-block;">
+          <div class="searchbox">
+            截止日期：
+            <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
+          </div>
+        </el-form-item>
+      </el-form>
+
       <div class="searchbox">
         <el-button type="primary" @click="search()">
           <i class="el-icon-zoom-in"></i>
@@ -44,7 +61,7 @@
       border
       :data="product"
       style="width: 100%"
-      :row-class-name="tableRowClassName">
+      stripe>
       <!-- <el-table-column prop="preSellName" label="活动名称"></el-table-column> -->
       <el-table-column prop="goodCode" label="商品编号"></el-table-column>
       <el-table-column prop="goodName" label="商品名"></el-table-column>
@@ -77,7 +94,25 @@
 export default {
   name:'count',
   data(){
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+        if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
+          callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+    };
     return {
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      },
+      rules2:{
+        endTime:[
+          { validator: validatePass, trigger: 'change' }
+        ]
+      },
       searchParams:{
         goodName:'',
         startTime:'',
@@ -98,7 +133,8 @@ export default {
     },
     // 重置
     reset(){
-      this.searchParams.goodName=''
+      this.searchParams.goodName='';
+      this.getList();
     },
     // 行的背色
     tableRowClassName({row, rowIndex}) {
@@ -135,7 +171,7 @@ export default {
       this.axios.get('/b2c/statistical/pre/sell/byGood',{params})
       .then(res=>{
         this.loading = false;
-        console.log(res.data)
+        // console.log(res.data)
         this.product=res.data.msg.datas;
         this.totalCount=res.data.msg.totalCount;
       })
@@ -157,5 +193,8 @@ export default {
 
 .el-table .success-row {
   background: #f0f9eb;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

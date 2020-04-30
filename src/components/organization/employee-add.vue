@@ -9,7 +9,7 @@
       <el-tabs v-model="tabName" type="card" @tab-click="handleClick">
         <el-tab-pane label="基础信息" name="basicInfo">
           <el-form-item class="half-form" label="用户名" prop="username">
-            <el-input v-model="form.username" :disabled="form.id != ''" placeholder="请输入用户名"></el-input>
+            <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
           </el-form-item>
           <!-- ********************************角色维护**************************************************************************** -->
           <!-- <el-form-item class="half-form" label="角色" prop="roleName">
@@ -26,7 +26,14 @@
             <el-input v-model="form.mobilephone" :disabled="form.id != ''" placeholder="请输入手机号"></el-input>
           </el-form-item>
 
-          <div>
+          <!-- 所属企业可修改 -->
+          <el-form-item  class="half-form" label="所属企业" prop="lastOrgName">
+            <el-select v-model="form.lastOrgName" placeholder="请选择所属企业" filterable>
+              <el-option v-for="item in companyDataList" :key="item.id" :label="item.name" :value="item.id"></el-option> 
+            </el-select>
+          </el-form-item>
+          <!-- 所属企业不可修改 -->
+          <!-- <div>
             <el-form-item v-if="form.id==''" class="half-form" label="所属企业" prop="orgId">
               <el-select v-model="form.orgId" placeholder="请选择所属企业" filterable>
                 <el-option v-for="item in companyDataList" :key="item.id" :label="item.name" :value="item.id"></el-option> 
@@ -35,18 +42,18 @@
             <el-form-item v-else class="half-form" label="所属企业" prop="orgId">
               <el-input v-model="form.orgName" :disabled="form.id != ''"></el-input>
             </el-form-item>
-          </div>
+          </div> -->
           <!-- 111111111111111暂不设置1111111111111111111111111111111111111111111111111111111 -->
           <!-- <el-form-item class="half-form" label="权限设置" prop="menu">
             <el-input v-model="form.menu" placeholder="暂不可设置" disabled></el-input>
           </el-form-item> -->
 
           <el-form-item class="half-form" label="企业工号" prop="workNo">
-            <el-input v-model="form.workNo" placeholder="请输入企业工号"></el-input>
+            <el-input v-model="form.workNo" placeholder="请输入企业工号" :disabled="form.id != ''"></el-input>
           </el-form-item>
            <el-form-item class="half-form" label="入职日期">
             <el-col>
-              <el-date-picker type="date" placeholder="选择入职日期" v-model="form.enterDate"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择入职日期" v-model="form.enterDate" :picker-options='pickerOptions'></el-date-picker>
             </el-col>
           </el-form-item>
           <!-- <el-form-item class="half-form" label="所属企业类型">
@@ -79,7 +86,7 @@
           </el-form-item>
           <el-form-item class="half-form" label="生日">
             <el-col>
-              <el-date-picker type="date" placeholder="选择生日" v-model="form.birthday"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择生日" v-model="form.birthday" :picker-options='pickerOptions'></el-date-picker>
             </el-col>
           </el-form-item>
           <el-form-item class="half-form" label="学历">
@@ -200,7 +207,12 @@
             { required: true, message: '请输入工号', trigger: 'blur' },
           ],
         },
-        options:[]
+        options:[],
+        pickerOptions:{
+          disabledDate(time) {
+            return time.getTime() > Date.now();
+         }
+        }
       }
     },
     mounted(){

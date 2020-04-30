@@ -26,10 +26,14 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
       style="width: 100%"
       >
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+        </template>
+      </el-table-column> 
       <el-table-column prop="title" label="标题" width="230"></el-table-column>
       <el-table-column prop="content" label="反馈内容"></el-table-column>
       <el-table-column prop="mobilePhone" label="反馈人手机号" width="200"></el-table-column>
@@ -71,22 +75,6 @@ export default {
     }
   },
   methods:{
-    // 每页展示多少条数据
-    tableRowClassName({row, rowIndex}) {
-      if (rowIndex == 0){
-        return '';
-      }
-      else if (rowIndex % 3 == 0) {
-        return 'success-row';
-      }
-      else if (rowIndex % 2 == 0){
-        return '';
-      } 
-      else if (rowIndex % 1 == 0){
-        return 'warning-row';
-      }
-      return '';
-    },
     handleSizeChange(size) {
       this.pagesize = size;
       this.getList();
@@ -113,7 +101,7 @@ export default {
       params.pagesize = this.pagesize;
       this.axios.get('crm/suggest/list',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.loading=false;
         this.dataList=res.data.msg.datas;
         this.totalCount=res.data.msg.totalCount;
@@ -127,5 +115,7 @@ export default {
 </script>
 
 <style scoped>
-
+.searchbox{
+  font-size: 14px;
+}
 </style>

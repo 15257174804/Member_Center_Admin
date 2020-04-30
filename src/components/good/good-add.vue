@@ -70,6 +70,9 @@
           <el-form-item class="half-form" label="许可证">
             <el-input v-model="form.license"></el-input>
           </el-form-item>
+          <el-form-item class="half-form" label="净重/kg" prop="weight">
+            <el-input v-model="form.weight" type="number"></el-input>
+          </el-form-item>
           <el-form-item class="half-form" label="是否上架">
             <el-switch active-color="#13ce66" v-model="form.isShow"></el-switch>
           </el-form-item>
@@ -120,6 +123,14 @@
   export default {
     name: "goodadd",
     data() {
+      var checkWeight=(rule,value,callback)=>{
+        let reg=/^(0|[1-9][0-9]*)(\.\d+)?$/;
+        if(reg.test(value)){
+          callback()
+        }else{
+          callback(new Error('请输入正数！'))
+        }
+      };
       return {
         title:"创建商品",
         tabName: 'basicInfo',//默认选项卡
@@ -153,7 +164,8 @@
           useTime:"",//使用时间
           taboo:"",//禁忌
           mattersNeedingAttention:"",//注意事项
-          isShow:""
+          isShow:"",
+          weight:''
         },
         rules: {
           goodName: [
@@ -168,13 +180,16 @@
           quantity:[
             { required: true, message: '请输入库存信息', trigger: 'blur' }
           ],
+          weight:[
+            { validator: checkWeight, trigger: 'blur' }
+          ],
         },
         currentPage:'',
         pagesize:''
       }
     },
-    mounted(){
-        // 路由参数
+    created(){
+      // 路由参数
         if(this.$route.query.id){
           this.form.id = this.$route.query.id;
           this.title = this.$route.query.title;
@@ -183,7 +198,12 @@
           this.pagesize=this.$route.query.pagesize;
           this.getData();
           this.getClass();
+          // console.log(this.currentPage)
+          // console.log(this.pagesize)
         }
+    },
+    mounted(){
+        
     },
     methods: {
       // 获取商品类别
@@ -203,32 +223,59 @@
       },
       //图片处理
       handleRemove(file, fileList) {
-        // console.log( _.pluck(fileList, 'name'));
-        // console.log( _.pluck(this.pictures, 'name'));
-        // return 
-        let _list = [];
-        this.pictures.forEach(row => {
-          fileList.forEach(row1 => {
-            if(row.name == row1.name){
-              _list.push({
-                isMain: row.isMain,
-                imgUrl: row.url
-              })
+        for(var i=0;i<this.pictures.length;i++){
+          if(this.pictures[i].id===file.id){
+            this.pictures.splice(i,1)
+          }
+        }
+        if(file.id){
+          let params={
+            id:file.id
+          }
+          this.axios.get('/b2c/product/good/picture/delete',{params})
+          .then(res=>{
+            if(res.data.code>0){
+              this.$message.success('删除成功')
+            }else{
+              this.$message.error(res.data.msg)
             }
           })
-        })
-        this.pictures = _list;
+        }
       },
       handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
       },
       handleSuccess(response, file, fileList){
-        this.pictures.push({
-          name: response.msg.originName,
-          isMain: false,
-          imgUrl: response.msg.title
-        })
+        // console.log('file')
+        // console.log(file)
+        // console.log('fileList')
+        // console.log(fileList)
+        // console.log('response')
+        // console.log(response)
+        if(this.form.id!==''){
+          let params={
+            goodId:this.form.id,
+            imgUrl:response.msg.title,
+            isMain:false
+          }
+          this.axios.post('/b2c/product/good/picture/save',params)
+          .then(res=>{
+            if(res.data.code>0){
+              this.$message.success('上传成功')
+            }else{
+              this.$message.error(res.data.msg)
+            }
+          })
+        }else{
+          this.pictures.push({
+            name: response.msg.originName,
+            isMain: false,
+            imgUrl: response.msg.title
+          })
+        }
+        
+
       },
       // 获取数据
       getData() {
@@ -256,15 +303,19 @@
             let data = res.data.msg.datas;
             data.forEach(row => {
               this.fileList.push({
+                id:row.id,
                 name: row.imgUrl,
                 url: global_.baseURL + '/b2c/image/' + row.imgUrl
               })
               this.pictures.push({
+                id:row.id,
                 name: row.imgUrl,
                 isMain: row.isMain,
                 imgUrl: row.imgUrl
               })
             })
+            // console.log(this.fileList)
+            // console.log(this.pictures)
           })
           .catch(err => {
             console.log(err);
@@ -281,6 +332,9 @@
               type: 'warning'
             }).then(() => {
               this.form.pictures = this.pictures;
+              if(this.pictures.length==0){
+                this.form.imgUrl=''
+              }
               //保存
               this.axios
               .post("/b2c/product/good/save", this.form)

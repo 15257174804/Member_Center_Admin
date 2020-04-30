@@ -90,7 +90,7 @@
           <!-- <el-form-item label="营业执照" prop="businessLicense">
             <el-input v-model="form.businessLicense" placeholder="请输入执照编号"></el-input>
           </el-form-item> -->
-          <el-form-item label="营业执照" prop="businessLicense">
+          <el-form-item label="营业执照" prop="licenses">
             <div class="license-group clearfix" >
               <div class="img-box">
                 <el-upload
@@ -99,23 +99,23 @@
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   >
-                  <img v-if="form.businessLicense.picture" :src="axios.defaults.baseURL + '/crm/image/' + form.businessLicense.picture" class="avatar">
+                  <img v-if="form.licenses[0].picture" :src="axios.defaults.baseURL + '/crm/image/' + form.licenses[0].picture" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
               </div>
               <div class="info-box">
-                <el-form ref="form" :model="form.businessLicense" label-width="80px" size="mini">
+                <el-form :model="form.licenses[0]" :rules="rules" label-width="80px" size="mini">
                   <el-form-item label="证照类型">
-                    <el-input v-model="form.businessLicense.typeName" disabled></el-input>
+                    <el-input v-model="form.licenses[0].typeName" disabled></el-input>
                   </el-form-item>
                   <el-form-item label="证照号码">
-                    <el-input v-model="form.businessLicense.memo" placeholder="请输入证件号码"></el-input>
+                    <el-input v-model="form.licenses[0].memo" placeholder="请输入证件号码"></el-input>
                   </el-form-item>
-                  <el-form-item label="生效日期">
-                    <el-date-picker type="date" placeholder="请选择" v-model="form.businessLicense.startTime"></el-date-picker>
+                  <el-form-item label="生效日期" prop="startTime">
+                    <el-date-picker type="date" placeholder="请选择" v-model="form.licenses[0].startTime"></el-date-picker>
                   </el-form-item>
-                  <el-form-item label="截止日期">
-                    <el-date-picker type="date" placeholder="请选择" v-model="form.businessLicense.validDate"></el-date-picker>
+                  <el-form-item label="截止日期" prop="validDate">
+                    <el-date-picker type="date" placeholder="请选择" v-model="form.licenses[0].validDate"></el-date-picker>
                   </el-form-item>
                 </el-form>
               </div>
@@ -151,7 +151,26 @@ export default {
         }
       }
     };
+    var checkStareTime = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('开始日期不能为空'));
+      }else{
+        this.tempTime=value;
+        callback();
+      }
+    };
+    var checkValidDate = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('截止日期不能为空'));
+      }
+      if (Date.parse(value)<Date.parse(this.tempTime)) {
+        callback(new Error('截止日期不能早于开始日期'));
+      }else{
+        callback();
+      }
+    };
     return {
+      tempTime:'',
       sheng: [],
       shi: [],
       qu: [],
@@ -170,13 +189,14 @@ export default {
         address:'',
         postcode:'',
         contactNumber:'',
-        businessLicense:{
+        licenses:[{
+          type:'1',
           picture:'',
           typeName:'经营许可证',
           memo:'',
           startTime:"",
           validDate:''
-        }
+        }]
       },
       rules: {
         code: [
@@ -185,15 +205,21 @@ export default {
         name: [
           { required:true,message:'企业名称不能为空', trigger: 'blur' }
         ],
-        businessLicense: [
-          { required:true, message:'营业执照不能为空', trigger: 'blur' }
+        licenses: [
+          { required:true }
         ],
         contactNumber: [
           { required:true, validator: checkPhone, trigger: 'blur' }
         ],
         type: [
           { required:true, message:'请选择企业类型', trigger: 'change' }
-        ]
+        ],
+        startTime:[
+            { validator: checkStareTime, trigger: 'change' }
+          ],
+          validDate:[
+            { validator: checkValidDate, trigger: 'change' }
+          ],
       }
     }
   },
@@ -205,15 +231,15 @@ export default {
     //添加证照
     // 选择图片
     handleAvatarSuccess(response, file, fileList){
-      this.form.businessLicense.picture = response.msg.title;
-      console.log(this.form.businessLicense);
+      this.form.licenses[0].picture = response.msg.title;
+      // console.log(this.form.licenses);
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.axios.post('/crm/corporation/register',this.form)
           .then(res=>{
-            console.log(res.data)
+            // console.log(res.data)
             if(res.data.code>0){
               this.$message({
                 type: 'success',

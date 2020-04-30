@@ -34,25 +34,36 @@ export default {
     },
     getBreadcrumb() {
       let matched = this.$route.matched;
-      this.activeTitle = matched[1].meta.title;
-      //如果不是首页
-      if (!this.isHave(matched[1])) {
-        this.hisRouteList = this.hisRouteList.concat(matched[1]);
+      // console.log('matched')
+      // console.log(matched)
+      if(matched.length>1){
+        this.activeTitle = matched[1].meta.title;
+        //如果不是首页
+        if (!this.isHave(matched[1])) {
+          // this.hisRouteList = this.hisRouteList.concat(matched[1]);
+          // this.hisRouteList.unshift(matched[1])
+          this.hisRouteList.splice(1,0,matched[1])
+        }
+        // console.log(this.hisRouteList);
       }
-      // console.log(this.hisRouteList);
+      
     },
     close(i){
+      // console.log(this.hisRouteList)
+      // console.log(i)
         this.hisRouteList.splice(i,1);
-        let name = this.hisRouteList[this.hisRouteList.length-1].name;
+        // let path = this.hisRouteList[this.hisRouteList.length-1].path;
+        let path = this.hisRouteList[i-1].path;
         this.$router.push({
-          name: name//跳转路径的name值，不写跳转后页面取不到参数
+          path: path//跳转路径的name值，不写跳转后页面取不到参数
         })
     }
   },
   watch: {
-    $route() {
-      this.getBreadcrumb();
-    }
+    // $route() {
+    //   this.getBreadcrumb();
+    // }
+    '$route':'getBreadcrumb'
   },
   mounted() {
     this.getBreadcrumb();
@@ -76,6 +87,8 @@ li{list-style:none;}
     transition: 1s;
     z-index: 111;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    overflow: hidden;
 }
 li{
     height: 29px;

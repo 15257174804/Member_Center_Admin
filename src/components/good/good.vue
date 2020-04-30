@@ -44,8 +44,8 @@
         </el-button>
       </div>
       <div class="searchbox">
-        <el-button>
-          <i class="el-icon-refresh-right" @click="reset()"></i>
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right" ></i>
           重置
         </el-button>
       </div>
@@ -73,19 +73,26 @@
           </el-upload>
         </div>
       </div>
-      
-      
-      
     </div>
-
     <el-table
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe 
       style="width: 100%"
       >
-      <el-table-column type="index" label="序号" width="60"></el-table-column>
+      <!-- <el-table-column type="index" label="序号" width="60"></el-table-column> -->
+      <el-table-column type="index" label="序号" width="50" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
+        </template>
+      </el-table-column> 
+      <el-table-column prop="backImg" label="图片" width="80" >
+          <template slot-scope="scope">
+            <img v-if="scope.row.imgUrl" style="width:60px;height:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl">
+            <span v-else>无</span>
+          </template>
+      </el-table-column>
       <el-table-column prop="goodName" label="商品名称"></el-table-column>
       <el-table-column prop="corpName" label="所属企业"></el-table-column>
       <el-table-column prop="goodsClass" label="商品分类"></el-table-column>
@@ -99,7 +106,10 @@
           <el-tag
             :type="scope.row.isShow =='1' ? 'success':'danger' "
             disable-transitions
+            @click="change(scope.row)"
+            style="cursor: pointer;"
           >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
+
         </template>
       </el-table-column>
       <el-table-column
@@ -124,7 +134,7 @@
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page.sync="currentPage"
+      :current-page="currentPage"
       :page-sizes="[5, 10, 15, 20]"
       :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
@@ -143,7 +153,7 @@ export default {
       searchParams:{
         redeemFlag:false,
         keyword:"",
-        isShow:""
+        isShow:"1"
       },
       dataList: [],
       pagesize: 5, //页面一次展示多少数据
@@ -154,23 +164,31 @@ export default {
       token: localStorage.getItem('loginToken')
     };
   },
-  mounted() {
-    // console.log('mounted11111')
+  created(){
+    // console.log('created11111')
     if(this.$route.query.pagesize){
       this.pagesize=Number(this.$route.query.pagesize);
       this.currentPage=Number(this.$route.query.currentPage);
-    }else{
-      this.pagesize=5;
-      this.currentPage=1;
     }
-    
     this.getDataList();
+  },
+  mounted() {
+    
   },
   activated(){
     // console.log('acticated222222222')
+    if(this.$route.query.pagesize){
+      this.pagesize=Number(this.$route.query.pagesize);
+      this.currentPage=Number(this.$route.query.currentPage);
+    }
+    this.getDataList();
   },
   deactivated(){
     // console.log('deactivated33333333333')
+    // this.$store.commit('setPagesize',this.pagesize);
+    // this.$store.commit('setCurrentPage',this.currentPage);
+    // console.log(this.$store.state.pagesize)
+    // console.log(this.$store.state.currentPage)
   },
   methods: {
     exportTemp(){
@@ -241,7 +259,12 @@ export default {
               this.$message.error('出错啦！请重试！')
             }
           })
-        })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消操作'
+          });
+        });
       }else{
         this.$confirm('确定上架该产品吗?', '提示', {
           confirmButtonText: '确定',
@@ -260,7 +283,12 @@ export default {
               this.$message.error('出错啦！请重试！')
             }
           })
-        })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消操作'
+          });          
+        });
       }
     },
     // 每页展示多少条数据
@@ -334,6 +362,7 @@ export default {
     reset(){
       this.searchParams.keyword = "";
       this.searchParams.isshow = "";
+      this.getDataList();
     }
   }
 };
@@ -345,6 +374,7 @@ tr,
 th,
 td {
   color: #303133;
+  
 }
 .blank {
   background: rgb(240, 243, 244);
@@ -354,6 +384,9 @@ td {
 .el-dropdown-link {
   cursor: pointer;
   
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>
 

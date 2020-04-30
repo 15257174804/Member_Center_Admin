@@ -30,8 +30,8 @@
         </el-button>
       </div>
       <div class="searchbox">
-        <el-button>
-          <i class="el-icon-refresh-right" @click="reset()"></i>
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right"></i>
           重置
         </el-button>
       </div>
@@ -41,7 +41,7 @@
       v-loading="loading"
       :data="dataList"
       border 
-      :row-class-name="tableRowClassName" 
+      stripe
       style="width: 100%"
       >
       <el-table-column prop="goodCode" label="商品编号" width="100"></el-table-column>
@@ -80,15 +80,15 @@
 
     <!-- 返利的弹出框 -->
     <el-dialog :title="title" :visible.sync="dialogFormVisible">
-      <el-form :model="form">
-        <div :class="title=='按商品分类设置返利'?'':'isShow'">
+      <el-form :model="form" ref="form" :rules="rules" label-width="150px">
+        <!-- <div :class="title=='按商品分类设置返利'?'':'isShow'">
           <el-form-item label="商品分类">
             <el-select v-model="form.fenlei" placeholder="请选择">
               <el-option label="区域一" value="shanghai"></el-option>
               <el-option label="区域二" value="beijing"></el-option>
             </el-select>
           </el-form-item>
-        </div>
+        </div> -->
         <!-- <el-form-item label="设置方式" :label-width="type">
           <el-select v-model="form.type" placeholder="请选择">
             <el-option label="金额" value="price"></el-option>
@@ -99,7 +99,7 @@
           <el-input :disabled="form.type=='percent'" v-model="form.price"></el-input>
         </el-form-item> -->
         <el-form-item label="百分比(区间0~1)" prop="rebateRate">
-          <el-input v-model="form.rebateRate"></el-input>
+          <el-input v-model="form.rebateRate" type="number"></el-input>
         </el-form-item>
 
       </el-form>
@@ -115,6 +115,20 @@
 export default {
   name:'rebateset',
   data(){
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+      if(!value){
+        callback(new Error('请输入返利比例'))
+      }else{
+        let reg=/^[0,1].\d{1,2}$/;
+        if(reg.test(value)){
+          callback()
+        }else{
+          callback(new Error("请输入0~1之间的小数"))
+        }
+      }
+      
+    };
     return {
       searchParams:{
         redeemFlag:false,
@@ -131,7 +145,13 @@ export default {
       form:{
         id:'',
         rebateRate:0
-      }
+      },
+      rules: {
+          rebateRate:[
+            { validator: validatePass, trigger: 'blur' },
+            // { min: 2, max: 8, message: '长度在 2 到 10 个字符', trigger: 'blur' }
+          ]
+        },
     }
   },
   methods:{
@@ -142,7 +162,7 @@ export default {
       // 等后续有商品分类了再完善
     },
     edit(row){
-      console.log(row)
+      // console.log(row)
       this.dialogFormVisible=true;
       this.form.id=row.id;
       this.form.rebateRate=row.rebateRate;
@@ -157,8 +177,8 @@ export default {
       
       this.axios.post('/b2c/product/good/save',params)
       .then(res=>{
-        console.log('设置保存')
-        console.log(res.data)
+        // console.log('设置保存')
+        // console.log(res.data)
         if(res.data.code > 0){
           this.$message({
             type: 'success',
@@ -181,7 +201,7 @@ export default {
       this.axios
         .get("b2c/product/good/list",{params})
         .then(res => {
-          console.log(res.data)
+          // console.log(res.data)
           this.loading = false;
           if(res.data.code < 0){
             this.$notify.error({
@@ -242,5 +262,8 @@ export default {
 <style>
 .isShow{
   display: none;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>

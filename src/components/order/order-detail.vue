@@ -50,9 +50,9 @@
         >
         </el-table-column>
         <el-table-column type="index" label="序号" width="60"></el-table-column>
-        <el-table-column prop="imgUrl" label="商品图片" width="300">
+        <el-table-column prop="imgUrl" label="商品图片" width="80">
             <template slot-scope="scope">
-              <img height="100" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl" alt="">
+              <img style="height:60px;width:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl" alt="">
             </template>
         </el-table-column>
         <el-table-column prop="goodName" label="商品名称"></el-table-column>
@@ -116,8 +116,8 @@
         this.axios
           .get("/b2c/order/detail/find/by/order/id", {params})
           .then(res => {
-            console.log('获取findbyid')
-            console.log(res.data)
+            // console.log('获取findbyid')
+            // console.log(res.data)
             this.loading = false;
             this.dataList = res.data.msg;
           })

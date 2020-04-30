@@ -8,7 +8,7 @@ module.exports = {
 		hotOnly: false,
 		proxy: {
 			'/api': {
-				target: 'http://healthtest.alink365.cn', //对应自己的接口
+				target: 'http://health.alink365.cn', //对应自己的接口
 				changeOrigin: true,
 				ws: true,
 				pathRewrite: {

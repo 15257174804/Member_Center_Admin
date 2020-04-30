@@ -46,14 +46,29 @@
         </el-button>
       </div>
       <br>
-      <div class="searchbox">
+      <!-- <div class="searchbox">
         起始时间：
         <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'185px',height:'40px'}"></el-date-picker>
       </div>
       <div class="searchbox">
         截止日期：
         <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'185px',height:'40px'}"></el-date-picker> 
-      </div>
+      </div> -->
+
+      <el-form status-icon :rules="rules2">
+        <el-form-item  style="display:inline-block;">
+          <div class="searchbox">
+            起始时间：
+            <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'185px',height:'40px'}" :picker-options='pickerOptions'></el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item prop="endTime" style="display:inline-block;">
+          <div class="searchbox">
+            截止日期：
+            <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'185px',height:'40px'}"></el-date-picker> 
+          </div>
+        </el-form-item>
+      </el-form>
       
     </div>
     <!-- 表单信息 -->
@@ -62,7 +77,7 @@
       border
       :data="datalist"
       style="width: 100%"
-      :row-class-name="tableRowClassName">
+      stripe>
       <el-table-column prop="orderCode" label="订单编号"></el-table-column>
       <el-table-column prop="createTime" label="申请时间"></el-table-column>
       <el-table-column prop="creatorName" label="用户信息" width="110">
@@ -127,7 +142,7 @@
           <el-input type="textarea" v-model="reform.auditOpinion" placeholder="请输入审核意见"></el-input>
         </el-form-item>
         <el-form-item label="退货地址" prop='receiveAddress'>
-          <el-input type="textarea" :disabled="reform.isAgree=='否'" v-model="reform.receiveAddress" placeholder="请输入买家退货时卖家的收货地址"></el-input>
+          <el-input type="textarea" :disabled="reform.isAgree=='否'" v-model="reform.receiveAddress" placeholder="请输入买家退货时卖家的收货地址，如卖家未发货，不用输入收货地址"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -158,7 +173,25 @@
 export default {
   name:'refund',
   data(){
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+        if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
+          callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+    };
     return {
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      },
+      rules2:{
+        endTime:[
+          { validator: validatePass, trigger: 'change' }
+        ]
+      },
       isCollapse: 0,   //导航按钮
       searchParams:{
         keyword:'',
@@ -193,12 +226,13 @@ export default {
   methods:{
     // 编辑
     view(row){
-      console.log('点击编辑')
+      // console.log('点击编辑')
     },
     agree1(row){
-      console.log('是否同意退款申请')
+      // console.log('是否同意退款申请')
       this.dialogVisible1=true;
       this.reform.id=row.id;
+      // console.log(row)
     },
     pass(){
       this.dialogVisible1=false;
@@ -236,7 +270,7 @@ export default {
       }
     },
     agree2(row){
-      console.log('确认收货')
+      // console.log('确认收货')
       this.dialogVisible2=true;
       this.reform.id=row.id;
     },
@@ -259,7 +293,7 @@ export default {
       })
     },
     agree3(row){
-      console.log('是否同意退款申请')
+      // console.log('是否同意退款申请')
       this.dialogVisible3=true;
       this.reform.id=row.id;
     },
@@ -337,14 +371,14 @@ export default {
       this.getList();
     },
     getList(){
-      console.log('获取所有页面数据数据')
+      // console.log('获取所有页面数据数据')
       this.loading=true;  //加载中，等获取信息成功后关闭this.loading=false;
       var params=this.searchParams;
       params.pageindex = this.curP;
       params.pagesize = this.pageSize;
       this.axios.get('/b2c/order/cancel/list',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
         this.loading = false;
         if(res.data.code < 0){
           this.$notify.error({
@@ -417,5 +451,8 @@ td {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+}
+.searchbox{
+  font-size: 14px;
 }
 </style>
