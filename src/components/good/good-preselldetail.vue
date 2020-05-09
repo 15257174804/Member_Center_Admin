@@ -267,9 +267,9 @@ export default {
         limitType: [
           { required: true, message: '请选择预约方式', trigger: 'change' }
         ],
-        // totalQuantity:[
-        //   { required: true, message: '请输入预约总数量', trigger: 'blur'}
-        // ],
+        totalQuantity:[
+          { required: true, message: '请输入预约总数量', trigger: 'blur'}
+        ],
         forPurchasing:[
           { required: true, message: '请选择是否限购', trigger: 'change'}
         ]
@@ -437,7 +437,7 @@ export default {
         if (valid) {
           for(let i=0;i<this.ruleForm.details.length;i++){
             if(!this.ruleForm.details[i].totalQuantity){
-              this.$message.error('请完善信息内容');
+              this.$message.error('请填写产品明细中预约产品的预约总数量！');
               return false
             }
           }
@@ -467,7 +467,7 @@ export default {
             this.$router.push('/goodpresell')
           })
         } else {
-          this.$message.error('请完善内容后提交保存!');
+          this.$message.error('请完善内容后提交保存1!');
           return false;
         }
       });

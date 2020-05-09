@@ -284,15 +284,15 @@ export default {
   methods: {
     goOrder(val){
       if(val==1){
-        this.$router.push({path:'/order',query: {flag:true,status:'2'}})
+        this.$router.push({path:'/order',query: {flag:'1',status:'2',pickupWay:'2'}})
       }else if(val==2){
-        this.$router.push({path:'/order',query: {flag:true,status:'2'}})
+        this.$router.push({path:'/order',query: {flag:'2',status:'2',pickupWay:'1'}})
       }else if(val==3){
-        this.$router.push({path:'/order',query: {flag:true,pickupWay:'1'}})
+        this.$router.push({path:'/order',query: {flag:'3',pickupWay:'1'}})
       }else if(val==4){
         this.$router.push({path:'/preorder',query: {flag:true,status:'5'}})
       }else if(val==5){
-        this.$router.push({path:'/order',query: {flag:true,clientConfirm:'0'}})
+        this.$router.push({path:'/order',query: {flag:'4',clientConfirm:'0'}})
       }else{
         this.$router.push({path:'/refund'})
       }

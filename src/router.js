@@ -60,9 +60,12 @@ const router = new Router({
         // 营销活动   限时抢购
         { path: "/timelimited", name: "timelimited", meta: { title: '限时抢购',keepAlive: true }, component: () => import('./components/activity/timeLimited.vue') },
         { path: "/limiteddetail", name: "limiteddetail", meta: { title: '限时抢购详情',keepAlive: false }, component: () => import('./components/activity/limiteddetail.vue') },
-        // 满减满赠
+        // 优惠券
         { path: "/fulldiscount", name: "fulldiscount", meta: { title: '优惠券管理' ,keepAlive: true}, component: () => import('./components/activity/fulldiscount.vue') },
         { path: "/fulldetail", name: "fulldetail", meta: { title: '优惠券设置',keepAlive: false }, component: () => import('./components/activity/fulldetail.vue') },
+        // 满减满赠
+        { path: "/reduce", name: "reduce", meta: { title: '满减满赠',keepAlive: true }, component: () => import('./components/activity/reduce.vue') },
+        { path: "/reducedetail", name: "reducedetail", meta: { title: '满减满赠详情',keepAlive: true }, component: () => import('./components/activity/reducedetail.vue') },
 
         // 基础设置   运费管理
         { path: "/freight", name: "freight", meta: { title: '运费管理' ,keepAlive: true}, component: () => import('./components/set/freight.vue') },

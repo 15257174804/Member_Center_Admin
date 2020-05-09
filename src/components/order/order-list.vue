@@ -200,7 +200,7 @@
           <el-input v-model="dform.expressCode" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="快递公司" prop="expressCorp">
-          <!-- <el-input v-model="dform.expressCorp" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></!--> -->
+          <!-- <el-input v-model="dform.expressCorp" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></!--> 
           <el-select v-model="dform.expressCorp" placeholder="请选择" :disabled="deliverytitle=='货运单信息'">
             <el-option
               v-for="item in deliveryoptions"
@@ -405,17 +405,30 @@ export default {
   },
   // 页面渲染前拿到数据
   mounted() {
-    if(this.$route.query.flag){
-      if(this.$route.query.status){
-        this.searchParams.status=this.$route.query.status
-        this.isCollapse=this.$route.query.status
-      }
-      if(this.$route.query.pickupWay){
-        this.searchParams.pickupWay=this.$route.query.pickupWay
-      }
-      if(this.$route.query.clientConfirm){
-        this.searchParams.clientConfirm=this.$route.query.clientConfirm
-      }
+    // if(this.$route.query.flag){
+    //   if(this.$route.query.status){
+    //     this.searchParams.status=this.$route.query.status
+    //     this.isCollapse=this.$route.query.status
+    //   }
+    //   if(this.$route.query.pickupWay){
+    //     this.searchParams.pickupWay=this.$route.query.pickupWay
+    //   }
+    //   if(this.$route.query.clientConfirm){
+    //     this.searchParams.clientConfirm=this.$route.query.clientConfirm
+    //   }
+    // }
+    if(this.$route.query.flag=='1'){
+      this.searchParams.status=this.$route.query.status;
+      this.searchParams.pickupWay=this.$route.query.pickupWay;
+      this.isCollapse=this.$route.query.status
+    }else if(this.$route.query.flag=='2'){
+      this.searchParams.status=this.$route.query.status;
+      this.searchParams.pickupWay=this.$route.query.pickupWay;
+      this.isCollapse=this.$route.query.status
+    }else if(this.$route.query.flag=='3'){
+      this.searchParams.pickupWay=this.$route.query.pickupWay;
+    }else if(this.$route.query.flag=='4'){
+      this.searchParams.clientConfirm=this.$route.query.clientConfirm;
     }
     this.getDataList();
     this.getAllNum();

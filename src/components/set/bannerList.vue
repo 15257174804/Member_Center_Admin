@@ -79,12 +79,12 @@
             <span v-else>无</span>
           </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态">
+      <!-- <el-table-column prop="status" label="状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status==0" type="danger" disable-transitions>停用</el-tag>
           <el-tag v-if="scope.row.status==1" type="success" disable-transitions>启用</el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
       fixed="right"
       label="操作"
@@ -214,7 +214,15 @@ export default {
             message: res.data.msg
           })
         }else{
-          this.dataList = res.data.msg.datas;
+          this._dataList = res.data.msg.datas;
+          if(this.$store.state.isAdmin=='systemAdmin'){
+            this.dataList=this._dataList.filter((val,i,arr)=>{
+              return val.groupId==0
+            })
+          }else{
+            this.dataList=this._dataList
+          }
+          // console.log(this.dataList)
           this.totalCount = res.data.msg.totalCount;
         }
       })

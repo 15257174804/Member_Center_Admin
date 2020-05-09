@@ -49,43 +49,46 @@ export default {
     },
     submitForm(corpId) {
       // console.log(corpId);
-      let params={corpId:corpId} 
-      this.axios.get('/crm/user/getUser',{
-        params:{
-          corpId:corpId
-        }
-      })
-      .then(res=>{
-        // console.log(res.data.msg.emp.clientId)
-        // console.log(this.formData)
-        const token = res.data.msg.token;
-        if(res.data.code < 0){
-          this.$notify.error({
-            title: '错误',
-            message: res.data.msg
-          })
-          retrun
-        }
-        for(var i=0;i<this.options.length;i++){
-          if(this.formData.value==this.options[i].value){
-            this.$store.dispatch("setGroupInfoFun",this.options[i].label);
+      if(corpId!=''){
+        let params={corpId:corpId} 
+        this.axios.get('/crm/user/getUser',{
+          params:{
+            corpId:corpId
           }
-        }
-        if(res.data.msg.emp.isAdmin){
-          this.$store.commit('setAdmin','isAdmin');
-        }
-        
-        localStorage.setItem("loginToken", token);
-        this.$router.push('/display');
-        this.$store.commit('setClientId',res.data.msg.emp.clientId)
-        this.$store.commit('setGroupId',res.data.msg.emp.groupId)
-        // console.log(this.$store.state.clientId)
-        // console.log(this.$store.state.groupId)
-      })
-      .catch(err=>{
-        console.log(err)
-      })
-
+        })
+        .then(res=>{
+          // console.log(res.data.msg.emp.clientId)
+          // console.log(this.formData)
+          const token = res.data.msg.token;
+          if(res.data.code < 0){
+            this.$notify.error({
+              title: '错误',
+              message: res.data.msg
+            })
+            retrun
+          }
+          for(var i=0;i<this.options.length;i++){
+            if(this.formData.value==this.options[i].value){
+              this.$store.dispatch("setGroupInfoFun",this.options[i].label);
+            }
+          }
+          if(res.data.msg.emp.isAdmin){
+            this.$store.commit('setAdmin','isAdmin');
+          }
+          
+          localStorage.setItem("loginToken", token);
+          this.$router.push('/display');
+          this.$store.commit('setClientId',res.data.msg.emp.clientId)
+          this.$store.commit('setGroupId',res.data.msg.emp.groupId)
+          // console.log(this.$store.state.clientId)
+          // console.log(this.$store.state.groupId)
+        })
+        .catch(err=>{
+          console.log(err)
+        })
+      }else{
+        this.$message.error('请选择企业')
+      }
 
       // if(options){
       //   this.$router.push("/display")

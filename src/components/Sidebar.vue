@@ -119,6 +119,9 @@
               <router-link to="/fulldiscount">
                 <el-menu-item index="14-2">优惠券</el-menu-item>
               </router-link>
+              <router-link to="/reduce">
+                <el-menu-item index="14-3">满减满赠</el-menu-item>
+              </router-link>
             </el-menu-item-group>
           </el-submenu>
 

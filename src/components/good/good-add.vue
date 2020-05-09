@@ -76,7 +76,11 @@
           <el-form-item class="half-form" label="是否上架">
             <el-switch active-color="#13ce66" v-model="form.isShow"></el-switch>
           </el-form-item>
+          <el-form-item class="half-form" label="是否药品">
+            <el-switch active-color="#13ce66" v-model="form.isMedical"></el-switch>
+          </el-form-item>
         </el-tab-pane>
+        
         <!-- <el-tab-pane label="业务信息" name="busiInfo">
           
         </el-tab-pane> -->
@@ -165,7 +169,8 @@
           taboo:"",//禁忌
           mattersNeedingAttention:"",//注意事项
           isShow:"",
-          weight:''
+          weight:'',
+          isMedical:''
         },
         rules: {
           goodName: [

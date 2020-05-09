@@ -55,7 +55,7 @@
         label="操作"
         width="120">
         <template slot-scope="scope">
-          <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
+          <el-button type="text" @click="edit(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>

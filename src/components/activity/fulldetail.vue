@@ -212,7 +212,6 @@ export default {
       }
     };
     var checkValidDate = (rule, value, callback) => {
-      debugger
       if(!value){
         return callback(new Error('请选择优惠券领取结束时间'));
       }

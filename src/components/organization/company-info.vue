@@ -3,7 +3,7 @@
     <div class="title clearfix">
       <span>{{title}}</span>
       <span v-if="form.name"><span style="color:#4B9BF7"> | </span>{{form.name}}</span>
-      <el-button type="primary" @click="onSubmit()">保存信息</el-button>
+      <el-button type="primary" @click="onSubmit()" style='position:fixed;z-index:1000;right:5px;top:100px;'>保存信息</el-button>
       <!-- <el-button>取消</el-button> -->
     </div>
     <el-tabs v-model="tabName" type="card" @tab-click="handleClick">
