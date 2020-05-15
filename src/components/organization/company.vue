@@ -61,7 +61,23 @@
         </template>
       </el-table-column> 
       <el-table-column prop="name" label="企业名称"></el-table-column>
-      <el-table-column prop="type" label="企业类型"></el-table-column>
+      <el-table-column prop="type" label="企业类型">
+        <template slot-scope="scope">
+          <span v-if='scope.row.type==1'>集团</span>
+          <span v-if='scope.row.type==2'>集团下连锁药店总部</span>
+          <span v-if='scope.row.type==3'>集团下连锁药店门店</span>
+          <span v-if='scope.row.type==4'>集团下连锁门诊</span>
+          <span v-if='scope.row.type==5'>集团下连锁门诊门店</span>
+          <span v-if='scope.row.type==6'>集团下互联网医院</span>
+          <span v-if='scope.row.type==7'>单体互联网医院</span>
+          <span v-if='scope.row.type==8'>单体药店</span>
+          <span v-if='scope.row.type==9'>单体门诊</span>
+          <span v-if='scope.row.type==10'>单体连锁药店总部</span>
+          <span v-if='scope.row.type==11'>单体连锁药店门店</span>
+          <span v-if='scope.row.type==12'>单体连锁门诊总部</span>
+          <span v-if='scope.row.type==13'>单体连锁门诊门店</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="lawMan" label="法人"></el-table-column>
       <el-table-column prop="linkman" label="联系人"></el-table-column>
       <el-table-column prop="contactNumber" label="联系方式"></el-table-column>
@@ -112,6 +128,7 @@
       :total="totalCount"
     ></el-pagination>
     <!-- total是总数据量 -->
+    <!-- <span>{{isAdmin}}</span> -->
 
     <!-- 点击企业审核 -->
     <el-dialog
@@ -227,22 +244,6 @@ export default {
         this.getDataList();
       }).catch(err=>{console.log(err)})
     },
-    // 每页展示多少条数据
-    tableRowClassName({row, rowIndex}) {
-      if (rowIndex == 0){
-        return '';
-      }
-      else if (rowIndex % 3 == 0) {
-        return 'success-row';
-      }
-      else if (rowIndex % 2 == 0){
-        return '';
-      } 
-      else if (rowIndex % 1 == 0){
-        return 'warning-row';
-      }
-      return '';
-    },
     handleSizeChange(size) {
       this.pagesize = size;
       this.getDataList();
@@ -291,14 +292,15 @@ export default {
             })
           }else{
             let _dataList=res.data.msg.datas;
-            this.getCompanyType();
-            _dataList.forEach(item=>{
-              this.companyType.forEach(item2=>{
-                if(item.type && item.type==item2.id){
-                  item.type=item2.name;
-                }
-              })
-            })
+            // this.getCompanyType();
+            // _dataList.forEach(item=>{
+            //   this.companyType.forEach(item2=>{
+            //     if(item.type && item.type==item2.id){
+            //       item.type=item2.name;
+            //     }
+            //   })
+            // })
+            // console.log(_dataList)
             this.dataList = _dataList;
             this.totalCount = res.data.msg.totalCount;
             

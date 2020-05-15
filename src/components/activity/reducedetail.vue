@@ -20,6 +20,9 @@
       <el-form-item label="活动描述" prop="activityDesc">
         <el-input v-model="Form.activityDesc" placeholder="请输入活动描述"></el-input>
       </el-form-item>
+      <el-form-item label="优先级" prop="computeSort">
+        <el-input v-model="Form.computeSort" type='number' :min='0' placeholder="请输入计算活动价格时的优先级"></el-input>
+      </el-form-item>
       <!-- 时间 -->
       <el-form-item label="预热时间" prop='preTime'>
         <el-date-picker
@@ -49,32 +52,90 @@
         </el-date-picker>
       </el-form-item>
       <!-- 活动标签，优惠方式，优惠力度都要改，对应的数据变量也需要改 -->
-      <!-- 活动标签 -->
-      <el-form-item label="活动类型" prop='activityType'>
-        <el-radio-group v-model="Form.activityType">
-          <el-radio label='满减'></el-radio>
-          <el-radio label='满折'></el-radio>
-          <el-radio label='满赠'></el-radio>
+      <el-form-item label="优惠方式" prop='countType'>
+        <el-radio-group v-model="Form.countType">
+          <el-radio label='按金额'></el-radio>
+          <el-radio label='按数量'></el-radio>
         </el-radio-group>
       </el-form-item>
-      <!-- 如果是满减满折才显示 -->
-      <el-form-item label="优惠力度" prop='useMinMoney' required>
-        <span v-if="Form.activityType=='满减'" style="color:#606266;">满 <input type="text" v-model="Form.useMinMoney">元，减<input type="text" v-model="Form.discount">元</span>
-        <span v-else-if="Form.activityType=='满折'" style="color:#606266;">满 <input type="text" v-model="Form.useMinMoney">元，折扣率<input type="text" v-model="Form.discountRate">  (折扣率为0-1之间小数，如0.8代表打八折)</span>
-        <span v-else-if="Form.activityType=='满赠'" style="color:#606266;">满 <input type="text" v-model="Form.useMinMoney">元送赠品
-          <br/>
-          <el-tag
-            style="cursor: pointer;"
-            @click="gift"
-            closable>
-            {{Form.giftGoodId}}
-            {{Form.giftGoodName}}
-          </el-tag>
-        </span>
-        <span v-else style="color:#606266;">请先选择活动类型</span>
-      </el-form-item>
+      <div v-if='Form.countType=="按金额"'>
+        <!-- 活动标签 -->
+        <el-form-item label="活动类型" prop='activityType'>
+          <el-radio-group v-model="Form.activityType">
+            <el-radio label='满减'></el-radio>
+            <el-radio label='满折'></el-radio>
+            <el-radio label='满赠'></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 如果是满减满折才显示 -->
+        <el-form-item label="优惠力度" required>
+          <!-- 按金额 -->
+          <span v-if="Form.activityType=='满减'" style="color:#606266;">
+            满 <input type="number" min='0' v-model="Form.useMinMoney" @blur="check1" ref='money1' style='bprder:1px solid #DCDFE6;width:80px;'>元，减<input @blur="check2" ref='money2' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='1' :max='Form.useMinMoney' v-model="Form.discount">元
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+          </span>
+          <span v-else-if="Form.activityType=='满折'" style="color:#606266;">
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check11" ref='money11' type="number" min='0' v-model="Form.useMinMoney">元，折扣率<input @blur="check22" ref='money22' type="number" min='0' max='1' step='0.01' v-model="Form.discountRate">  (折扣率为0-1之间小数，如0.8代表打八折)
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+          </span>
+          <span v-else-if="Form.activityType=='满赠'" style="color:#606266;">
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check111" ref='money111' type="number" min='0' v-model="Form.useMinMoney">元送赠品
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+            <br/>
+            <el-tag
+              style="cursor: pointer;"
+              @click="gift"
+              closable>
+              {{Form.giftGoodId}}
+              {{Form.giftGoodName}}
+            </el-tag>
+          </span>
+          <span v-else style="color:#606266;">请先选择活动类型</span>
+        </el-form-item>
+      </div>
+      <div v-if='Form.countType=="按数量"'>
+        <!-- 活动标签 -->
+        <el-form-item label="活动类型" prop='activityType'>
+          <el-radio-group v-model="Form.activityType">
+            <el-radio label='满减'></el-radio>
+            <el-radio label='满折'></el-radio>
+            <el-radio label='满赠'></el-radio>
+            <el-radio label='满送'></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 如果是满减满折才显示 -->
+        <el-form-item label="优惠力度" required>
+          <!-- 按数量 -->
+          <span v-if="Form.activityType=='满减'" style="color:#606266;">
+            满 <input type="number" v-model="Form.goodCount" @blur="check3" ref='money3' style='bprder:1px solid #DCDFE6;width:80px;'>件，减<input @blur="check2" ref='money2' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='1' :max='Form.useMinMoney' v-model="Form.discount">元
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+          </span>
+          <span v-else-if="Form.activityType=='满折'" style="color:#606266;">
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" v-model="Form.goodCount">件，折扣率<input @blur="check22" ref='money22' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='0' max='1' step='0.01' v-model="Form.discountRate">  (折扣率为0-1之间小数，如0.8代表打八折)
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+          </span>
+          <span v-else-if="Form.activityType=='满赠'" style="color:#606266;">
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" min='0' v-model="Form.goodCount">件送赠品
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+            <br/>
+            <el-tag
+              style="cursor: pointer;"
+              @click="gift"
+              closable>
+              {{Form.giftGoodId}}
+              {{Form.giftGoodName}}
+            </el-tag>
+          </span>
+          <span v-else-if="Form.activityType=='满送'" style="color:#606266;">
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" v-model="Form.goodCount">件，送<input @blur="check2222" style='bprder:1px solid #DCDFE6;width:80px;' ref='money2222' type="number" v-model="Form.maxGiftCount">件  (赠同商品)
+            <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
+          </span>
+          <span v-else style="color:#606266;">请先选择活动类型</span>
+        </el-form-item>
+      </div>
+
       <!-- 全店通用 -->
-      <el-form-item label="全店产品通用" prop='allGoods'>
+      <el-form-item v-if="!flag" label="全店产品通用" prop='allGoods'>
         <el-switch
           v-model="Form.allGoods"
           @change="addAll"
@@ -118,7 +179,13 @@
         </el-table>
       </div>
       <el-form-item style="margin-top:20px;">
-        <el-button type="primary" @click="submitForm('Form')">保存</el-button>
+        
+        <el-tooltip v-if='Form.status&&Form.status==3' class="item" effect="dark" content="已发布的活动不允许进行修改" placement="bottom">
+          <div style="display:inline-block;width:70px;margin-right:10px;">
+            <el-button type="primary" @click="submitForm('Form')" :disabled='isDisabled'>保存</el-button>
+          </div>
+        </el-tooltip>
+        <el-button v-else type="primary" @click="submitForm('Form')" :disabled='isDisabled'>保存</el-button>
         <el-button @click="goback">返回</el-button>
       </el-form-item>
     </el-form>
@@ -209,7 +276,7 @@ export default {
         return callback(new Error('请选择活动开始时间'));
       }
       if (Date.parse(value)<Date.parse(this.tempTime)) {
-        callback(new Error('活动开始时间不能早于预热时间'));
+        return callback(new Error('活动开始时间不能早于预热时间'));
       }else{
         this.tempTime=value;
         callback();
@@ -220,12 +287,26 @@ export default {
         return callback(new Error('请选择活动结束时间'));
       }
       if (Date.parse(value)<Date.parse(this.tempTime)) {
-        callback(new Error('活动结束时间不能早于开始时间'));
+        return callback(new Error('活动结束时间不能早于开始时间'));
       }else{
         callback();
       }
     };
+    var checkSort= (rule, value, callback) => {
+      let reg=/^[+]{0,1}(\d+)$/;
+      if(!value){
+        return callback(new Error('请输入活动优先级'));
+      }else{
+        if(reg.test(value)){
+          callback()
+        }else{
+          return callback(new Error('请输入正整数'));
+        }
+      }
+    };
     return {
+      isDisabled:false,  //控制保存按钮的禁用
+      innerMsg:'',  //自定义表单验证
       title:'新建活动',
       tempTime:'',
       flag:false,  //添加删除产品时，如果是新增时不调接口，如果是修改时调用接口
@@ -239,15 +320,18 @@ export default {
         activityName:'',
         activityCode:'',
         activityDesc:'',
+        countType:'',   //1 是按件数 2 按金额
         activityType:'',
         preTime:'',
         startTime:'',
         endTime:'',
-        useMinMoney:'',
+        useMinMoney:'',  //按金额的门槛
         discount:'',
         discountRate:'',
         giftGoodId:'',
         giftGoodName:'请选择赠品',
+        goodCount:'',   //按件数的门槛
+        maxGiftCount:'',  //增同产品数量
         allGoods:true,
         isTogether:true,
         useCount:'',
@@ -274,6 +358,9 @@ export default {
         ],
         useCount: [
           { required: true, message: '请输入活动使用限制次数', trigger: 'blur' }
+        ],
+        computeSort: [
+          {  required: true,validator: checkSort, trigger: 'blur' }
         ]
       },
       dialogVisible:false,
@@ -300,6 +387,101 @@ export default {
     }
   },
   methods:{
+    // 自定义表单验证
+    check1(){
+      let reg=/^(0|[1-9][0-9]*)(\.\d+)?$/;
+      if(this.Form.useMinMoney==''){
+        this.innerMsg='活动金额不能为空';
+        this.$refs.money1.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.useMinMoney)){
+        this.innerMsg='活动金额只能为正数';
+        this.$refs.money1.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money1.style.border='1px solid #DCDFE6';
+      }
+    },
+    check2(){
+      let reg=/^([1-9][0-9]*)(\.\d+)?$/;
+      if(this.Form.discount==''){
+        this.innerMsg='优惠金额不能为空';
+        this.$refs.money2.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.discount)){
+        this.innerMsg='优惠金额只能为大于0的正数';
+        this.$refs.money2.style.border='1px solid #F56C6C';
+      }else if(Number(this.Form.discount)>Number(this.Form.useMinMoney)){
+        this.innerMsg='优惠金额不能大于活动金额';
+        this.$refs.money2.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money2.style.border='1px solid #DCDFE6';
+      }
+    },
+    check11(){
+      let reg=/^(0|[1-9][0-9]*)(\.\d+)?$/;
+      if(this.Form.useMinMoney==''){
+        this.innerMsg='活动金额不能为空';
+        this.$refs.money11.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.useMinMoney)){
+        this.innerMsg='活动金额只能为正数';
+        this.$refs.money11.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money11.style.border='1px solid #DCDFE6';
+      }
+    },
+    check22(){
+      let reg=/^0(\.[1-9]{1,2})+$/;
+      if(this.Form.discountRate==''){
+        this.innerMsg='活动折扣不能为空';
+        this.$refs.money22.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.discountRate)){
+        this.innerMsg='请输入0~1之间小数';
+        this.$refs.money22.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money22.style.border='1px solid #DCDFE6';
+      }
+    },
+    check111(){
+      let reg=/^(0|[1-9][0-9]*)(\.\d+)?$/;
+      if(this.Form.useMinMoney==''){
+        this.innerMsg='活动金额不能为空';
+        this.$refs.money111.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.useMinMoney)){
+        this.innerMsg='活动金额只能为正数';
+        this.$refs.money111.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money111.style.border='1px solid #DCDFE6';
+      }
+    },
+    check3(){
+      let reg=/^[1-9]\d*$/;
+      if(this.Form.goodCount==''){
+        this.innerMsg='优惠件数不能为空';
+        this.$refs.money3.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.goodCount)){
+        this.innerMsg='优惠件数只能为大于0的正整数';
+        this.$refs.money3.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money3.style.border='1px solid #DCDFE6';
+      }
+    },
+    check2222(){
+      let reg=/^[1-9]\d*$/;
+      if(this.Form.maxGiftCount==''){
+        this.innerMsg='赠送件数不能为空';
+        this.$refs.money2222.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.maxGiftCount)){
+        this.innerMsg='赠送件数只能为大于0的正整数';
+        this.$refs.money2222.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money2222.style.border='1px solid #DCDFE6';
+      }
+    },
     // 时间处理
     timeFormate(val){
       var date=new Date(val)
@@ -316,12 +498,24 @@ export default {
       .then(res=>{
         console.log(res.data)
         this.Form=res.data.msg;
-        if(this.Form.activityType==1){
+        if(this.Form.countType==2){
+          this.Form.countType='按金额';
+        }else if(this.Form.countType==1){
+          this.Form.countType='按数量'
+        }
+
+        if(this.Form.activityType==1||this.Form.activityType==5){
           this.Form.activityType='满减'
-        }else if(this.Form.activityType==2){
+        }else if(this.Form.activityType==2||this.Form.activityType==6){
           this.Form.activityType='满赠'
-        }else if(this.Form.activityType==3){
+        }else if(this.Form.activityType==3||this.Form.activityType==7){
           this.Form.activityType='满折'
+        }else if(this.Form.activityType==9){
+          this.Form.activityType='满送'
+        }
+        
+        if(this.Form.status==3){
+          this.isDisabled=true
         }
         this.Form.preTime=this.timeFormate(this.Form.preTime);
         this.Form.startTime=this.timeFormate(this.Form.startTime);
@@ -481,14 +675,33 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid)=>{
         if (valid){
+          this.isDisabled=true;
+          setTimeout(()=>{
+            this.isDisabled=false;
+          },5000)
           // 按正确接口来修改
-          if(this.Form.activityType=='满折'){
-            this.Form.activityType=3;
-          }else if(this.Form.activityType=='满减'){
+          if(this.Form.countType=='按金额'&&this.Form.activityType=='满减'){
             this.Form.activityType=1
-          }else if(this.Form.activityType=='满赠'){
+          }else if(this.Form.countType=='按金额'&&this.Form.activityType=='满赠'){
             this.Form.activityType=2
+          }else if(this.Form.countType=='按金额'&&this.Form.activityType=='满折'){
+            this.Form.activityType=3
+          }else if(this.Form.countType=='按数量'&&this.Form.activityType=='满减'){
+            this.Form.activityType=5
+          }else if(this.Form.countType=='按数量'&&this.Form.activityType=='满赠'){
+            this.Form.activityType=6
+          }else if(this.Form.countType=='按数量'&&this.Form.activityType=='满折'){
+            this.Form.activityType=7
+          }else if(this.Form.countType=='按数量'&&this.Form.activityType=='满送'){
+            this.Form.activityType=9
           }
+
+          if(this.Form.countType=='按金额'){
+            this.Form.countType=2;
+          }else if(this.Form.countType=='按数量'){
+            this.Form.countType=1
+          }
+
           this.Form.goods=this.goods;
           this.axios.post('/b2c/disActivity/save',this.Form)
           .then(res=>{

@@ -1,5 +1,5 @@
 <template>
-    <ul id="topBar">
+    <ul id="topBar" ref='ul'>
         <li :class="{'active': items.meta.title == activeTitle }" v-for="(items,index) in hisRouteList" :key="index">
             <i v-if="items.meta.title == activeTitle" class="el-icon-star-on"></i>
             <router-link :to="{ path: items.path }">
@@ -34,8 +34,6 @@ export default {
     },
     getBreadcrumb() {
       let matched = this.$route.matched;
-      // console.log('matched')
-      // console.log(matched)
       if(matched.length>1){
         this.activeTitle = matched[1].meta.title;
         //如果不是首页
@@ -44,7 +42,22 @@ export default {
           // this.hisRouteList.unshift(matched[1])
           this.hisRouteList.splice(1,0,matched[1])
         }
-        // console.log(this.hisRouteList);
+        // 导航栏滚动条的自动定位
+        let i=this.hisRouteList.findIndex((val,index,arr)=>{
+          return val.meta.title==matched[1].meta.title
+        })
+        let len=this.hisRouteList.length;
+        if(i==0||i==1||i==2||i==3||i==4){
+          this.$refs.ul.scrollLeft=0
+        }else{
+          this.$refs.ul.scrollLeft=i/len*this.$refs.ul.scrollWidth;
+        }
+        
+        // console.log(i)
+        // console.log(len)
+        // console.log(this.$refs.ul.scrollWidth)
+        // console.log(this.$refs.ul.scrollLeft)
+      
       }
       
     },
@@ -74,12 +87,12 @@ export default {
 <style scoped>
 li{list-style:none;}
 #topBar{
-    width: calc(100% - 200px);
+    width: calc(100% - 220px);
     position: absolute;
-    left: 200px;
-    height: 39px;
+    left: 220px;
+    height: 50px;
     margin:0;
-    padding: 5px .7rem;
+    padding: 10px .7rem;
     background-color: #fff;
     box-sizing: border-box;
     margin: auto;
@@ -88,8 +101,28 @@ li{list-style:none;}
     z-index: 111;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     white-space: nowrap;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y:hidden;
 }
+/* 滚动条 */
+#topBar::-webkit-scrollbar{
+  width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
+  height: 3px;
+}
+#topBar::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.01);
+  background: rgba(0, 0, 0, 0.01);
+}
+
+#topBar::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.01);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.01);
+}
+
 li{
     height: 29px;
     line-height: 29px;

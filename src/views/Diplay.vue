@@ -51,7 +51,7 @@ a {
   color: #fff;
 }
 #display >>> .wrap{
-  top: 90px!important;
+  top: 100px!important;
   width: calc(100% - 200px);
 }
 

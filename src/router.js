@@ -66,6 +66,9 @@ const router = new Router({
         // 满减满赠
         { path: "/reduce", name: "reduce", meta: { title: '满减满赠',keepAlive: true }, component: () => import('./components/activity/reduce.vue') },
         { path: "/reducedetail", name: "reducedetail", meta: { title: '满减满赠详情',keepAlive: true }, component: () => import('./components/activity/reducedetail.vue') },
+        // 商品组
+        { path: "/commodityGroup", name: "commodityGroup", meta: { title: '商品组',keepAlive: true }, component: () => import('./components/activity/commodityGroup.vue') },
+        { path: "/groupDetail", name: "groupDetail", meta: { title: '商品组设置',keepAlive: true }, component: () => import('./components/activity/groupDetail.vue') },
 
         // 基础设置   运费管理
         { path: "/freight", name: "freight", meta: { title: '运费管理' ,keepAlive: true}, component: () => import('./components/set/freight.vue') },

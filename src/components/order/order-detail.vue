@@ -50,7 +50,7 @@
         >
         </el-table-column>
         <el-table-column type="index" label="序号" width="60"></el-table-column>
-        <el-table-column prop="imgUrl" label="商品图片" width="80">
+        <el-table-column prop="imgUrl" label="商品图片" width="100" align="center">
             <template slot-scope="scope">
               <img style="height:60px;width:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl" alt="">
             </template>

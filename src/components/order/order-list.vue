@@ -149,7 +149,7 @@
         <template slot-scope="scope">
           <p class="pbutton" @click="showDetail(scope.row)" style="margin-right:13px;"><i class="el-icon-edit"></i>详情</p>
 
-          <el-dropdown trigger="click">
+          <el-dropdown trigger="click" v-if="scope.row.status!='-1' || scope.row.status!='1'">
             <span class="el-dropdown-link" style="color: #409EFF;">
               更多<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
@@ -158,7 +158,7 @@
                 <p class="pbutton" v-if="scope.row.pickupWay=='1'&& scope.row.clientConfirm!='1'  && (scope.row.status=='0'||scope.row.status=='2')" @click="manage(scope.row)">分配门店</p>
               </el-dropdown-item>
               <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.clientConfirm=='0'&& scope.row.pickUpStore==clientid" @click="clientConfirm(scope.row)">自提门店确认</p> 
+                <p class="pbutton" v-if="scope.row.clientConfirm=='0'&& scope.row.pickUpStore==clientid && scope.row.status!='-1'" @click="clientConfirm(scope.row)">自提门店确认</p> 
               </el-dropdown-item>
               <el-dropdown-item >
                 <p class="pbutton" v-if="scope.row.pickupWay=='1' && (scope.row.status=='2'|| scope.row.status=='0')" @click="notice(scope.row)">自提通知</p>
@@ -167,7 +167,7 @@
                 <p class="pbutton" v-if="scope.row.clientConfirm=='1' &&(scope.row.status == '2' && scope.row.pickupWay == '1')" @click="cancelVerification(scope.row)">确认提货</p>
               </el-dropdown-item>
               <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.status=='0' && scope.row.clientConfirm =='1' && scope.row.payType=='0'" @click="changepay(scope.row)">转线下支付</p>  
+                <p class="pbutton" v-if="scope.row.status=='0' && scope.row.clientConfirm =='1'" @click="changepay(scope.row)">转线下支付</p>  
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -405,18 +405,6 @@ export default {
   },
   // 页面渲染前拿到数据
   mounted() {
-    // if(this.$route.query.flag){
-    //   if(this.$route.query.status){
-    //     this.searchParams.status=this.$route.query.status
-    //     this.isCollapse=this.$route.query.status
-    //   }
-    //   if(this.$route.query.pickupWay){
-    //     this.searchParams.pickupWay=this.$route.query.pickupWay
-    //   }
-    //   if(this.$route.query.clientConfirm){
-    //     this.searchParams.clientConfirm=this.$route.query.clientConfirm
-    //   }
-    // }
     if(this.$route.query.flag=='1'){
       this.searchParams.status=this.$route.query.status;
       this.searchParams.pickupWay=this.$route.query.pickupWay;
@@ -434,6 +422,7 @@ export default {
     this.getAllNum();
   },
   methods: {
+    // 备注
     memo(row){
       console.log(row)
       this.dialogVisible6=true;

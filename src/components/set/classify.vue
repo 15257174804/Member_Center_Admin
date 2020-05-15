@@ -74,9 +74,8 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
-      :page-sizes="[5, 10, 15, 20]"
       :page-size="pagesize"
-      layout="total, sizes, prev, pager, next, jumper"
+      layout="total, prev, pager, next, jumper"
       :total="totalCount"
     ></el-pagination>
 
@@ -137,7 +136,7 @@ export default {
         // status:1
       },
       dataList: [],
-      pagesize: 5, //页面一次展示多少数据
+      pagesize:100, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
       loading: false,
@@ -242,6 +241,7 @@ export default {
     },
     // 删除商品类别
     del(row){
+      console.log(row)
       let params={
         id:row.id
       }
@@ -348,7 +348,7 @@ export default {
       .then(res=>{
         if(this.searchParams.keyword==''&&this.searchParams.level==''){
           this.totalCount=res.data.msg.totalCount;
-          this.pagesize=res.data.msg.totalCount;
+          // this.pagesize=res.data.msg.totalCount;
           this.currentPage=1;
         }else{
           this.dataList=res.data.msg.datas;
@@ -365,6 +365,7 @@ export default {
     // 获取所属类别
     getparentList(){
       let params={
+        status:1,
         level:this.form.level-1
       }
       this.axios.get('/b2c/classify/list',{params})

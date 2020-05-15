@@ -15,10 +15,19 @@
           <el-input v-model="ruleForm.floorDesc" placeholder="请输入楼层描述"></el-input>
         </el-form-item>
         <el-form-item label="楼层链接" prop="floorLink">
-          <el-input v-model="ruleForm.floorLink" placeholder="请输入楼层跳转的目标链接"></el-input>
+          <!-- <el-input v-model="ruleForm.floorLink" placeholder="请输入楼层跳转的目标链接"></el-input> -->
+          <el-select v-model="ruleForm.floorLink" placeholder="请选择">
+            <el-option
+              v-for="item in linkoptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.value">
+            </el-option>
+          </el-select>
+
         </el-form-item>
         <el-form-item label="楼层类型" prop="floorType">
-          <el-select v-model="ruleForm.floorType" placeholder="请选择">
+          <el-select v-model="ruleForm.floorType" placeholder="请选择" @change="changefloortype">
             <el-option
               v-for="item in options"
               :key="item.id"
@@ -34,7 +43,7 @@
           <colorPicker v-model="ruleForm.backColor" />
         </el-form-item>
         <el-form-item label="背景图" prop="backImg">
-          <span style="color:#909399;background-color: #f4f4f5;">广告位图片优先级高于背景图片</span>
+          <span style="color:#909399;background-color: #f4f4f5;">广告位图片优先级高于背景图片.</span>
           <!-- 之前的样式,没有删除按钮的样式 -->
           <!-- <el-upload
             class="avatar-uploader"
@@ -66,13 +75,44 @@
         </el-form-item>
       
 
-      <h1>广告位信息 <span style="color:#909399;background-color: #f4f4f5;">(楼层类型为商品板块时可选择商品，楼层类型为企业板块时可选择企业)</span></h1>
-        <el-row>
-          <el-button v-if="ruleForm.floorType==5||ruleForm.floorType==1" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choose">选择产品<i class="el-icon-plus el-icon--right"></i></el-button>
-          <el-button v-else-if="ruleForm.floorType==2" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choosec">选择企业<i class="el-icon-plus el-icon--right"></i></el-button>
-          <el-button v-else-if="ruleForm.floorType==8" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="chooseclass">选择分类<i class="el-icon-plus el-icon--right"></i></el-button>
-          <el-button v-else style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choosepicture">选择图片<i class="el-icon-plus el-icon--right"></i></el-button>
-        </el-row>
+        <h1>广告位信息 <span style="color:#909399;background-color: #f4f4f5;">(楼层类型为商品板块时可选择商品，楼层类型为企业板块时可选择企业)</span></h1>
+        <div v-if='ruleForm.floorType==5||ruleForm.floorType==1||ruleForm.floorType==2||ruleForm.floorType==8'>
+          <el-row>
+            <el-button v-if="ruleForm.floorType==5||ruleForm.floorType==1" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choose">选择产品<i class="el-icon-plus el-icon--right"></i></el-button>
+            <el-button v-else-if="ruleForm.floorType==2" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choosec">选择企业<i class="el-icon-plus el-icon--right"></i></el-button>
+            <el-button v-else-if="ruleForm.floorType==8" style="margin:20px 0 20px 0;" type="primary" size="mini" @click="chooseclass">选择分类<i class="el-icon-plus el-icon--right"></i></el-button>
+            <el-button v-else style="margin:20px 0 20px 0;" type="primary" size="mini" @click="choosepicture">选择图片<i class="el-icon-plus el-icon--right"></i></el-button>
+          </el-row>
+          <!-- 广告位表格 -->
+          <el-table
+            :data="ruleForm.cells"
+            height="250"
+            border
+            style="width: 100%">
+            <el-table-column prop="cellSort" label="序号" width="60"></el-table-column>
+            <el-table-column prop="cellGoodId" label="商品ID"  v-if="ruleForm.floorType==5"  width="100"></el-table-column>
+            <el-table-column prop="cellCorpId" label="企业ID" v-if="ruleForm.floorType==2"  width="100"></el-table-column>
+            <el-table-column prop="goodClassId" label="类别ID" v-if="ruleForm.floorType==8"  width="100"></el-table-column>
+            <el-table-column prop="cellName" label="名称"  width="200" ></el-table-column>
+            <el-table-column prop="img" label="图片"  width="100">
+              <template slot-scope="scope">
+                <img v-if="scope.row.img" height="100" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.img"  class="imgsize"/>
+                <span v-else>无</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="cellLink" label="跳转链接" ></el-table-column>
+            <el-table-column prop="isLink" label="是否可跳转"  width="100"></el-table-column>
+            <el-table-column
+              label="操作"
+              width="150">
+              <template slot-scope="scope">
+                <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
+                <el-button type="text" @click="delgood(scope.row)"><i class="el-icon-delete"></i>删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table> 
+        </div>
+
         <!-- 选择产品 -->
         <el-dialog
           title="请选择广告位产品"
@@ -103,11 +143,23 @@
               border
               style="width: 100%">
               <el-table-column type="index" label="序号" width="60"></el-table-column>
+              <el-table-column prop="imgUrl" label="图片">
+                <template slot-scope="scope">
+                  <img v-if="scope.row.imgUrl" :src="axios.defaults.baseURL + '/crm/image/' +scope.row.imgUrl" class="imgsize"/>
+                  <span v-else>无</span>
+                </template>
+              </el-table-column>
               <el-table-column prop="goodCode" label="商品编号"></el-table-column>
               <el-table-column prop="goodName" label="商品名称"></el-table-column>
               <el-table-column prop="corpName" label="所属企业"></el-table-column>
               <el-table-column prop="goodsClass" label="商品分类"></el-table-column>
               <el-table-column prop="spec" label="规格"></el-table-column>
+              <el-table-column prop="isShow" label="状态">
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.isShow" type="success" disable-transitions>在售</el-tag>
+                  <el-tag v-if="!scope.row.isShow" type="danger" disable-transitions>已下架</el-tag>
+                </template>
+              </el-table-column>
               <el-table-column
                 fixed="right"
                 label="操作"
@@ -163,6 +215,12 @@
               border
               style="width: 100%">
               <el-table-column type="index" label="序号" width="60"></el-table-column>
+              <el-table-column prop="logo" label="LOGO">
+                <template slot-scope="scope">
+                  <img v-if="scope.row.logo" :src="axios.defaults.baseURL + '/crm/image/' +scope.row.logo" class="imgsize"/>
+                  <span v-else>无</span>
+                </template>
+              </el-table-column>
               <el-table-column prop="name" label="企业名称"></el-table-column>
               <el-table-column prop="type" label="企业类型"></el-table-column>
               <el-table-column prop="linkman" label="联系人"></el-table-column>
@@ -263,34 +321,6 @@
             <el-button type="primary" @click="dialogVisibleclass = false">确 定</el-button>
           </span>
         </el-dialog>
-        <!-- 广告位表格 -->
-        <el-table
-          :data="ruleForm.cells"
-          height="250"
-          border
-          style="width: 100%">
-          <el-table-column prop="cellSort" label="序号" width="60"></el-table-column>
-          <el-table-column prop="cellGoodId" label="商品ID"  v-if="ruleForm.floorType==5"  width="100"></el-table-column>
-          <el-table-column prop="cellCorpId" label="企业ID" v-if="ruleForm.floorType==2"  width="100"></el-table-column>
-          <el-table-column prop="goodClassId" label="类别ID" v-if="ruleForm.floorType==8"  width="100"></el-table-column>
-          <el-table-column prop="cellName" label="名称"  width="200" ></el-table-column>
-          <el-table-column prop="img" label="图片"  width="100">
-            <template slot-scope="scope">
-              <img v-if="scope.row.img" height="100" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.img"  class="imgsize"/>
-              <span v-else>无</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="cellLink" label="跳转链接" ></el-table-column>
-          <el-table-column prop="isLink" label="是否可跳转"  width="100"></el-table-column>
-          <el-table-column
-            label="操作"
-            width="150">
-            <template slot-scope="scope">
-              <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
-              <el-button type="text" @click="delgood(scope.row)"><i class="el-icon-delete"></i>删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table> 
         <!-- 点击编辑，弹出填写广告位具体内容的弹框 -->
         <el-dialog
           :title="edittitle"
@@ -307,7 +337,15 @@
               </el-radio-group>
             </el-form-item>
             <el-form-item label="跳转链接" prop="cellLink">
-              <el-input :disabled="numform.isLink=='否'" v-model="numform.cellLink" autocomplete="off"></el-input>
+              <!-- <el-input :disabled="numform.isLink=='否'" v-model="numform.cellLink" autocomplete="off"></el-input> -->
+              <el-select :disabled="numform.isLink=='否'" v-model="numform.cellLink" placeholder="请选择">
+                <el-option
+                  v-for="item in linkoptions"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="图片" prop="img">
               <!-- <el-upload
@@ -362,43 +400,74 @@ export default {
           id:0,
           value: 1,
           name: 'banner板块'
-        }, {
-          id:1,
-          value: 2,
-          name: '企业板块'
-        }, {
-          id:2,
-          value: 3,
-          name: '活动板块'
-        },{
-          id:3,
-          value: 4,
-          name: '热卖商品'
-        },
+        }, 
+        // {
+        //   id:1,
+        //   value: 2,
+        //   name: '企业板块'
+        // }, 
+        // {
+        //   id:2,
+        //   value: 3,
+        //   name: '活动板块'
+        // },
+        // {
+        //   id:3,
+        //   value: 4,
+        //   name: '热卖商品'
+        // },
         {
           id:4,
           value: 5,
           name: '商品板块'
-        },{
+        },
+        {
           id:5,
           value: 6,
           name: '秒杀板块'
-        },{
-          id:6,
-          value: 7,
-          name: '预售板块'
-        },{
+        },
+        // {
+        //   id:6,
+        //   value: 7,
+        //   name: '预售板块'
+        // },
+        {
           id:7,
           value: 8,
           name: '商品分类板块'
-        },{
-          id:8,
-          value: 9,
-          name: '优惠券板块'
-        },{
+        },
+        // {
+        //   id:8,
+        //   value: 9,
+        //   name: '优惠券板块'
+        // },
+        {
           id:9,
           value: 10,
           name: '公告'
+        }
+      ],
+      linkoptions: [{
+          id:0,
+          value: 'combinedGoodList',
+          name: '组合商品'
+        }, {
+          id:1,
+          value: 'flashSale',
+          name: '限时抢购'
+        }, {
+          id:2,
+          value: 'appointment',
+          name: '预约商品'
+        },{
+          id:3,
+          value: 'voucherCenter',
+          name: '领券中心'
+        },
+        {
+          id:4,
+          value: 'integralMall',
+          name: '积分商城'
         }
       ],
       dialogVisible:false,    //选择产品
@@ -454,6 +523,13 @@ export default {
     }
   },
   methods:{
+    // 改变楼层类型
+    changefloortype(event){
+      console.log(event)
+      if(this.ruleForm.id==''){
+        this.ruleForm.cells.splice(0)
+      }
+    },
     // 选择分类
     chooseclass(){
       this.dialogVisibleclass = true;
@@ -461,6 +537,7 @@ export default {
     },
     getClassList(){
       let params=this.searchParams;
+      params.status=1;
       params.pageindex = this.currentPage;
       params.pagesize = this.pagesize;
       this.axios.get('/b2c/classify/list',{params})
@@ -625,6 +702,7 @@ export default {
       let obj={
         cellGoodId:row.id,
         cellName:row.goodName,
+        img:row.imgUrl,
         cellType:5
       }
       this.ruleForm.cells=this.ruleForm.cells.concat(obj)
@@ -692,14 +770,20 @@ export default {
     choosepicture(){
       // console.log('添加图片')
       // console.log(this.ruleForm.cells)
-      this.edittitle='新增'
-      this.dialogVisible2=true;
-      this.numform.cellSort='';
-      this.numform.cellLink='';
-      this.numform.img='';
-      this.imgUrl2='';
-      this.fileList2=[];
-      this.numform.cellName='';
+      // this.edittitle='新增'
+      // this.dialogVisible2=true;
+      // this.numform.cellSort='';
+      // this.numform.cellLink='';
+      // this.numform.img='';
+      // this.imgUrl2='';
+      // this.fileList2=[];
+      // this.numform.cellName='';
+      // this.hideUpload = this.fileList2.length >= 1;
+      let obj={
+        cellName:'图片',
+        img:''
+      }
+      this.ruleForm.cells=this.ruleForm.cells.concat(obj)
     },
     submit2(formName){
       // console.log(this.numform)
@@ -847,7 +931,7 @@ export default {
       this.title=this.$route.query.title;
       this.getData();
     }
-    this.getOption();
+    // this.getOption();   //先写死，后期有需求可以打开获取自定义楼层类型
   }
 }
 </script>

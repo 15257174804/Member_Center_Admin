@@ -10,7 +10,8 @@
           <el-input v-model="ruleForm.scoreRate" placeholder="消费1元获取多少积分"></el-input>
         </el-form-item> -->
         <el-form-item label="兑换比例" prop="scoreRate">
-          <span style="color:#606266;">消费 <input type="number" v-model="ruleForm.scoreRate">元，获取1个积分</span>
+          <span style="color:#606266;">消费 <input type="number" v-model="ruleForm.scoreRate" @blur="check" ref='score'>元，获取1个积分</span>
+          <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
         </el-form-item>
         <!-- 预约方式控制个人和企业的预约数量的显示隐藏 -->
         <el-form-item label="小数舍入方式" prop="roundType">
@@ -42,7 +43,7 @@ export default {
   name:'integralset',
   data(){
     return {
-      
+      innerMsg:'',   //自定义验证
       ruleForm:{
         scoreRate:'',
         roundType:'',
@@ -63,6 +64,20 @@ export default {
     }
   },
   methods:{
+    // 自定义验证
+    check(){
+      let reg=/^(0|[1-9][0-9]*)(\.\d+)?$/;
+      if(this.ruleForm.scoreRate==''){
+        this.innerMsg='消费金额不能为空';
+        this.$refs.score.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.ruleForm.scoreRate)){
+        this.innerMsg='请输入正数';
+        this.$refs.score.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.score.style.border='1px solid #DCDFE6';
+      }
+    },
     reset(formName){
       this.$refs[formName].resetFields();
     },

@@ -1,7 +1,7 @@
 <template>
   <div id="sidebar">
-    <el-container style="border: 1px solid #eee,width:200px;">
-      <el-aside id="elaside" width="200px">
+    <el-container style="border: 1px solid #eee,width:220px;">
+      <el-aside id="elaside" width="220px">
         <el-menu :default-openeds="['1', '1']">
           <div v-for="(v,i) in menu" :key=i>
             <!-- <template v-if="v.items.length == 0">
@@ -121,6 +121,9 @@
               </router-link>
               <router-link to="/reduce">
                 <el-menu-item index="14-3">满减满赠</el-menu-item>
+              </router-link>
+              <router-link to="/commodityGroup">
+                <el-menu-item index="14-4">商品组</el-menu-item>
               </router-link>
             </el-menu-item-group>
           </el-submenu>
@@ -317,6 +320,7 @@ export default {
 .el-menu {
   height: 100%;
   background: #fff;
+  padding-right:10px;
 }
 .el-menu .el-submenu {
   background: #fff;
@@ -340,13 +344,13 @@ export default {
 /* view */
 .wrap {
   position: absolute;
-  left: 200px;
+  left: 220px;
   right: 0;
-  top: 65px;
+  top: 65px !important;
   bottom: 0;
   margin: auto;
   background: #ffffff;
-  width: calc(100% - 250px);
+  width: calc(100% - 220px) !important;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   overflow-y: scroll;
   transition: 1s;

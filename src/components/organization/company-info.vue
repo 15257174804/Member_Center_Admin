@@ -18,6 +18,7 @@
       </el-tab-pane>
       <el-tab-pane label="证照管理" name="cardInfo">
         <!-- <el-button @click="addLicense()">添加证照</el-button> -->
+        <span v-if='innerMsg' style='color:#f56c6c;font-size:14px;'>*经营许可证信息为必填</span>
         <div class="license-group clearfix" v-for="(v,i) in licenses" :key="i">
           <div @click="getImageTypeIndex(i)" class="img-box">
             <el-upload
@@ -83,6 +84,7 @@
         }
       };
       return {
+        innerMsg:false,
         tempTime:'',
         title: "新建企业",
         checkAll: false,
@@ -283,6 +285,8 @@
                 if(this.licenses[i].whetherMust){
                   if(this.licenses[i].memo=='' || this.licenses[i].startTime=='' || this.licenses[i].validDate==''){
                     this.$message.error('请完善营业执照信息')
+                    this.tabName='cardInfo';
+                    this.innerMsg=true;
                     return
                   }
                 }

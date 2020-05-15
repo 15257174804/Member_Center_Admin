@@ -39,7 +39,6 @@
         <el-table
           :data="ruleForm.postageCalculateList"
           height="200"
-          border
           :header-cell-style="headClass"
           style="width: 100%">
           <el-table-column type="index" label="序号" width="60"></el-table-column>
@@ -94,7 +93,6 @@
         <el-table
           :data="ruleForm.postageFreeList"
           height="200"
-          border
           :header-cell-style="headClass"
           style="width: 100%">
           <el-table-column type="index" label="序号" width="60"></el-table-column>

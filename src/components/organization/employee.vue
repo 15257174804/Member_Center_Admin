@@ -15,8 +15,14 @@
       <!-- 订单号 -->
       <div class="searchbox">
         用户名：
-        <el-input v-model="searchParams.keyword" placeholder="请输入用户名" :style="{width:'180px',height:'40px'}"></el-input>
+        <el-input v-model="searchParams.keyword" placeholder="请输入用户信息" :style="{width:'180px',height:'40px'}"></el-input>
       </div>
+      <!-- <div class="searchbox">
+        所属企业：
+        <el-select v-model="searchParams.groupId" :style="{width:'120px',height:'40px'}">
+          <el-option v-for='(item,i) of grouplink' :key='i' :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </div>  -->
       <div class="searchbox">
         状态：
         <el-select v-model="searchParams.isValid" :style="{width:'120px',height:'40px'}">
@@ -130,11 +136,13 @@ export default {
   name: "employee",
   data() {
     return {
+      grouplink:[],
       searchParams:{
         keyword:"",
         enterStartTime:"",
         enterEndTime:"",
-        isValid:""
+        isValid:"",
+        groupId:''
       },
       dataList: [],
       pagesize: 5, //页面一次展示多少数据
@@ -146,6 +154,7 @@ export default {
   // 页面渲染前拿到数据
   mounted() {
     this.getDataList();
+    this.getGroup();
   },
   methods: {
     // 成为合伙人
@@ -229,7 +238,7 @@ export default {
           }
         })
     },
-    // 获取所有单位数据
+    // 获取所有数据
     getDataList() {
       this.loading = true;
       let params = this.searchParams;
@@ -246,12 +255,35 @@ export default {
             })
           }else{
             this.dataList = res.data.msg.datas;
+            // for(var i=0;i<this.dataList.length;i++){
+            //   if(this.dataList[i].clientId){
+            //     this.dataList[i].groupId=this.dataList[i].clientId;
+            //   }else if(this.dataList[i].corpId){
+            //     this.dataList[i].groupId=this.dataList[i].corpId;
+            //   }
+            // }
+            // console.log(this.dataList)
             this.totalCount = res.data.msg.totalCount;
           }
         })
         .catch(err => {
            console.log(err);
         });
+    },
+    // 获取企业信息
+    getGroup(){
+      let params={
+        status:1,
+        pagesize:100,
+        pageindex:1
+      }
+      this.axios.get('/crm/corporation/list',{params})
+      .then(res=>{
+        if(res.data.code>0){
+          this.grouplink=res.data.msg.datas;
+          console.log(this.grouplink)
+        }
+      })
     },
     search(){
       this.currentPage = 1;
@@ -263,6 +295,7 @@ export default {
       this.searchParams.enterStartTime = "";
       this.searchParams.enterEndTime = "";
       this.searchParams.isValid = "";
+      this.searchParams.groupId='';
       this.getDataList();
     }
   }

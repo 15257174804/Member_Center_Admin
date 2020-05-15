@@ -3,7 +3,7 @@
     <!-- 标题栏 -->
     <div class="title clearfix">
       <span>满减满赠</span>
-       <router-link to="reducedetail">  
+       <router-link to="/reducedetail">  
         <el-button type="success">
           <i class="el-icon-circle-plus-outline"></i>
           新建
@@ -20,9 +20,13 @@
         活动类型：
         <el-select v-model="searchParams.activityType" :style="{width:'120px',height:'40px'}">
           <el-option label="所有" value=""></el-option>
-          <el-option label="满减" value='1'></el-option>
-          <el-option label="满折" value='3'></el-option>
-          <el-option label="满赠" value='2'></el-option>
+          <el-option label="按金额满减" value='1'></el-option>
+          <el-option label="按金额满赠" value='2'></el-option>
+          <el-option label="按金额满折" value='3'></el-option>
+          <el-option label="按数量满减" value='5'></el-option>
+          <el-option label="按数量满赠" value='6'></el-option>
+          <el-option label="按数量满折" value='7'></el-option>
+          <el-option label="按数量满送" value='9'></el-option>
         </el-select>
       </div> 
       <div class="searchbox">
@@ -60,15 +64,20 @@
         </template>
       </el-table-column> 
       <el-table-column prop="activityName" label="名称" ></el-table-column>
+      <el-table-column prop="computeSort" label="优先级" ></el-table-column>
       <el-table-column prop="activityCode" label="活动编码" ></el-table-column>
       <el-table-column prop="preTime" label="预热时间"></el-table-column>
       <el-table-column prop="startTime" label="开始时间"></el-table-column>
       <el-table-column prop="endTime" label="结束时间"></el-table-column>
       <el-table-column prop="activityType" label="活动类型" >
         <template slot-scope="scope">
-          <span v-if="scope.row.activityType=='1'" type="success" disable-transitions>满减</span>
-          <span v-if="scope.row.activityType=='2'" type="brand" disable-transitions>满赠</span>
-          <span v-if="scope.row.activityType=='3'" type="info" disable-transitions>满折</span>
+          <span v-if="scope.row.activityType=='1'" >按金额满减</span>
+          <span v-if="scope.row.activityType=='2'" >按金额满赠</span>
+          <span v-if="scope.row.activityType=='3'" >按金额满折</span>
+          <span v-if="scope.row.activityType=='5'" >按数量满减</span>
+          <span v-if="scope.row.activityType=='6'" >按数量满赠</span>
+          <span v-if="scope.row.activityType=='7'" >按数量满折</span>
+          <span v-if="scope.row.activityType=='9'" >按数量满送</span>
         </template>
       </el-table-column>
       <el-table-column prop="activityDesc" label="活动描述" ></el-table-column>

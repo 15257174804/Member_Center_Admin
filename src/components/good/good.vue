@@ -87,7 +87,7 @@
           <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
         </template>
       </el-table-column> 
-      <el-table-column prop="backImg" label="图片" width="80" >
+      <el-table-column prop="backImg" label="图片" width="100" align="center" >
           <template slot-scope="scope">
             <img v-if="scope.row.imgUrl" style="width:60px;height:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl">
             <span v-else>无</span>
@@ -153,7 +153,7 @@ export default {
       searchParams:{
         redeemFlag:false,
         keyword:"",
-        isShow:"1"
+        isShow:""
       },
       dataList: [],
       pagesize: 5, //页面一次展示多少数据

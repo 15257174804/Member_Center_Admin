@@ -70,7 +70,7 @@
           <el-form-item class="half-form" label="许可证">
             <el-input v-model="form.license"></el-input>
           </el-form-item>
-          <el-form-item class="half-form" label="净重/kg" prop="weight">
+          <el-form-item class="half-form" label="净重/g" prop="weight">
             <el-input v-model="form.weight" type="number"></el-input>
           </el-form-item>
           <el-form-item class="half-form" label="是否上架">
@@ -202,10 +202,10 @@
           this.currentPage=this.$route.query.currentPage;
           this.pagesize=this.$route.query.pagesize;
           this.getData();
-          this.getClass();
           // console.log(this.currentPage)
           // console.log(this.pagesize)
         }
+        this.getClass();
     },
     mounted(){
         
@@ -214,9 +214,10 @@
       // 获取商品类别
       getClass(){
         let params={
-          level:2
+          status:1
         }
-        this.axios.get('/b2c/classify/list')
+
+        this.axios.get('/b2c/classify/list',{params})
         .then(res=>{
           // console.log('获取树形数据')
           // console.log(res.data.msg.datas)
@@ -287,10 +288,10 @@
         let params = {
           id: this.form.id
         }
-        this.axios
-          .get("/b2c/product/good/findbyid", {params})
+        this.axios.get("/b2c/product/good/findbyid", {params})
           .then(res => {
             this.form = res.data.msg;
+            this.form.weight=this.form.weight*1000
             this.getfileList();
           })
           .catch(err => {
@@ -340,6 +341,7 @@
               if(this.pictures.length==0){
                 this.form.imgUrl=''
               }
+              this.form.weight=this.form.weight/1000
               //保存
               this.axios
               .post("/b2c/product/good/save", this.form)

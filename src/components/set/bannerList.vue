@@ -39,7 +39,8 @@
       </div>
       <div class="searchbox">
         <!-- 链接暂时是测试环境的，后期需要更改 -->
-        <el-button @click="showIframe('http://health.alink365.cn/#/showHomePage?groupId='+groupId)" class="showIframe">
+        <!-- <el-button @click="showIframe('http://health.alink365.cn/#/showHomePage?groupId='+groupId)" class="showIframe"> -->
+        <el-button @click="showIframe" class="showIframe">
           <i class="el-icon-view"></i>
           预览
         </el-button>
@@ -51,7 +52,7 @@
       border 
       stripe 
       style="width: 100%">
-      <el-table-column prop="adSort" label="序号" width="60"></el-table-column>
+      <el-table-column prop="adSort" label="楼层序号" width="60"></el-table-column>
       <el-table-column prop="floorType" label="楼层类型">
         <template slot-scope="scope">
           <span v-if="scope.row.floorType==1">banner板块</span>
@@ -105,6 +106,86 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="totalCount"
     ></el-pagination>
+    <!-- 预览 -->
+    <div v-if='Preview'>
+      <div id='showMobilePreview'>
+        <div class='mobile_preview_header'><i class='mobile_preview_header_icon'></i></div>
+
+        <div class='mobile_preview_frame'>
+          <!-- banner -->
+          <div v-if="bannerList.length>0">
+            <el-carousel height="150px">
+              <el-carousel-item v-for="(item,i) of bannerList" :key="i">
+                <img style='width:99%;height:100%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+              </el-carousel-item>
+            </el-carousel>
+          </div>
+          <!-- 分类 -->
+          <div v-if="classList.length>0">
+            <ul class="classtype">
+              <li v-for="(item,i) of classList" :key='i'>
+                <img v-if='item.img' style='width:60px;heigth:60px;border-radius: 50%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                <img v-else style='width:60px;heigth:60px;border-radius: 50%;' src="../../assets/nopicture.png" alt="">
+                <p style='margin:0;color: #666666;font-size:12px;'>{{item.cellName}}</p>
+              </li>
+            </ul>
+          </div>
+          <!-- 公告 -->
+          <div class='newtype' v-if='newname!=""'>
+            <div class='left'></div>
+            <div class='right'>{{newname}}</div>
+            <div class='el-icon-arrow-right' style='color:#999;font-size:12px;'></div>
+          </div>
+          <!-- 限时抢购 -->
+          <div class='timelimite' v-if="timelimited!=''">
+            <div class='timetitle'>
+              <div style='color:#333;font-weight:700;'>限时抢购</div>
+              <div style='color:#666;font-size:12px;'>去抢购 <i class='el-icon-arrow-right'></i></div>
+            </div>
+            <div class='timecontent'>
+              <div>
+                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi3.png" alt="">
+                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+              </div>
+              <div>
+                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi4.png" alt="">
+                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+              </div>
+              <div>
+                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi5.png" alt="">
+                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+              </div>
+              <div>
+                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi6.png" alt="">
+                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+              </div>
+            </div>
+          </div>
+          <!-- 商品大类 -->
+          <div class='goodsList' v-for="(val,i) of goodList" :key='i'>
+            <div class='goodtitle'>
+              <div style='color:#333;font-weight:700;'>{{val.floorName}}</div>
+            </div>
+            <div class='goodcontent'>
+              <div style='width:160px;padding-bottom:15px;' v-for="(item,i) of val.cells" :key='i'>
+                <img v-if='item.img' style='width:140px;height:140px;margin:10px' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                <img v-else style='width:140px;height:140px;margin:10px' src="../../assets/nopicture.png" alt="">
+                <p style='margin:0 0 0 10px;color:#333;font-size:15px'>{{item.cellName}}</p>
+                <p style='margin:0 0 0 10px;color:#EF4348;font-size:14px;font-weight:700;'>￥{{item.goodPrice.toFixed(2)}}</p>
+              </div>
+            </div>
+          </div>
+          <!-- end -->
+        </div>
+
+        <div class='mobile_preview_footer'><i class='mobile_preview_footer_icon'></i></div>
+      </div>
+      <div id='YuFrameMobilePreviewBg' @click='Preview=false'  style='cursor:pointer;width:100%;height:100%;background-color: rgba(128,128,128,.4);display:block;z-index:9998;position:absolute;left:0px;top:0px;filter:Alpha(Opacity=30);/* IE */-moz-opacity:0.4;/* Moz + FF */opacity: 0.4; '></div>
+    </div>
 
   </div>
 </template>
@@ -114,6 +195,15 @@ export default {
   name:'bannerlist',
   data(){
     return {
+      // 预览
+      Preview:false,
+      bannerList:[],
+      classList:[],
+      newname:'',
+      timelimited:'',
+      goodfloorName:'热卖商品',
+      goodList:[],
+
       groupId:this.$store.state.groupId,
       searchParams:{
         keyword:"",
@@ -121,28 +211,31 @@ export default {
         showCells:true
       },
       dataList: [],
-      pagesize: 5, //页面一次展示多少数据
+      pagesize: 10, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
       loading: false,
     }
   },
   methods:{
-    showIframe(url){
-      $("<div id='showMobilePreview'>" +
-          "<div class='mobile_preview_header'><i class='mobile_preview_header_icon'></i></div>" +
-          "<div class='mobile_preview_frame'><iframe id='YuFrameMobilePreview' name='YuFrameMobilePreview' ></iframe></div>" + 
-          "<div class='mobile_preview_footer'><i class='mobile_preview_footer_icon'></i></div>" +
-      "</div>").prependTo('body');
-       $("#YuFrameMobilePreview").attr("src", url);  
-      //添加背景遮罩
-      $("<div id='YuFrameMobilePreviewBg' style='cursor:pointer;width:100%;height:100%;background-color: Gray;display:block;z-index:9998;position:absolute;left:0px;top:0px;filter:Alpha(Opacity=30);/* IE */-moz-opacity:0.4;/* Moz + FF */opacity: 0.4; '/>").prependTo('body'); 
-      //点击背景遮罩移除iframe和背景
-      $("#YuFrameMobilePreviewBg").click(function() {
-        $("#showMobilePreview").remove();
-        $("#YuFrameMobilePreviewBg").remove();
-      });
+    showIframe(){
+      this.Preview=true;
     },
+    // showIframe(url){
+    //   $("<div id='showMobilePreview'>" +
+    //       "<div class='mobile_preview_header'><i class='mobile_preview_header_icon'></i></div>" +
+    //       "<div class='mobile_preview_frame'><iframe id='YuFrameMobilePreview' name='YuFrameMobilePreview' ></iframe></div>" + 
+    //       "<div class='mobile_preview_footer'><i class='mobile_preview_footer_icon'></i></div>" +
+    //   "</div>").prependTo('body');
+    //    $("#YuFrameMobilePreview").attr("src", url);  
+    //   //添加背景遮罩
+    //   $("<div id='YuFrameMobilePreviewBg' style='cursor:pointer;width:100%;height:100%;background-color: Gray;display:block;z-index:9998;position:absolute;left:0px;top:0px;filter:Alpha(Opacity=30);/* IE */-moz-opacity:0.4;/* Moz + FF */opacity: 0.4; '/>").prependTo('body'); 
+    //   //点击背景遮罩移除iframe和背景
+    //   $("#YuFrameMobilePreviewBg").click(function() {
+    //     $("#showMobilePreview").remove();
+    //     $("#YuFrameMobilePreviewBg").remove();
+    //   });
+    // },
     del(row){
       let params={
         id:row.id
@@ -214,14 +307,29 @@ export default {
             message: res.data.msg
           })
         }else{
-          this._dataList = res.data.msg.datas;
-          if(this.$store.state.isAdmin=='systemAdmin'){
-            this.dataList=this._dataList.filter((val,i,arr)=>{
-              return val.groupId==0
-            })
-          }else{
-            this.dataList=this._dataList
+          this.dataList = res.data.msg.datas;
+          for(var i=0;i<this.dataList.length;i++){
+            if(this.dataList[i].floorType==1){
+              this.bannerList=this.dataList[i].cells
+            }else if(this.dataList[i].floorType==8){
+              this.classList=this.dataList[i].cells
+            }else if(this.dataList[i].floorType==10){
+              this.newname=this.dataList[i].floorName
+            }else if(this.dataList[i].floorType==6){
+              this.timelimited=this.dataList[i].floorName
+            }else if(this.dataList[i].floorType==5){
+              // this.goodList=this.dataList[i].cells;
+              this.goodList=this.goodList.concat(this.dataList[i])
+              // this.goodfloorName=this.dataList[i].floorName
+            }
           }
+          // if(this.$store.state.isAdmin=='systemAdmin'){
+          //   this.dataList=this._dataList.filter((val,i,arr)=>{
+          //     return val.groupId==0
+          //   })
+          // }else{
+          //   this.dataList=this._dataList
+          // }
           // console.log(this.dataList)
           this.totalCount = res.data.msg.totalCount;
         }
@@ -234,7 +342,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang='scss'>
 .bgcolor{
   width:20px;
   height:20px;
@@ -274,9 +382,9 @@ export default {
   margin-top: 18px; 
 }
 .mobile_preview_frame {
-  width: 375px;
+  width: 387px;
   min-height: 294px;
-  height: 667px;
+  height: 677px;
   max-height: calc(100vh - 166px);
   top: 40px;
   left: 0;
@@ -284,32 +392,97 @@ export default {
   position: relative;
   background-color: #fff;
   display: block;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-#YuFrameMobilePreview {
-  border: none;
-  width: 375px;
-  height: 100%;
+/* 滚动条 */
+.mobile_preview_frame::-webkit-scrollbar{
+  width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
+  height: 3px;
 }
-.mobile_preview_header_icon {
-  display: inline-block;
-  width: 65px;
-  height: 10px;
-  background: #c8c9cc;
-  border-radius: 9px;
-  vertical-align: middle;
-  margin-top: 18px;
+.mobile_preview_frame::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.01);
+  background: rgba(0, 0, 0, 0.01);
 }
-.mobile_preview_frame {
-  width: 375px;
-  min-height: 294px;
-  height: 667px;
-  max-height: calc(100vh - 166px);
-  top: 40px;
-  left: 0;
-  border: 6px solid #eeeff2;
-  position: relative;
-  background-color: #fff;
-  display: block;
+
+.mobile_preview_frame::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.01);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.01);
+}
+.el-carousel__button{
+  width:5px;
+  height:5px;
+  border-radius: 50%;
+}
+.classtype{
+  width:350px;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin:0;
+  padding: 20px 0 0 0;
+  li{
+    width:75px;height:75px;
+    margin-bottom: 15px;
+    
+  }
+}
+.newtype{
+  width:351px;
+  height:35px;
+  display: flex;
+  margin:15px 0;
+  align-items: center;
+  .left{
+    width:30%;
+    height:35px;
+    background: url(../../assets/notice.png) no-repeat left center;
+    background-size: 65px 20px;
+    border-right:1px solid #c3c3c3;
+  }
+  .right{
+    width:67%;
+    height:35px;
+    color:#FF8D00;
+    font-size:12px;
+    text-align: left;
+    line-height: 35px;
+    padding-left:15px;
+  }
+}
+.timelimite{
+  width:351px;
+  padding:15px 0;
+  .timetitle{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+  }
+  .timecontent{
+    display: flex;
+    justify-content: space-between;
+
+  }
+}
+.goodsList{
+  margin:15px 0;
+  width:351px;
+  text-align: left;
+  .goodtitle{
+    padding-bottom: 10px;
+  }
+  .goodcontent{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 }
 #YuFrameMobilePreview {
   border: none;
