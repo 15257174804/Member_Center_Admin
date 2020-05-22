@@ -14,22 +14,21 @@
         <el-form-item label="楼层描述" prop="floorDesc">
           <el-input v-model="ruleForm.floorDesc" placeholder="请输入楼层描述"></el-input>
         </el-form-item>
-        <el-form-item label="楼层链接" prop="floorLink">
-          <!-- <el-input v-model="ruleForm.floorLink" placeholder="请输入楼层跳转的目标链接"></el-input> -->
-          <el-select v-model="ruleForm.floorLink" placeholder="请选择">
+        <el-form-item label="楼层类型" prop="floorType">
+          <el-select v-model="ruleForm.floorType" placeholder="请选择" @change="changefloortype">
             <el-option
-              v-for="item in linkoptions"
+              v-for="item in options"
               :key="item.id"
               :label="item.name"
               :value="item.value">
             </el-option>
           </el-select>
-
         </el-form-item>
-        <el-form-item label="楼层类型" prop="floorType">
-          <el-select v-model="ruleForm.floorType" placeholder="请选择" @change="changefloortype">
+        <el-form-item label="跳转链接" prop="floorLink">
+          <!-- <el-input v-model="ruleForm.floorLink" placeholder="请输入楼层跳转的目标链接"></el-input> -->
+          <el-select v-model="ruleForm.floorLink" placeholder="请选择">
             <el-option
-              v-for="item in options"
+              v-for="item in linkoptions"
               :key="item.id"
               :label="item.name"
               :value="item.value">
@@ -327,7 +326,7 @@
           :visible.sync="dialogVisible2"
           width="45%">
           <el-form :model="numform" status-icon :rules="rules" ref="numform" label-width="200px" >
-            <el-form-item label="序号" prop="cellSort">
+            <el-form-item label="序号" prop="cellSort" required>
               <el-input v-model="numform.cellSort" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="是否可跳转" prop="isLink">
@@ -348,16 +347,6 @@
               </el-select>
             </el-form-item>
             <el-form-item label="图片" prop="img">
-              <!-- <el-upload
-                class="avatar-uploader"
-                :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess2"
-                :before-upload="beforeAvatarUpload">
-                <img v-if="imgUrl2" :src="imgUrl2" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload> -->
-
               <el-upload :class="{'hide':hideUpload}"
                 :action="axios.defaults.baseURL + '/crm/file/imgupload?token=' + token"
                 list-type="picture-card"
@@ -445,7 +434,12 @@ export default {
           id:9,
           value: 10,
           name: '公告'
-        }
+        },
+        {
+          id:10,
+          value: 11,
+          name: '商品组板块'
+        },
       ],
       linkoptions: [{
           id:0,
@@ -518,8 +512,12 @@ export default {
         ],
         adSort:[
           { required: true, message: '请输入楼层序号', trigger: 'blur' }
+        ],
+        cellSort:[
+          { required: true, message: '请输入广告位序号', trigger: 'blur' }
         ]
-      }
+      },
+      i:0,   //广告位序号计数
     }
   },
   methods:{
@@ -567,7 +565,9 @@ export default {
     addclass(row){
       // console.log('点击添加')
       // console.log(row)
+      this.i++
       let obj={
+        cellSort:this.i,
         goodClassId:row.id,
         cellName:row.name,
         img:row.logo,
@@ -624,7 +624,9 @@ export default {
     addc(row){
       // console.log('点击添加')
       // console.log(row)
+      this.i++
       let obj={
+        cellSort:this.i,
         cellCorpId:row.id,
         cellName:row.name,
         img:row.logo,
@@ -640,6 +642,7 @@ export default {
     // 获取完整详情列表
     getDataList(){
       let params = this.searchParams;
+      params.isShow=1;
       params.redeemFlag=false;
       params.pageindex = this.currentPage;
       params.pagesize = this.pagesize;
@@ -699,7 +702,9 @@ export default {
     add(row){
       // console.log('点击添加')
       // console.log(row)
+      this.i++
       let obj={
+        cellSort:this.i,
         cellGoodId:row.id,
         cellName:row.goodName,
         img:row.imgUrl,
@@ -768,17 +773,6 @@ export default {
     },
     // 添加图片
     choosepicture(){
-      // console.log('添加图片')
-      // console.log(this.ruleForm.cells)
-      // this.edittitle='新增'
-      // this.dialogVisible2=true;
-      // this.numform.cellSort='';
-      // this.numform.cellLink='';
-      // this.numform.img='';
-      // this.imgUrl2='';
-      // this.fileList2=[];
-      // this.numform.cellName='';
-      // this.hideUpload = this.fileList2.length >= 1;
       let obj={
         cellName:'图片',
         img:''

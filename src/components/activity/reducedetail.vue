@@ -27,27 +27,30 @@
       <el-form-item label="预热时间" prop='preTime'>
         <el-date-picker
           v-model="Form.preTime"
+          type="datetime"
           :picker-options='pickerOptions'
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
+          format="yyyy-MM-dd HH:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="选择预热时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="开始时间" prop='startTime'>
         <el-date-picker
           v-model="Form.startTime"
+          type="datetime"
           :picker-options='pickerOptions'
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
+          format="yyyy-MM-dd HH:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="选择活动开始时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="结束时间" prop='endTime'>
         <el-date-picker
           v-model="Form.endTime"
+          type="datetime"
           :picker-options='pickerOptions'
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
+          format="yyyy-MM-dd HH:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="选择活动结束时间">
         </el-date-picker>
       </el-form-item>
@@ -105,13 +108,12 @@
         </el-form-item>
         <!-- 如果是满减满折才显示 -->
         <el-form-item label="优惠力度" required>
-          <!-- 按数量 -->
           <span v-if="Form.activityType=='满减'" style="color:#606266;">
-            满 <input type="number" v-model="Form.goodCount" @blur="check3" ref='money3' style='bprder:1px solid #DCDFE6;width:80px;'>件，减<input @blur="check2" ref='money2' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='1' :max='Form.useMinMoney' v-model="Form.discount">元
+            满 <input type="number" v-model="Form.goodCount" @blur="check3" ref='money3' style='bprder:1px solid #DCDFE6;width:80px;'>件，减<input @blur="check4" ref='money4' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='1' :max='Form.useMinMoney' v-model="Form.discount">元
             <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
           </span>
           <span v-else-if="Form.activityType=='满折'" style="color:#606266;">
-            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" v-model="Form.goodCount">件，折扣率<input @blur="check22" ref='money22' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='0' max='1' step='0.01' v-model="Form.discountRate">  (折扣率为0-1之间小数，如0.8代表打八折)
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" v-model="Form.goodCount">件，折扣率<input @blur="check44" ref='money44' style='bprder:1px solid #DCDFE6;width:80px;' type="number" min='0' max='1' step='0.01' v-model="Form.discountRate">  (折扣率为0-1之间小数，如0.8代表打八折)
             <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
           </span>
           <span v-else-if="Form.activityType=='满赠'" style="color:#606266;">
@@ -127,7 +129,8 @@
             </el-tag>
           </span>
           <span v-else-if="Form.activityType=='满送'" style="color:#606266;">
-            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" v-model="Form.goodCount">件，送<input @blur="check2222" style='bprder:1px solid #DCDFE6;width:80px;' ref='money2222' type="number" v-model="Form.maxGiftCount">件  (赠同商品)
+            满 <input style='bprder:1px solid #DCDFE6;width:80px;' @blur="check3" ref='money3' type="number" v-model="Form.goodCount">件，送1件(赠同商品)&nbsp;&nbsp;
+            赠送上限<input @blur="check4444" style='bprder:1px solid #DCDFE6;width:80px;' ref='money4444' type="number" v-model="Form.maxGiftCount">件  
             <span v-if='innerMsg!=""' style='color:#f56c6c;font-size:14px;'>{{innerMsg}}</span>
           </span>
           <span v-else style="color:#606266;">请先选择活动类型</span>
@@ -469,17 +472,43 @@ export default {
         this.$refs.money3.style.border='1px solid #DCDFE6';
       }
     },
-    check2222(){
+    check4(){
+      let reg=/^([1-9][0-9]*)(\.\d+)?$/;
+      if(this.Form.discount==''){
+        this.innerMsg='优惠金额不能为空';
+        this.$refs.money4.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.discount)){
+        this.innerMsg='优惠金额只能为大于0的正数';
+        this.$refs.money4.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money4.style.border='1px solid #DCDFE6';
+      }
+    },
+    check44(){
+      let reg=/^0(\.[1-9]{1,2})+$/;
+      if(this.Form.discountRate==''){
+        this.innerMsg='活动折扣不能为空';
+        this.$refs.money44.style.border='1px solid #F56C6C';
+      }else if(!reg.test(this.Form.discountRate)){
+        this.innerMsg='请输入0~1之间小数';
+        this.$refs.money44.style.border='1px solid #F56C6C';
+      }else{
+        this.innerMsg=''
+        this.$refs.money44.style.border='1px solid #DCDFE6';
+      }
+    },
+    check4444(){
       let reg=/^[1-9]\d*$/;
       if(this.Form.maxGiftCount==''){
         this.innerMsg='赠送件数不能为空';
-        this.$refs.money2222.style.border='1px solid #F56C6C';
+        this.$refs.money4444.style.border='1px solid #F56C6C';
       }else if(!reg.test(this.Form.maxGiftCount)){
         this.innerMsg='赠送件数只能为大于0的正整数';
-        this.$refs.money2222.style.border='1px solid #F56C6C';
+        this.$refs.money4444.style.border='1px solid #F56C6C';
       }else{
         this.innerMsg=''
-        this.$refs.money2222.style.border='1px solid #DCDFE6';
+        this.$refs.money4444.style.border='1px solid #DCDFE6';
       }
     },
     // 时间处理
@@ -517,9 +546,9 @@ export default {
         if(this.Form.status==3){
           this.isDisabled=true
         }
-        this.Form.preTime=this.timeFormate(this.Form.preTime);
-        this.Form.startTime=this.timeFormate(this.Form.startTime);
-        this.Form.endTime=this.timeFormate(this.Form.endTime);
+        // this.Form.preTime=this.timeFormate(this.Form.preTime);
+        // this.Form.startTime=this.timeFormate(this.Form.startTime);
+        // this.Form.endTime=this.timeFormate(this.Form.endTime);
       })
     },
     getGoods(){

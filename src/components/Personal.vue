@@ -66,13 +66,13 @@ export default {
   data(){
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'));
+        return callback(new Error('请输入密码'));
       } else {
         const reg=/^\w{6,}$/;
         if(reg.test(value)){
           callback();
         }else{
-          callback(new Error('请输入至少6位密码(数字、大小写字母或下划线_)'));
+          return callback(new Error('请输入至少6位密码(数字、大小写字母或下划线_)'));
         }
       }
     };

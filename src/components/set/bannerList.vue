@@ -112,74 +112,85 @@
         <div class='mobile_preview_header'><i class='mobile_preview_header_icon'></i></div>
 
         <div class='mobile_preview_frame'>
-          <!-- banner -->
-          <div v-if="bannerList.length>0">
-            <el-carousel height="150px">
-              <el-carousel-item v-for="(item,i) of bannerList" :key="i">
-                <img style='width:99%;height:100%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
-              </el-carousel-item>
-            </el-carousel>
-          </div>
-          <!-- 分类 -->
-          <div v-if="classList.length>0">
-            <ul class="classtype">
-              <li v-for="(item,i) of classList" :key='i'>
-                <img v-if='item.img' style='width:60px;heigth:60px;border-radius: 50%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
-                <img v-else style='width:60px;heigth:60px;border-radius: 50%;' src="../../assets/nopicture.png" alt="">
-                <p style='margin:0;color: #666666;font-size:12px;'>{{item.cellName}}</p>
-              </li>
-            </ul>
-          </div>
-          <!-- 公告 -->
-          <div class='newtype' v-if='newname!=""'>
-            <div class='left'></div>
-            <div class='right'>{{newname}}</div>
-            <div class='el-icon-arrow-right' style='color:#999;font-size:12px;'></div>
-          </div>
-          <!-- 限时抢购 -->
-          <div class='timelimite' v-if="timelimited!=''">
-            <div class='timetitle'>
-              <div style='color:#333;font-weight:700;'>限时抢购</div>
-              <div style='color:#666;font-size:12px;'>去抢购 <i class='el-icon-arrow-right'></i></div>
+          <div v-if="dataList.length>0">
+            <div v-for="(value,index) of dataList" :key="index">
+              <!-- banner -->
+              <div v-if="value.floorType==1">
+                <el-carousel height="150px">
+                  <el-carousel-item v-for="(item,i) of value.cells" :key="i">
+                    <img style="width:99%;height:100%;" :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
+              <!-- 分类 -->
+              <div v-if="value.floorType==8">
+                <ul class="classtype">
+                  <li v-for="(item,i) of value.cells" :key='i'>
+                    <img v-if='item.img' style='width:60px;heigth:60px;border-radius: 50%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                    <img v-else style='width:60px;heigth:60px;border-radius: 50%;' src="../../assets/nopicture.png" alt="">
+                    <p style='margin:0;color: #666666;font-size:12px;'>{{item.cellName}}</p>
+                  </li>
+                </ul>
+              </div>
+              <!-- 公告 -->
+              <div class='newtype' v-if='value.floorType==10'>
+                <div class='left'></div>
+                <div class='right'>{{value.floorName}}</div>
+                <div class='el-icon-arrow-right' style='color:#999;font-size:12px;'></div>
+              </div>
+              <!-- 限时抢购 -->
+              <div class='timelimite' v-if="value.floorType==6">
+                <div class='timetitle'>
+                  <div style='color:#333;font-weight:700;'>限时抢购</div>
+                  <div style='color:#666;font-size:12px;'>去抢购 <i class='el-icon-arrow-right'></i></div>
+                </div>
+                <div class='timecontent'>
+                  <div>
+                    <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi3.png" alt="">
+                    <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                    <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+                  </div>
+                  <div>
+                    <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi4.png" alt="">
+                    <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                    <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+                  </div>
+                  <div>
+                    <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi5.png" alt="">
+                    <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                    <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+                  </div>
+                  <div>
+                    <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi6.png" alt="">
+                    <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
+                    <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
+                  </div>
+                </div>
+              </div>
+              <!-- 商品大类 -->
+              <div class='goodsList' v-if="value.floorType==5">
+                <div class='goodtitle'>
+                  <div style='color:#333;font-weight:700;'>{{value.floorName}}</div>
+                </div>
+                <div class='goodcontent'>
+                  <div style='width:160px;padding-bottom:15px;' v-for="(item,i) of value.cells" :key='i'>
+                    <img v-if='item.img' style='width:140px;height:140px;margin:10px' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                    <img v-else style='width:140px;height:140px;margin:10px' src="../../assets/nopicture.png" alt="">
+                    <p style='margin:0 0 0 10px;color:#333;font-size:15px'>{{item.cellName}}</p>
+                    <p style='margin:0 0 0 10px;color:#EF4348;font-size:14px;font-weight:700;'>￥{{item.goodPrice.toFixed(2)}}</p>
+                  </div>
+                </div>
+              </div>
+              <!-- 商品组 -->
+              <div class="groupPro" v-if="value.floorType==11">
+                <img :src="axios.defaults.baseURL + '/b2c/image/' +value.backImg" alt="">
+              </div>
+              <!-- end -->
             </div>
-            <div class='timecontent'>
-              <div>
-                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi3.png" alt="">
-                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
-                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
-              </div>
-              <div>
-                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi4.png" alt="">
-                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
-                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
-              </div>
-              <div>
-                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi5.png" alt="">
-                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
-                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
-              </div>
-              <div>
-                <img style='width:70px;height:70px;margin-bottom:5px;' src="../../assets/pi6.png" alt="">
-                <p style='margin:0;color:#EF4348;font-size:14px;font-weight:700;'>￥10.00</p>
-                <p style='margin:0;color:#999;font-size:10px;text-decoration: line-through;'>￥12.00</p>
-              </div>
-            </div>
           </div>
-          <!-- 商品大类 -->
-          <div class='goodsList' v-for="(val,i) of goodList" :key='i'>
-            <div class='goodtitle'>
-              <div style='color:#333;font-weight:700;'>{{val.floorName}}</div>
-            </div>
-            <div class='goodcontent'>
-              <div style='width:160px;padding-bottom:15px;' v-for="(item,i) of val.cells" :key='i'>
-                <img v-if='item.img' style='width:140px;height:140px;margin:10px' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
-                <img v-else style='width:140px;height:140px;margin:10px' src="../../assets/nopicture.png" alt="">
-                <p style='margin:0 0 0 10px;color:#333;font-size:15px'>{{item.cellName}}</p>
-                <p style='margin:0 0 0 10px;color:#EF4348;font-size:14px;font-weight:700;'>￥{{item.goodPrice.toFixed(2)}}</p>
-              </div>
-            </div>
+          <div v-else>
+            还没有设置楼层哦！
           </div>
-          <!-- end -->
         </div>
 
         <div class='mobile_preview_footer'><i class='mobile_preview_footer_icon'></i></div>
@@ -308,30 +319,22 @@ export default {
           })
         }else{
           this.dataList = res.data.msg.datas;
-          for(var i=0;i<this.dataList.length;i++){
-            if(this.dataList[i].floorType==1){
-              this.bannerList=this.dataList[i].cells
-            }else if(this.dataList[i].floorType==8){
-              this.classList=this.dataList[i].cells
-            }else if(this.dataList[i].floorType==10){
-              this.newname=this.dataList[i].floorName
-            }else if(this.dataList[i].floorType==6){
-              this.timelimited=this.dataList[i].floorName
-            }else if(this.dataList[i].floorType==5){
-              // this.goodList=this.dataList[i].cells;
-              this.goodList=this.goodList.concat(this.dataList[i])
-              // this.goodfloorName=this.dataList[i].floorName
-            }
-          }
-          // if(this.$store.state.isAdmin=='systemAdmin'){
-          //   this.dataList=this._dataList.filter((val,i,arr)=>{
-          //     return val.groupId==0
-          //   })
-          // }else{
-          //   this.dataList=this._dataList
-          // }
-          // console.log(this.dataList)
           this.totalCount = res.data.msg.totalCount;
+          // 循环自动生成
+          // for(var i=0;i<this.dataList.length;i++){
+          //   if(this.dataList[i].floorType==1){
+          //     this.bannerList=this.dataList[i].cells
+          //   }else if(this.dataList[i].floorType==8){
+          //     this.classList=this.dataList[i].cells
+          //   }else if(this.dataList[i].floorType==10){
+          //     this.newname=this.dataList[i].floorName
+          //   }else if(this.dataList[i].floorType==6){
+          //     this.timelimited=this.dataList[i].floorName
+          //   }else if(this.dataList[i].floorType==5){
+          //     this.goodList=this.goodList.concat(this.dataList[i])
+          //   }
+          // }
+          
         }
       })
     }
@@ -482,6 +485,15 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+  }
+}
+.groupPro{
+  width:351px;
+  height:150px;
+  margin:15px 0;
+  img{
+    width: 100%;
+    height: 100%;
   }
 }
 #YuFrameMobilePreview {

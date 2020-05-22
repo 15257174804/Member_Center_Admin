@@ -9,8 +9,8 @@ const filters={
   // 其他过滤器
   titleFormate(val){
     if(!val) return ''
-    if(val.length>7){
-      val=val.substr(0,6)+'...'
+    if(val.length>6){
+      val=val.substr(0,5)+'...'
     }
     return val
   },

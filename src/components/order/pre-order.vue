@@ -44,24 +44,7 @@
           <el-option label="拒绝接单" value="3"></el-option>
         </el-select>
       </div> 
-      <div class="searchbox">
-        <el-button type="primary" @click="search()">
-          <i class="el-icon-zoom-in"></i>
-          查询
-        </el-button>
-      </div>
-      <div class="searchbox">
-        <el-button @click="reset()">
-          <i class="el-icon-refresh-right"></i>
-          重置
-        </el-button>
-      </div>
-      <div class="searchbox">
-        <el-button @click="exportExcel()">
-          <i class="el-icon-document-checked"></i>
-          导出
-        </el-button>
-      </div>
+      
       <!-- <el-button style="padding:12px 20px;background:#fdc52d;border:1px solid #fdc52d;float:right;" type="info" @click="exportExcel">导出</el-button> -->
       <br>
       <el-form status-icon :rules="rules2" style="display:inline-block;">
@@ -78,15 +61,6 @@
           </div>
         </el-form-item>
       </el-form>
-
-      <!-- <div class="searchbox">
-        起始时间：
-        <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}"></el-date-picker>
-      </div>
-      <div class="searchbox">
-        截止日期：
-        <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
-      </div> -->
       <div class="searchbox">
         预约类型：
         <el-select v-model="searchParams.preType" :style="{width:'120px',height:'40px'}">
@@ -94,6 +68,30 @@
           <el-option label="个人预约" value="1"></el-option>
           <el-option label="企业预约" value="2"></el-option>
         </el-select>
+      </div><br>
+      <div class="searchbox">
+        <el-button type="primary" @click="search()">
+          <i class="el-icon-zoom-in"></i>
+          查询
+        </el-button>
+      </div>
+      <div class="searchbox">
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right"></i>
+          重置
+        </el-button>
+      </div>
+      <div class="searchbox">
+        <el-button @click="exportExcel2()">
+          <i class="el-icon-document-checked"></i>
+          发货单导出
+        </el-button>
+      </div>
+      <div class="searchbox">
+        <el-button @click="exportExcel()">
+          <i class="el-icon-document-checked"></i>
+          订单明细导出
+        </el-button>
       </div> 
     </div>
 
@@ -121,7 +119,7 @@
       <el-table-column prop="pickupWay" label="提货方式" width="120">
         <template slot-scope="scope">
           <span v-if="scope.row.pickupWay =='2'">快递
-            <el-button v-if="scope.row.status=='2' || scope.row.status=='0'" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货</el-button>
+            <el-button v-if="scope.row.status=='2'" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货</el-button>
             <el-button v-if="scope.row.expressCode && scope.row.expressCorp" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货信息</el-button>
           </span>
           <span v-if="scope.row.pickupWay =='1'">自提</span>
@@ -491,6 +489,32 @@ export default {
         var href=res.request.responseURL;
         // console.log(href)
 
+        downloadElement.style.display = 'none';
+        downloadElement.href = href;
+        document.body.appendChild(downloadElement);
+        downloadElement.click(); //点击下载
+        document.body.removeChild(downloadElement); //下载完成移除元素
+        window.URL.revokeObjectURL(href); //释放掉blob对象
+      })
+    },
+    // 最新的订单明细导出
+    exportExcel(){
+      let params={
+        queryType:2,
+        status:this.searchParams.status,
+        startTime:this.searchParams.startTime,
+        endTime:this.searchParams.endTime,
+        orderTypeFlag:1,   //0 普通订单  1 预约订单
+        preType:this.searchParams.preType,
+        id:this.searchParams.orderNo,
+        pickupWay:this.searchParams.pickupWay,
+        clientConfirm:this.searchParams.clientConfirm,
+      }
+      this.axios.get('/b2c/order/detail/export',{params})
+      .then(res=>{
+        console.log(res)
+        var downloadElement = document.createElement('a');
+        var href=res.request.responseURL;
         downloadElement.style.display = 'none';
         downloadElement.href = href;
         document.body.appendChild(downloadElement);

@@ -38,7 +38,7 @@
           </el-submenu>
 
           <router-link to="/home">
-            <el-submenu index="1">
+            <el-submenu index="1" v-if="deliver!=18012789838">
               <template slot="title">
                 <i class="el-icon-s-home"></i>
                 首页
@@ -54,7 +54,7 @@
             </el-submenu>
           </router-link> -->
 
-          <el-submenu index="11">
+          <el-submenu index="11" v-if="deliver!=18012789838">
             <template slot="title">
               <i class="el-icon-share"></i>组织架构管理
             </template>
@@ -71,7 +71,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="12">
+          <el-submenu index="12" v-if="deliver!=18012789838">
             <template slot="title">
               <i class="el-icon-s-goods"></i>商品管理
             </template>
@@ -99,16 +99,16 @@
               <router-link to="/preorder">
                 <el-menu-item index="13-2">预约订单</el-menu-item>
               </router-link>
-              <router-link to="/count">
+              <router-link to="/count" v-if="deliver!=18012789838">
                 <el-menu-item index="13-3">预约汇总</el-menu-item>
               </router-link>
-              <router-link to="/refund">
+              <router-link to="/refund" v-if="deliver!=18012789838">
                 <el-menu-item index="13-4">退款管理</el-menu-item>
               </router-link>
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="14">
+          <el-submenu index="14" v-if="deliver!=18012789838">
             <template slot="title">
               <i class="el-icon-s-ticket"></i>营销活动
             </template>
@@ -128,7 +128,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="15">
+          <el-submenu index="15" v-if="deliver!=18012789838">
             <template slot="title">
               <i class="el-icon-s-shop"></i>积分商城
             </template>
@@ -145,7 +145,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="16">
+          <el-submenu index="16" v-if="deliver!=18012789838">
             <template slot="title">
               <i class="el-icon-s-tools"></i>基础设置
             </template>
@@ -174,7 +174,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="17">
+          <el-submenu index="17" v-if="deliver!=18012789838">
             <template slot="title">
               <i class="el-icon-user-solid"></i>合伙人
             </template>
@@ -263,11 +263,13 @@ export default {
             {title: '订单列表',link: '/order'}
           ]
         },
-      ]
+      ],
+      deliver:window.localStorage.getItem('deliver')
     };
   },
   mounted() {
-    
+    let d=window.localStorage.getItem('deliver')
+    console.log(d)
   }
 };
 </script>

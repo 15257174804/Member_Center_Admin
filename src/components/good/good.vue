@@ -95,11 +95,21 @@
       </el-table-column>
       <el-table-column prop="goodName" label="商品名称"></el-table-column>
       <el-table-column prop="corpName" label="所属企业"></el-table-column>
-      <el-table-column prop="goodsClass" label="商品分类"></el-table-column>
+      <el-table-column prop="goodClassName" label="商品分类">
+        <!-- <template slot-scope="scope">
+          <span v-if='scope.row.goodsClass==""'>{{scope.row.goodClassName}}</span>
+          <span v-else>{{scope.row.goodsClass}}</span>
+        </template> -->
+      </el-table-column>
       <el-table-column prop="prodArea" label="产地"></el-table-column>
       <el-table-column prop="producer" label="厂家"></el-table-column>
       <el-table-column prop="spec" label="规格"></el-table-column>
-      <el-table-column prop="useUnit" label="单位" width="60"></el-table-column>
+      <el-table-column prop="weight" label="净重/g">
+        <template slot-scope="scope">
+          <span>{{scope.row.weight*1000}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="quantity" label="库存"></el-table-column>
       <el-table-column prop="retailPrice" label="价格" width="60"></el-table-column>
       <el-table-column width="120" prop="isShow" label="销售状态">
         <template slot-scope="scope">
@@ -109,7 +119,6 @@
             @click="change(scope.row)"
             style="cursor: pointer;"
           >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
-
         </template>
       </el-table-column>
       <el-table-column

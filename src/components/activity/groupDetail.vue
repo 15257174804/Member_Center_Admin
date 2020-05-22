@@ -243,9 +243,20 @@ export default {
       this.title=this.$route.query.title;
       this.flag=true;
       this.getData();
+      this.getPic();
     }
   },
   methods:{
+    // 获取图片列表
+    getPic(){
+      let params={
+        id:this.form.id
+      }
+      this.axios.get('/b2c/cgPic/byCgID',{params})
+      .then(res=>{
+        console.log(res.data)
+      })
+    },
     getData(){
       let params={
         id:this.form.id
@@ -326,11 +337,29 @@ export default {
         quantity:1,
         innerMsg:''
       }
+      if(this.flag){
+        let params={
+          commodityGroupId:this.form.id,
+          goodId:row.id,
+          quantity:1
+        }
+        this.axios.post('/b2c/cgp/add',params)
+        .then(res=>{
+          if(res.data.code>0){
+            console.log(res.data)
+            this.getData();
+          }else{
+            console.log(res.data.msg)
+          }
+        })
+      }
       this.products=this.products.concat(obj)
     },
-    // 修改商品组时增加商品
+    // 修改商品组时增加商品数量
     addcomfirm(row){
-      let reg=/^[+][1-9]\d*$/;
+      console.log(row)
+      let reg=/^[1-9]\d*$/;
+      console.log()
       if(row.quantity==''){
         row.innerMsg='商品数量不能为空';
         // this.$refs.qty.style.border='1px solid #F56C6C';
@@ -345,11 +374,10 @@ export default {
       }
       if(this.flag){
         let params={
-          commodityGroupId:this.form.id,
-          goodId:row.goodId,
+          id:row.id,
           quantity:row.quantity
         }
-        this.axios.post('/b2c/cgp/add',params)
+        this.axios.post('/b2c/cgp/save',params)
         .then(res=>{
           if(res.data.code>0){
             console.log(res.data)

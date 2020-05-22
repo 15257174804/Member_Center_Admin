@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     driverkey: 0,
     user_name: localStorage.getItem('user_name')?localStorage.getItem('user_name'):"请重新登录",
-    group_name:sessionStorage.getItem('group_name')?sessionStorage.getItem('group_name'):"请重新登录",
+    group_name:sessionStorage.getItem('group_name'),
     token:"",
     flodKey: 0,
     clientId:'',

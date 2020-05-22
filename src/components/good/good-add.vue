@@ -46,7 +46,7 @@
           <el-form-item class="half-form" label="商品分类">
             <!-- <el-input v-model="form.goodsClass"></el-input> -->
             <el-select v-model="form.goodsClass" placeholder="请选择商品分类">
-              <el-option v-for="item in classList" :key="item.id" :label="item.name" :value="item.name"></el-option> 
+              <el-option v-for="item in classList" :key="item.id" :label="item.name" :value="item.id"></el-option> 
             </el-select>
           </el-form-item>
           <el-form-item class="half-form" label="规格">

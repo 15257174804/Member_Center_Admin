@@ -164,6 +164,7 @@ export default {
     removetoken() {
       // 清除token
       localStorage.removeItem("loginToken");
+      localStorage.removeItem("userInfo");
       this.$router.push("/login");
     },
     // 面包屑

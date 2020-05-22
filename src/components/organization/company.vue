@@ -108,6 +108,9 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item >
+                <el-button type="text" @click="del(scope.row)"><i class="el-icon-delete"></i>删除</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item >
                 <el-button v-if="(scope.row.status==2 &&scope.row.realLevel==1 && isAdmin=='systemAdmin') || (scope.row.status==2 &&scope.row.realLevel!=1 && isAdmin=='isAdmin')" type="text" @click="audit(scope.row)"><i class="el-icon-coordinate"></i>企业审核</el-button>
               </el-dropdown-item>
               <el-dropdown-item ><el-button type="text" @click="edit(scope.row,'busiInfo')"><i class="el-icon-shopping-cart-1"></i>经营范围</el-button></el-dropdown-item>
@@ -182,6 +185,32 @@ export default {
     };
   },
   methods: {
+    // 删除企业
+    del(row){
+      let params={
+        id:row.id
+      }
+      this.$confirm('确定要删除该店铺吗？','提示',{
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(()=>{
+        this.axios.get('/crm/corporation/delete',{params})
+        .then(res=>{
+          if(res.data.code>0){
+            this.$message.success('删除成功')
+            this.getDataList();
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        })
+      }).catch(()=>{
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        });
+      })
+    },
     // 修改企业营业状态
     onBusiness(row){
       // console.log(row)

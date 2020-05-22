@@ -142,12 +142,12 @@ export default {
       let phoneReg = /^1[3|4|5|7|8][0-9]{9}$/;
       let phoneReg2=/^[0][1-9]{2,3}-[0-9]{5,10}$/;
       if (value === '') {
-        callback(new Error('手机号不能为空'));
+        return callback(new Error('手机号不能为空'));
       } else {
         if (phoneReg.test(value)||phoneReg2.test(value)) {
           callback()
         } else {
-          callback(new Error('电话号码格式不正确'))
+          return callback(new Error('电话号码格式不正确'))
         }
       }
     };
@@ -164,7 +164,7 @@ export default {
         return callback(new Error('截止日期不能为空'));
       }
       if (Date.parse(value)<Date.parse(this.tempTime)) {
-        callback(new Error('截止日期不能早于开始日期'));
+        return callback(new Error('截止日期不能早于开始日期'));
       }else{
         callback();
       }

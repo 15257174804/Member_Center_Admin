@@ -243,12 +243,11 @@ export default {
         // console.log(res.data)
         if(res.data.code>0){
           this.tableData=res.data.msg.datas;
-          for(var i=0;i<this.tableData.length;i++){
-            this.tableData[i].preTime=this.timeFormate(this.tableData[i].preTime)
-            this.tableData[i].startTime=this.timeFormate(this.tableData[i].startTime)
-            this.tableData[i].endTime=this.timeFormate(this.tableData[i].endTime)
-
-          }
+          // for(var i=0;i<this.tableData.length;i++){
+          //   this.tableData[i].preTime=this.timeFormate(this.tableData[i].preTime)
+          //   this.tableData[i].startTime=this.timeFormate(this.tableData[i].startTime)
+          //   this.tableData[i].endTime=this.timeFormate(this.tableData[i].endTime)
+          // }
           this.totalCount=res.data.msg.totalCount;
         }else{
           this.$notify.error({

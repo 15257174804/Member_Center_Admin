@@ -27,9 +27,9 @@
           </el-form-item>
 
           <!-- 所属企业可修改 -->
-          <el-form-item  class="half-form" label="所属企业" prop="lastOrgName">
-            <el-select v-model="form.lastOrgName" placeholder="请选择所属企业" filterable>
-              <el-option v-for="item in companyDataList" :key="item.id" :label="item.name" :value="item.id"></el-option> 
+          <el-form-item  class="half-form" label="所属企业" prop="orgId">
+            <el-select v-model="form.orgId" placeholder="请选择所属企业" filterable>
+              <el-option v-for="(item,i) in companyDataList" :key="i" :label="item.name" :value="item.id"></el-option> 
             </el-select>
           </el-form-item>
           <!-- 所属企业不可修改 -->
@@ -212,7 +212,7 @@
           disabledDate(time) {
             return time.getTime() > Date.now();
          }
-        }
+        },
       }
     },
     mounted(){
@@ -244,7 +244,6 @@
             if(res.data.code > 0){
               this.form = res.data.msg;
               this.form.roles=res.data.msg.role[0].id;
-              // let baseInfo = res.data.msg.baseInfo;
             }
           })
           .catch(err => {
@@ -277,6 +276,10 @@
               obj.id=res.data.msg.datas[i].id;
               obj.name=res.data.msg.datas[i].name;
               this.companyDataList.push(obj);
+              if(obj.name==this.form.lastOrgName){
+                this.form.orgId=obj.id
+              }
+              // console.log(this.form.orgId)
             }
             // console.log('查看所属企业信息')
             // console.log(this.companyDataList)

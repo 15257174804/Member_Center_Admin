@@ -65,7 +65,7 @@
         <div class="door">
           <h3>快速入口</h3>
           <div class="content">
-            <router-link to='/good'>
+            <router-link to=''>
               <div style="height:36px;"> 
                 尽请期待
                 <!-- <img src="../assets/home/商品发布.png" alt="" style="{width:36px;height:36px;}">
@@ -95,18 +95,17 @@
         </div>
         <!-- 主体内容 -->
           <div v-if="show">
-
             <div v-if="newslist[0].titlePic!=''" class="firstlabel">
               <img :src="axios.defaults.baseURL + '/b2c/image/' + newslist[0].titlePic" />
               <div style="cursor: pointer;" @click="goNews">
                 <span>{{newslist[0].title|titleFormate}}</span>
-                <span style="color:#909399;font-size:12px;">{{newslist[0].createTime|timeFormate}}</span>
+                <span style="color:#909399;font-size:0.75rem;">{{newslist[0].createTime|timeFormate}}</span>
               </div>
             </div>
             <ul>
               <li v-for="(item,i) of newslist.slice(1)" :key="i" style="cursor: pointer;" @click="goNews">
                 <span>{{item.title|titleFormate}}</span>
-                <span style="color:#909399;font-size:12px;margin-top:4px;">{{item.createTime|timeFormate}}</span>
+                <span style="color:#909399;font-size:0.75rem;margin-top:4px;">{{item.createTime|timeFormate}}</span>
               </li>
             </ul>
             <div style="padding:50px;" v-if="newslist.length==0">暂无公告</div>
@@ -119,7 +118,7 @@
             <img src="../assets/home/paihang.png" align="bottom">
             <span style="margin-left:6px;">单品销量排行</span>
           </div>
-          <router-link :to="{path:'/newslist'}">  <!--跳转链接需要修改-->
+          <router-link :to="{path:''}">  <!--跳转链接需要修改-->
             <span class="more">更多</span>
           </router-link>
         </div>
@@ -162,7 +161,8 @@ export default {
           trigger: 'axis'
         },
         legend: {
-          data: ['浏览量(PV)', '访客数(UV)']
+          data: ['浏览量(PV)', '访客数(UV)'],
+          x:'right'
         },
         grid: {
           top:'20%',
@@ -530,13 +530,14 @@ export default {
         if(this.countMode==1){
           this.option.title.text='流量统计(按天)';
           for(let i=0;i<len;i++){
-            _xAxis.push(_xdata[i].loginDate)
+            _xAxis.push(_xdata[i].loginDate.slice(5))
             _series.push(_xdata[i].loginCount)
           }
         }else if(this.countMode==2){
           this.option.title.text='流量统计(按周)';
           for(let i=0;i<len;i++){
             _xAxis.push(_xdata[i].weekStartDate+_xdata[i].weekEndDate)
+            // _xAxis.push()
             _series.push(_xdata[i].loginCount)
           }
         }else{
@@ -629,37 +630,37 @@ export default {
         .Lottery1{
           width:24%;height:125px;
           background: url('../assets/home/1.png') no-repeat center center;
-          background-size: cover;
+          background-size: 100% 100%;
           color:#fff;
           border-radius: 13px;
-          p:first-child{font-size:14px;margin:24px 0 14px 26px;}
+          p:first-child{font-size:14px;margin:24px 0 14px 15px;}
           p:last-child{font-size:28px;font-weight: 540;margin:0 0 0 26px;}
         }
         .Lottery2{
           width:24%;height:125px;
           background: url('../assets/home/2.png') no-repeat center center;
-          background-size: cover;
+          background-size: 100% 100%;
           color:#fff;
           border-radius: 13px;
-          p:first-child{font-size:14px;margin:24px 0 14px 26px;}
+          p:first-child{font-size:14px;margin:24px 0 14px 15px;}
           p:last-child{font-size:28px;font-weight: 540;margin:0 0 0 26px;}
         }
         .Lottery3{
           width:24%;height:125px;
           background: url('../assets/home/3.png') no-repeat center center;
-          background-size: cover;
+          background-size: 100% 100%;
           color:#fff;
           border-radius: 13px;
-          p:first-child{font-size:14px;margin:24px 0 14px 26px;}
+          p:first-child{font-size:14px;margin:24px 0 14px 15px;}
           p:last-child{font-size:28px;font-weight: 540;margin:0 0 0 26px;}
         }
         .Lottery4{
           width:24%;height:125px;
           background: url('../assets/home/4.png') no-repeat center center;
-          background-size: cover;
+          background-size: 100% 100%;
           color:#fff;
           border-radius: 13px;
-          p:first-child{font-size:14px;margin:24px 0 14px 26px;}
+          p:first-child{font-size:14px;margin:24px 0 14px 15px;}
           p:last-child{font-size:28px;font-weight: 540;margin:0 0 0 26px;}
         }
       }
@@ -744,7 +745,7 @@ export default {
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            font-size: 14px;
+            font-size: 0.8rem;
             height:40px;
             img{
               width:40%;height:40px;
@@ -762,7 +763,7 @@ export default {
             margin:0;
             padding-left:14px;
             color:#303133;
-            font-size: 14px;
+            font-size: 0.8rem;
             li{margin-bottom: 4px;}
             li span:last-child{
               float:right;

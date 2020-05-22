@@ -75,7 +75,9 @@ export default {
           if(res.data.msg.emp.isAdmin){
             this.$store.commit('setAdmin','isAdmin');
           }
-          
+          if(res.data.msg.emp.username){
+            this.$store.dispatch("setUserInfoFun",res.data.msg.emp.username);
+          }
           localStorage.setItem("loginToken", token);
           this.$router.push('/display');
           this.$store.commit('setClientId',res.data.msg.emp.clientId)

@@ -42,25 +42,6 @@
           <el-option label="拒绝接单" value="3"></el-option>
         </el-select>
       </div> 
-      <!-- 按钮 -->
-       <div class="searchbox">
-        <el-button type="primary" @click="search()">
-          <i class="el-icon-zoom-in"></i>
-          查询
-        </el-button>
-      </div>
-      <div class="searchbox">
-        <el-button @click="reset()">
-          <i class="el-icon-refresh-right"></i>
-          重置
-        </el-button>
-      </div>
-      <div class="searchbox">
-        <el-button @click="exportExcel()">
-          <i class="el-icon-document-checked"></i>
-          导出
-        </el-button>
-      </div>
       <!-- <el-button style="padding:12px 20px;background:#fdc52d;border:1px solid #fdc52d;float:right;" type="info" @click="exportExcel">导出</el-button> -->
       <br>
       <el-form status-icon :rules="rules2">
@@ -77,7 +58,31 @@
           </div>
         </el-form-item>
       </el-form>
-      
+      <!-- 按钮 -->
+       <div class="searchbox">
+        <el-button type="primary" @click="search()">
+          <i class="el-icon-zoom-in"></i>
+          查询
+        </el-button>
+      </div>
+      <div class="searchbox">
+        <el-button @click="reset()">
+          <i class="el-icon-refresh-right"></i>
+          重置
+        </el-button>
+      </div>
+      <div class="searchbox">
+        <el-button @click="exportExcel2()">
+          <i class="el-icon-document-checked"></i>
+          发货单导出
+        </el-button>
+      </div>
+      <div class="searchbox">
+        <el-button @click="exportExcel()">
+          <i class="el-icon-document-checked"></i>
+          订单明细导出
+        </el-button>
+      </div>
     </div>
 
     <el-table
@@ -100,8 +105,8 @@
       <el-table-column prop="pickupWay" label="提货方式" width="120">
         <template slot-scope="scope">
           <span v-if="scope.row.pickupWay =='2'">快递
-            <el-button v-if="scope.row.status=='2' || scope.row.status=='0'" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货</el-button>
-            <el-button v-if="scope.row.expressCode && scope.row.expressCorp" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货信息</el-button>
+            <!-- <el-button v-if="scope.row.status=='2'" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货</el-button>
+            <el-button v-if="scope.row.expressCode && scope.row.expressCorp" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货信息</el-button> -->
           </span>
           <span v-if="scope.row.pickupWay =='1'">客户自提</span>
         </template>
@@ -168,6 +173,12 @@
               </el-dropdown-item>
               <el-dropdown-item >
                 <p class="pbutton" v-if="scope.row.status=='0' && scope.row.clientConfirm =='1'" @click="changepay(scope.row)">转线下支付</p>  
+              </el-dropdown-item>
+              <el-dropdown-item >
+                <p class="pbutton" v-if="scope.row.status=='2'" @click="delivery(scope.row)">发货</p> 
+              </el-dropdown-item>
+              <el-dropdown-item >
+                <p class="pbutton" v-if="scope.row.expressCode && scope.row.expressCorp" @click="delivery(scope.row)">发货信息</p>
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -451,8 +462,8 @@ export default {
         this.searchParams.clientConfirm=''
       }
     },
-    // 导出订单
-    exportExcel(){
+    // 导出订单旧版本
+    exportExcel2(){
       let params={
         queryType:2,
         status:this.searchParams.status,
@@ -487,9 +498,31 @@ export default {
         downloadElement.click(); //点击下载
         document.body.removeChild(downloadElement); //下载完成移除元素
         window.URL.revokeObjectURL(href); //释放掉blob对象
-
-        
-
+      })
+    },
+    // 最新的订单明细导出
+    exportExcel(){
+      let params={
+        queryType:2,
+        status:this.searchParams.status,
+        startTime:this.searchParams.startTime,
+        endTime:this.searchParams.endTime,
+        orderTypeFlag:0,   //0 普通订单  1 预约订单
+        id:this.searchParams.orderNo,
+        pickupWay:this.searchParams.pickupWay,
+        clientConfirm:this.searchParams.clientConfirm,
+      }
+      this.axios.get('/b2c/order/detail/export',{params})
+      .then(res=>{
+        console.log(res)
+        var downloadElement = document.createElement('a');
+        var href=res.request.responseURL;
+        downloadElement.style.display = 'none';
+        downloadElement.href = href;
+        document.body.appendChild(downloadElement);
+        downloadElement.click(); //点击下载
+        document.body.removeChild(downloadElement); //下载完成移除元素
+        window.URL.revokeObjectURL(href); //释放掉blob对象
       })
     },
     //核销订单

@@ -59,7 +59,12 @@
       <el-table-column prop="level" label="类别层级"></el-table-column>
       <!-- 类型是预留字段，现在只有1 商品分类 -->
       <el-table-column prop="type" label="类别类型"></el-table-column>   
-      <el-table-column prop="parentName" label="所属类别"></el-table-column>
+      <el-table-column prop="parentName" label="所属类别">
+        <template slot-scope="scope">
+          <span v-if="scope.row.parentName">{{scope.row.parentName}}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column
       fixed="right"
       label="操作"

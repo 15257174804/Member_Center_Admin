@@ -150,11 +150,14 @@ export default {
                 })
                 return
               }
+              window.localStorage.setItem("deliver", res.data.msg.mobilephone);
+              console.log(res.data.msg.mobilephone)
+              this.$store.dispatch("setUserInfoFun",res.data.msg.username);
               localStorage.setItem("loginToken", token);
               localStorage.setItem("userInfo", JSON.stringify(res.data.msg));
               // console.log(res.data.msg)
               // console.log(this.$store.state.user_name)
-              this.$store.dispatch("setUserInfoFun",res.data.msg.username);
+              
               this.global.token = token;
               this.$store.getters.change;
               if(res.data.msg.systemAdministrator){
