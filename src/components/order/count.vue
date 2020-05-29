@@ -97,7 +97,7 @@ export default {
     var validatePass = (rule, value, callback) => {
       // console.log(this.searchParams.endTime)
         if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
-          callback(new Error('截止日期不能早于开始日期'));
+          return callback(new Error('截止日期不能早于开始日期'));
         }else{
           callback();
         }

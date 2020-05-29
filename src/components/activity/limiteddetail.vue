@@ -93,6 +93,14 @@
             <el-table-column prop="goodName" label="商品名称"></el-table-column>
             <el-table-column prop="retailPrice" label="价格"></el-table-column>
             <el-table-column prop="spec" label="规格"></el-table-column>
+            <el-table-column width="120" prop="isShow" label="销售状态">
+              <template slot-scope="scope">
+                <el-tag
+                  :type="scope.row.isShow =='1' ? 'success':'danger' "
+                  disable-transitions
+                >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column
               fixed="right"
               label="操作"
@@ -207,7 +215,7 @@ export default {
         return callback(new Error('截止日期不能为空'));
       }
       if (Date.parse(value)<Date.parse(this.tempTime)) {
-        callback(new Error('截止日期不能早于开始日期'));
+        return callback(new Error('截止日期不能早于开始日期'));
       }else{
         callback();
       }
@@ -220,7 +228,8 @@ export default {
       goodlist:[],  //保存查询到的所有的商品列表
       searchParams:{
         redeemFlag:false,
-        keyword:''
+        keyword:'',
+        isShow:1
       },
       //单个商品id
       pagesize: 5, //页面一次展示多少数据

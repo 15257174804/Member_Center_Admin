@@ -141,7 +141,7 @@
         <el-form-item label="审核意见" prop='auditOpinion'>
           <el-input type="textarea" v-model="reform.auditOpinion" placeholder="请输入审核意见"></el-input>
         </el-form-item>
-        <el-form-item label="退货地址" prop='receiveAddress'>
+        <el-form-item label="退货地址" prop='receiveAddress' :required='isRequired'>
           <el-input type="textarea" :disabled="reform.isAgree=='否'" v-model="reform.receiveAddress" placeholder="请输入买家退货时卖家的收货地址，如卖家未发货，不用输入收货地址"></el-input>
         </el-form-item>
       </el-form>
@@ -176,7 +176,7 @@ export default {
     var validatePass = (rule, value, callback) => {
       // console.log(this.searchParams.endTime)
         if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
-          callback(new Error('截止日期不能早于开始日期'));
+          return callback(new Error('截止日期不能早于开始日期'));
         }else{
           callback();
         }
@@ -221,6 +221,7 @@ export default {
       dialogVisible1:false,
       dialogVisible2:false,
       dialogVisible3:false,
+      isRequired:false
     }
   },
   methods:{
@@ -406,9 +407,11 @@ export default {
             }else{
               this.datalist[i].payed='买家未付款'
             }
-            if(this.datalist[i].receiver){
+            if(this.datalist[i].receiver && this.datalist[i].customMobile){
               this.datalist[i].creatorName=this.datalist[i].receiver+'<br/>'+this.datalist[i].customMobile
-            }else{
+            }else if(this.datalist[i].receiver &&!this.datalist[i].customMobile){
+              this.datalist[i].creatorName=this.datalist[i].receiver
+            }else if(!this.datalist[i].receiver && this.datalist[i].customMobile){
               this.datalist[i].creatorName=this.datalist[i].creatorName+'<br/>'+this.datalist[i].customMobile
             }
             

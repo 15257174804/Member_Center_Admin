@@ -271,10 +271,10 @@ export default {
             }else{
               this.form.redeemLimitFlag='否'
             }
-            if(this.form.redeemPrice==''){
-              this.form.redeemType='积分'
+            if(this.form.redeemPrice==0||this.form.redeemPrice==''){
+              this.$set(this.form,'redeemType','积分')
             }else{
-              this.form.redeemType='积分+现金'
+              this.$set(this.form,'redeemType','积分+现金')
             }
             this.getfileList();
           })
@@ -291,7 +291,6 @@ export default {
           .get("/b2c/product/good/picture/list", {params})
           .then(res => {
             let data = res.data.msg.datas;
-            console.log(data)
             data.forEach(row => {
               this.fileList.push({
                 id:row.id,

@@ -50,7 +50,7 @@ export default {
   data() {
     var validatePass = (rule, value, callback) => {
       if (value === "") {
-        callback(new Error("请输入用户名"));
+        return callback(new Error("请输入用户名"));
       } else {
         if (this.ruleForm.username !== "") {
         }
@@ -59,7 +59,7 @@ export default {
     };
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
-        callback(new Error("请输入密码"));
+        return callback(new Error("请输入密码"));
       } else {
         if (this.ruleForm.password !== "") {
         }

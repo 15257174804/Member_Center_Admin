@@ -15,11 +15,11 @@
         </p>
         <p>
           <label>订单金额：</label>
-          <span class="red">￥{{form.amount}}</span>
+          <span class="red">￥{{form.totalAmount}}</span>
         </p>
         <p>
           <label>实付金额：</label>
-          <span class="red">￥{{form.realPayAmount}}</span>
+          <span class="red">￥{{form.amount}}</span>
         </p>
         <p>
           <label>提货方式：</label>

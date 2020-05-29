@@ -132,6 +132,13 @@ export default {
       // 发送请求，保存数据
       // console.log(this.$refs.getform.ruleForm)
       let params=this.$refs.getform.ruleForm;
+      // *************************************************************
+      // params.postageCalculateList.forEach(val=>{
+      //   return val.effectiveArea.join();
+      // })
+      // params.postageFreeList.forEach(val=>{
+      //   return val.effectiveArea.join();
+      // })
       if(params.name==''){
         this.$message.error('请填写模板名称信息')
         this.$refs.getform.ruleForm.name=""
@@ -166,7 +173,7 @@ export default {
         if(res.data.code>0){
           this.$message({
             type: 'success',
-            message: res.data.msg
+            message: '保存成功'
           });
         }else{
           this.$message.error(res.data.msg);

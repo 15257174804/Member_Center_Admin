@@ -273,6 +273,13 @@ export default {
       .then(res=>{
         this.ruleForm=res.data.msg;
         this.imgUrl=this.axios.defaults.baseURL + '/b2c/image/' + this.ruleForm.titlePic;
+        this.fileList=[
+          {
+            name:this.ruleForm.titlePic,
+            url:this.axios.defaults.baseURL + '/b2c/image/' + this.ruleForm.titlePic
+          }
+        ]
+        this.hideUpload = this.fileList.length >= 1;
       })
     }
   },

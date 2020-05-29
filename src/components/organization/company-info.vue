@@ -78,7 +78,7 @@
           return callback(new Error('截止日期不能为空'));
         }
         if (Date.parse(value)<Date.parse(this.tempTime)) {
-          callback(new Error('截止日期不能早于开始日期'));
+          return callback(new Error('截止日期不能早于开始日期'));
         }else{
           callback();
         }

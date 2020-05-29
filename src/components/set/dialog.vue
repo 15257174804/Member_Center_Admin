@@ -6,11 +6,11 @@
       </el-form-item>
       <el-form-item label="发货时间" prop="sendInDays">
         <el-select v-model="ruleForm.sendInDays" placeholder="请选择发货时间">
-          <el-option label="1天内发货" value="1"></el-option>
-          <el-option label="2天内发货" value="2"></el-option>
-          <el-option label="3天内发货" value="3"></el-option>
-          <el-option label="4天内发货" value="4"></el-option>
-          <el-option label="5天内发货" value="5"></el-option>
+          <el-option label="1天内发货" value=1></el-option>
+          <el-option label="2天内发货" value=2></el-option>
+          <el-option label="3天内发货" value=3></el-option>
+          <el-option label="4天内发货" value=4></el-option>
+          <el-option label="5天内发货" value=5></el-option>
           <!-- <el-option
             v-for="item in options"
             :key="item.value"
@@ -37,6 +37,7 @@
         <el-button type="primary" @click="add1" style="margin:10px 0 10px 0;">请设置区域运费计价方式 <i class="el-icon-plus"></i></el-button>
         
         <el-table
+          border
           :data="ruleForm.postageCalculateList"
           height="200"
           :header-cell-style="headClass"
@@ -57,10 +58,10 @@
           </el-table-column>
         </el-table>
         <!-- 弹出框1 -->
-        <el-dialog :visible.sync="dialogFormVisible1" append-to-body width="35%">
+        <el-dialog title='请设置区域运费计价方式' :visible.sync="dialogFormVisible1" append-to-body width="40%" :close-on-click-modal='false' :show-close="false">
           <el-form :model="form1" label-width="120px" ref="form1">
             <el-form-item label="配送区域" prop="effectiveArea">
-              <el-select v-model="form1.effectiveArea" multiple placeholder="请选择" style="width:100%;">
+              <el-select v-model="form1.effectiveArea" multiple placeholder="请选择" style="width:90%;">
                 <el-option
                   v-for="item in options"
                   :key="item.id"
@@ -70,16 +71,16 @@
               </el-select>
             </el-form-item>
             <el-form-item label="首件数/首重kg" prop="defaultQuantity">
-              <el-input v-model="form1.defaultQuantity" autocomplete="off"></el-input>
+              <el-input v-model="form1.defaultQuantity" autocomplete="off" style='width:90%;'></el-input>
             </el-form-item>
             <el-form-item label="首费" prop="defaultPrice">
-              <el-input v-model="form1.defaultPrice" autocomplete="off"></el-input>
+              <el-input v-model="form1.defaultPrice" autocomplete="off" style='width:90%;'></el-input>
             </el-form-item>
             <el-form-item label="续件数/续重kg" prop="increaseQuantity">
-              <el-input v-model="form1.increaseQuantity" autocomplete="off"></el-input>
+              <el-input v-model="form1.increaseQuantity" autocomplete="off" style='width:90%;'></el-input>
             </el-form-item>
             <el-form-item label="续费" prop="increasePrice">
-              <el-input v-model="form1.increasePrice" autocomplete="off"></el-input>
+              <el-input v-model="form1.increasePrice" autocomplete="off" style='width:90%;'></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -91,13 +92,25 @@
         <el-button type="primary" @click="add2" style="margin:10px 0 10px 0;">请设置免邮条件 <i class="el-icon-plus"></i></el-button>
         
         <el-table
+          border
           :data="ruleForm.postageFreeList"
           height="200"
           :header-cell-style="headClass"
           style="width: 100%">
           <el-table-column type="index" label="序号" width="60"></el-table-column>
           <el-table-column prop="effectiveAreaName" label="运送区域"></el-table-column>
-          <el-table-column prop="quantity" label="满多少件包邮"></el-table-column>
+          <el-table-column prop="quantity" label="满多少件包邮">
+            <template slot-scope="scope">
+              <span v-if="scope.row.quantity!=''">{{scope.row.quantity}}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="amount" label="满多少元包邮">
+            <template slot-scope="scope">
+              <span v-if="scope.row.amount!=''">{{scope.row.amount}}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
           <el-table-column
             label="操作"
             width="150">
@@ -109,10 +122,10 @@
         </el-table>
         
         <!-- 弹出框2 -->
-        <el-dialog :visible.sync="dialogFormVisible2" append-to-body width="35%">
+        <el-dialog title='请设置免邮条件' :visible.sync="dialogFormVisible2" append-to-body width="40%" :close-on-click-modal='false' :show-close="false">
           <el-form :model="form2" label-width="120px" ref="form2">
             <el-form-item label="配送区域" prop="effectiveArea">
-              <el-select v-model="form2.effectiveArea" multiple placeholder="请选择">
+              <el-select v-model="form2.effectiveArea" multiple placeholder="请选择" style='width:90%;'>
                 <el-option
                   v-for="item in options"
                   :key="item.id"
@@ -121,8 +134,18 @@
                 </el-option>
               </el-select>
             </el-form-item>
+            <el-form-item label="包邮方式">
+              <el-radio-group v-model="form2.packageMailConditions" @change="changeType($event)">
+                <el-radio label=2>按金额</el-radio>
+                <el-radio label=1>按件数</el-radio>
+                <el-radio label=3>金额+件数</el-radio>
+              </el-radio-group>
+            </el-form-item>
             <el-form-item label="满多少件包邮" prop="quantity">
-              <el-input v-model="form2.quantity" autocomplete="off"></el-input>
+              <el-input v-model="form2.quantity" :disabled="form2.packageMailConditions=='2'" style='width:90%;'></el-input>
+            </el-form-item>
+            <el-form-item label="满多少元包邮" prop="amount">
+              <el-input v-model="form2.amount" :disabled="form2.packageMailConditions=='1'" style='width:90%;'></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -163,12 +186,14 @@ export default {
       form2:{
         id:'',
         quantity:'',
+        amount:'',
         effectiveArea:'',
-        effectiveAreaName:''
+        effectiveAreaName:'',
+        packageMailConditions:'',
       },
       ruleForm:{
         name:'',
-        sendInDays:'',
+        sendInDays:1,
         weatherItIsFree:1,   //是否包邮
         valuationMethods:1,  //按件数1
         postageCalculateList:[],  //运费计算方式
@@ -191,13 +216,11 @@ export default {
     }
   },
   methods:{
-    rset2(formName){
-      this.dialogFormVisible2 = false;
-      // this.$refs[formName].resetFields();
-    },
-    rset1(formName){
-      this.dialogFormVisible1 = false;
-      // this.$refs[formName].resetFields();
+    // 切换免邮方式
+    changeType(e){
+      // console.log(e)
+      this.form2.quantity='';
+      this.form2.amount='';
     },
     getparentform(){
       this.$nextTick(function(){
@@ -205,6 +228,7 @@ export default {
         if(this.parentform.id){
           // console.log(this.parentform)
           this.ruleForm=this.parentform;
+          this.ruleForm.sendInDays=this.ruleForm.sendInDays.toString()
         }
         else{
           this.ruleForm={
@@ -223,7 +247,7 @@ export default {
       let params = {
         level: 1,
         superiorId: 100000,
-        pageSize: 40
+        pagesize: 40
       };
       this.axios
       .get("/crm/region/list", {params})
@@ -239,46 +263,75 @@ export default {
     },
     add1(){
       let obj={
+        id:'',
         effectiveArea:'',
-        defaultQuantity:0,
-        defaultPrice:0,
-        increaseQuantity:0,
-        increasePrice:0
+        defaultQuantity:'',
+        defaultPrice:'',
+        increaseQuantity:'',
+        increasePrice:'',
+        effectiveAreaName:''
       }
       this.ruleForm.postageCalculateList.push(obj)
     },
     edit1(index,row){
+      // console.log(row)
       this.dialogFormVisible1=true;
-      this.form1.id=index;
+      this.form1=row;
+      if(this.form1.id==''){
+        this.form1.id=index;
+      }
+      if(this.form1.effectiveArea!=''){
+        this.form1.effectiveArea=this.form1.effectiveArea.toString();
+        this.form1.effectiveArea=this.form1.effectiveArea.split(',');
+        this.form1.effectiveArea=this.form1.effectiveArea.map(Number)
+      }
+      // console.log(this.form1)
+      // console.log(this.form1.effectiveArea[0],typeof this.form1.effectiveArea[0])
       this.getsheng();
     },
     save1(formName){
       this.dialogFormVisible1=false;
-      let index=this.form1.id;
-      // console.log(11111)
-      this.form1.effectiveAreaName=''
-      for(var i=0;i<this.form1.effectiveArea.length;i++){
-        for(var j=0;j<this.options.length;j++){
+      this.form1.effectiveAreaName='';
+      for(let i=0;i<this.form1.effectiveArea.length;i++){
+        for(let j=0;j<this.options.length;j++){
           if(this.form1.effectiveArea[i]==this.options[j].id){
-            
             this.form1.effectiveAreaName=this.form1.effectiveAreaName+' '+this.options[j].name
           }
         }
       }
-      // console.log(this.form1.effectiveArea)
-      // console.log(this.form1.effectiveAreaName)
-      // console.log(2222222222)
-
-      this.ruleForm.postageCalculateList[index].effectiveArea=this.form1.effectiveArea.join();
-      this.ruleForm.postageCalculateList[index].effectiveAreaName=this.form1.effectiveAreaName;
-      this.ruleForm.postageCalculateList[index].transportMethod=1;
-      this.ruleForm.postageCalculateList[index].defaultQuantity=this.form1.defaultQuantity;
-      this.ruleForm.postageCalculateList[index].defaultPrice=this.form1.defaultPrice;
-      this.ruleForm.postageCalculateList[index].increaseQuantity=this.form1.increaseQuantity;
-      this.ruleForm.postageCalculateList[index].increasePrice=this.form1.increasePrice;
-      // console.log(this.ruleForm.postageCalculateList[index])
-
+      for(let i=0;i<this.ruleForm.postageCalculateList.length;i++){
+        if(this.ruleForm.postageCalculateList[i].id==this.form1.id){
+          this.ruleForm.postageCalculateList[i]=this.form1;    //JSON.parse(JSON.stringify( this.form1 )); 
+          if(this.ruleForm.postageCalculateList[i].effectiveArea.length>0){
+            this.ruleForm.postageCalculateList[i].effectiveArea=this.ruleForm.postageCalculateList[i].effectiveArea.join(',')
+          }
+        }
+      }
+      // console.log(this.ruleForm.postageCalculateList)
+    },
+    rset1(formName){
+      this.dialogFormVisible1 = false;
+      for(let i=0;i<this.ruleForm.postageCalculateList.length;i++){
+        if(this.ruleForm.postageCalculateList[i].id==this.form1.id){
+          this.ruleForm.postageCalculateList[i]=this.form1;  //JSON.parse(JSON.stringify( this.form1 ));
+          if(this.ruleForm.postageCalculateList[i].effectiveArea.length>0){
+            this.ruleForm.postageCalculateList[i].effectiveArea=this.ruleForm.postageCalculateList[i].effectiveArea.join(',')
+          }
+        }
+      }
+      // console.log(this.ruleForm.postageCalculateList)
       // this.$refs[formName].resetFields();
+    },
+    handleClose1(){
+      for(let i=0;i<this.ruleForm.postageCalculateList.length;i++){
+        if(this.ruleForm.postageCalculateList[i].id==this.form1.id){
+          this.ruleForm.postageCalculateList[i]=this.form1;   //JSON.parse(JSON.stringify( this.form1 ));
+          if(this.ruleForm.postageCalculateList[i].effectiveArea.length>0){
+            this.ruleForm.postageCalculateList[i].effectiveArea=this.ruleForm.postageCalculateList[i].effectiveArea.join(',')
+          }
+        }
+      }
+      // console.log(this.ruleForm.postageCalculateList)
     },
     del1(index,row){
       // console.log(row)
@@ -297,38 +350,75 @@ export default {
     },
     add2(){
       let obj={
+        id:'',
         effectiveArea:'',
-        quantity:0
+        effectiveAreaName:'',
+        quantity:'',
+        amount:'',
+        packageMailConditions:'',
+        transportMethod:1
       }
       this.ruleForm.postageFreeList.push(obj)
     },
     edit2(index,row){
+      // console.log(row)
       this.dialogFormVisible2=true;
-      this.form2.id=index;
+      this.form2=row;
+      if(this.form2.id==''){
+        this.form2.id=index;
+      }
+      if(this.form2.effectiveArea!=''){
+        this.form2.effectiveArea=this.form2.effectiveArea.toString();
+        this.form2.effectiveArea=this.form2.effectiveArea.split(',');
+        this.form2.effectiveArea=this.form2.effectiveArea.map(Number)
+      }
+      this.form2.packageMailConditions=this.form2.packageMailConditions.toString()
       this.getsheng();
     },
     save2(formName){
       this.dialogFormVisible2=false;
-      let index=this.form2.id;
       // console.log('save2')
       // console.log(11111)
-      this.form2.effectiveAreaName=''
-      for(var i=0;i<this.form2.effectiveArea.length;i++){
-        for(var j=0;j<this.options.length;j++){
+      this.form2.effectiveAreaName='';
+      for(let i=0;i<this.form2.effectiveArea.length;i++){
+        for(let j=0;j<this.options.length;j++){
           if(this.form2.effectiveArea[i]==this.options[j].id){
-            
             this.form2.effectiveAreaName=this.form2.effectiveAreaName+' '+this.options[j].name
           }
         }
       }
-      this.ruleForm.postageFreeList[index].effectiveArea=this.form2.effectiveArea.join();
-      this.ruleForm.postageFreeList[index].effectiveAreaName=this.form2.effectiveAreaName;
-      this.ruleForm.postageFreeList[index].transportMethod=1;
-      this.ruleForm.postageFreeList[index].packageMailConditions=1;
-      this.ruleForm.postageFreeList[index].quantity=this.form2.quantity;
-      // console.log(this.ruleForm.postageFreeList[index])
-
+      for(let i=0;i<this.ruleForm.postageFreeList.length;i++){
+        if(this.ruleForm.postageFreeList[i].id==this.form2.id){
+          this.ruleForm.postageFreeList[i]=this.form2;  //JSON.parse(JSON.stringify( this.form2 ));
+          if(this.ruleForm.postageFreeList[i].effectiveArea.length>0){
+            this.ruleForm.postageFreeList[i].effectiveArea=this.ruleForm.postageFreeList[i].effectiveArea.join(',')
+          }
+        }
+      }
+      // console.log(this.ruleForm.postageFreeList)
+    },
+    rset2(formName){
+      this.dialogFormVisible2 = false;
+      for(let i=0;i<this.ruleForm.postageFreeList.length;i++){
+        if(this.ruleForm.postageFreeList[i].id==this.form2.id){
+          this.ruleForm.postageFreeList[i]=this.form2;  //JSON.parse(JSON.stringify( this.form2 ));
+          if(this.ruleForm.postageFreeList[i].effectiveArea.length>0){
+            this.ruleForm.postageFreeList[i].effectiveArea=this.ruleForm.postageFreeList[i].effectiveArea.join(',')
+          }
+        }
+      }
       // this.$refs[formName].resetFields();
+    },
+    handleClose2(){
+      for(let i=0;i<this.ruleForm.postageFreeList.length;i++){
+        if(this.ruleForm.postageFreeList[i].id==this.form2.id){
+          this.ruleForm.postageFreeList[i]=this.form2;//JSON.parse(JSON.stringify( this.form2 ));
+          if(this.ruleForm.postageFreeList[i].effectiveArea.length>0){
+            this.ruleForm.postageFreeList[i].effectiveArea=this.ruleForm.postageFreeList[i].effectiveArea.join(',')
+          }
+        }
+      }
+      // console.log(this.ruleForm.postageFreeList)
     },
     del2(index,row){
       this.$confirm('确定要删除该条记录吗？','提示',{

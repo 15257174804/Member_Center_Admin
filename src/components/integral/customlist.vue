@@ -31,17 +31,16 @@
       <el-table-column type="index" label="序号" width="60"></el-table-column>
       <el-table-column prop="cardNo" label="会员卡号" ></el-table-column>
       <el-table-column prop="baseInfo.username" label="会员名"></el-table-column>  
-      <el-table-column prop="baseInfo.sex" label="性别" sortable></el-table-column>  
+      <el-table-column prop="baseInfo.sex" label="性别"></el-table-column>  
       <el-table-column prop="baseInfo.mobilephone" label="手机号"></el-table-column>
-      <el-table-column prop="baseInfo.birthday" label="生日" sortable></el-table-column>
-      <el-table-column prop="score" label="积分" sortable></el-table-column>
+      <el-table-column prop="baseInfo.birthday" label="生日"></el-table-column>
+      <el-table-column prop="scoreBalance" label="积分余额" sortable></el-table-column>
       <!-- 预售状态 -->
       <el-table-column width="100" prop="isValid" label="账户状态">
         <template slot-scope="scope">
-          <el-tag
-            :type="scope.row.isValid ? 'success':'danger' "
-            disable-transitions
-          >{{scope.row.isValid? '正常':'停用'}}</el-tag>
+          <el-tag v-if='scope.row.isValid==true' type='success' >正常</el-tag>
+          <el-tag v-else-if='scope.row.isValid==false' type='danger' >停用</el-tag>
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column width="100" prop="isValid" label="标签">
@@ -277,19 +276,6 @@ export default {
           this.$message.error(res.data.msg)
         }
       })
-      // let obj={
-      //   memberLabelId:row.id,
-      //   customerUserId:this.customerUserId,
-      //   customerId:this.customerId,
-      //   labelName:row.name
-      // }
-      // if(this.labelList.length>0){
-      //   for(var i=0;i<this.labelList.legnth;i++){
-      //     if(this.labelList[i].memberLabelId!=obj.memberLabelId){
-      //       this.labelList=this.labelList.concat(obj)
-      //     }
-      //   }
-      // }
     },
     // 查看详情
     edit(row){
@@ -352,11 +338,16 @@ export default {
         // console.log(res.data)
         this.dataList=res.data.msg.datas;
         this.totalCount=res.data.msg.totalCount;
+        
         for(var i=0;i<this.dataList.length;i++){
-          if(this.dataList[i].baseInfo.sex==1){
-            this.dataList[i].baseInfo.sex='男';
-          }else{
-            this.dataList[i].baseInfo.sex='女';
+          if(this.dataList[i].baseInfo){
+            if(this.dataList[i].baseInfo.sex==1){
+              this.dataList[i].baseInfo.sex='男';
+            }else if(this.dataList[i].baseInfo.sex==0){
+              this.dataList[i].baseInfo.sex='女';
+            }else{
+              this.dataList[i].baseInfo.sex='-';
+            }
           }
         }
       })

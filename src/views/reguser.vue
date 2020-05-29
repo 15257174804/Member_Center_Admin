@@ -31,12 +31,12 @@ export default {
     var checkPhone = (rule, value, callback) => {
       let phoneReg = /^1[3|4|5|7|8][0-9]{9}$/;
       if (value === '') {
-        callback(new Error('手机号不能为空'));
+        return callback(new Error('手机号不能为空'));
       } else {
         if (phoneReg.test(value)) {
           callback()
         } else {
-          callback(new Error('电话号码格式不正确'))
+          return callback(new Error('电话号码格式不正确'))
         }
       }
     };

@@ -116,6 +116,7 @@
               <el-dropdown-item ><el-button type="text" @click="edit(scope.row,'busiInfo')"><i class="el-icon-shopping-cart-1"></i>经营范围</el-button></el-dropdown-item>
               <el-dropdown-item ><el-button type="text" @click="edit(scope.row,'cardInfo')"><i class="el-icon-picture-outline-round"></i>证照管理</el-button></el-dropdown-item>
               <el-dropdown-item ><el-button type="text" @click="onBusiness(scope.row)"><i class="el-icon-refresh"></i>营业修改</el-button></el-dropdown-item>
+              <el-dropdown-item ><el-button type="text" @click="power(scope.row)"><i class="el-icon-refresh"></i>菜单权限</el-button></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -155,6 +156,64 @@
         <el-button type="primary" @click="pass">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 企业权限管理 -->
+    <el-dialog
+      title="权限设置"
+      :visible.sync="powerDialogVisible"
+      append-to-body
+      :close-on-click-modal='false' 
+      :show-close="false"
+      width="60%">
+      <el-button type="primary" plain @click="addMenu()" style='margin:0 0 10px 0;'>新增菜单</el-button>
+      <el-table :data="powerData" border>
+        <el-table-column property="menuSort" label="序号" width="100"></el-table-column>
+        <el-table-column property="menuCode" label="编码" ></el-table-column>
+        <el-table-column prop="menuGrade" label="等级">
+          <template slot-scope="scope">
+            <span v-if="scope.row.menuGrade==1">一级菜单</span>
+            <span v-if="scope.row.menuGrade==2">二级菜单</span>
+          </template>
+        </el-table-column>
+        <el-table-column property="menuName" label="菜单名称"></el-table-column>
+        <el-table-column property="status" label="状态">
+          <template slot-scope="scope">
+            <el-tag
+              :type="scope.row.status ==1 ? 'success':'danger' "
+              disable-transitions
+            >{{scope.row.status ==1 ? '正常':'停用'}}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" @click="delMenu(scope.row)"><i class="el-icon-edit"></i>删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="powerDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="powerDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog 
+      :visible.sync="dialogFormVisible"
+      append-to-body
+      :close-on-click-modal='false' 
+      :show-close="false"
+      width='35%'>
+      <el-form :model="menuForm" ref="menuForm" label-width="120px">
+        <el-form-item label="菜单" prop="menuId">
+          <el-select v-model="menuForm.menuId" placeholder="请选择" style='width:80%;'>
+            <el-option v-for="(val,i) of menuLink" :key='i' :label="val.name" :value="val.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel('menuForm')">取 消</el-button>
+        <el-button type="primary" @click="saveMenu('menuForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -181,10 +240,102 @@ export default {
         isPass:'是',
         opinion:''
       },
-      isAdmin:this.$store.state.isAdmin
+      isAdmin:this.$store.state.isAdmin,
+      powerDialogVisible:false,   //控制权限的弹窗
+      powerData:[],
+      dialogFormVisible:false,
+      menuForm:{
+        id:'',
+        groupId:'',
+        menuId:''
+      },
+      menuLink:[]
     };
   },
   methods: {
+    // 企业权限管理-平台
+    power(row){
+      this.powerDialogVisible=true;
+      this.menuForm.groupId=row.id;
+      this.getCorpMenu();
+    },
+    // 获取企业菜单
+    getCorpMenu(){
+      let params={
+        groupId:this.menuForm.groupId
+      }
+      this.axios.get('/crm/emac/list',{params})
+      .then(res=>{
+        if(res.data.code>0){
+          this.powerData=res.data.msg.datas;
+        }
+      })
+    },
+    // 删除菜单
+    delMenu(row){
+      this.$confirm('确定要删除该店铺吗？','提示',{
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(()=>{
+        let params={
+          id:row.id
+        }
+        this.axios.get('/crm/emac/delete',{params})
+        .then(res=>{
+          if(res.data.code>0){
+            this.$message.success('删除成功');
+            this.getCorpMenu();
+          }
+        })
+      }).catch(()=>{
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        });
+      })
+    },
+    // 新增菜单
+    addMenu(){
+      this.dialogFormVisible=true;
+      this.getMenulist();
+    },
+    // 获取平台菜单列表
+    getMenulist(){
+      let params={
+        status:1
+      }
+      this.axios.get('/crm/menu/list',{params})
+      .then(res=>{
+        if(res.data.code>0){
+          this.menuLink=res.data.msg.datas;
+        }
+      })
+    },
+    // 保存新增的菜单
+    saveMenu(formName){
+      this.$refs[formName].validate((valid) =>{
+        if (valid){
+          let params=this.menuForm;
+          this.axios.post('crm/emac/save',params)
+          .then(res=>{
+            if(res.data.code>0){
+              this.dialogFormVisible=false;
+              this.getCorpMenu();
+            }
+          })
+        }else {
+            this.$message.error('请完善内容后保存!');
+            return false;
+          }
+      })
+    },
+    // 取消
+    cancel(formName){
+      this.menuForm.id='';
+      this.menuForm.menuId='';
+      this.dialogFormVisible=false;
+    },
     // 删除企业
     del(row){
       let params={

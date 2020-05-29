@@ -235,6 +235,14 @@
           <el-table-column prop="goodName" label="商品名称"></el-table-column>
           <el-table-column prop="retailPrice" label="金额"></el-table-column>
           <el-table-column prop="spec" label="规格"></el-table-column>
+          <el-table-column width="120" prop="isShow" label="销售状态">
+            <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.isShow =='1' ? 'success':'danger' "
+                disable-transitions
+              >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column
             label="操作"
             width="150">
@@ -371,7 +379,8 @@ export default {
       goodlist:[],  //保存查询到的所有的商品列表
       searchParams:{
         redeemFlag:false,
-        keyword:''
+        keyword:'',
+        isShow:1
       },
       pagesize: 5, //页面一次展示多少数据
       currentPage: 1, // 第几页

@@ -9,7 +9,6 @@
         </el-button>
       </router-link>
     </div>
-
      <!-- search -->
     <div class="search">
       <!-- 订单号 -->
@@ -25,17 +24,39 @@
           <el-option label="已下架" value="0"></el-option>
         </el-select>
       </div> 
-      <!-- 状态 -->
-      <!-- <div class="searchbox">
-        企业类型：
-        <el-select v-model="searchParams.corpType" :style="{width:'120px',height:'40px'}">
+      <div class="searchbox">
+        有无图片：
+        <el-select v-model="searchParams.hasPic" :style="{width:'120px',height:'40px'}" >
           <el-option label="所有" value=""></el-option>
-          <el-option label="批发公司" value="1"></el-option>
-          <el-option label="连锁总部" value="2"></el-option>
-          <el-option label="连锁门店" value="3"></el-option>
-          <el-option label="单体门店" value="4"></el-option>
+          <el-option label="有" value=true></el-option>
+          <el-option label="无" value=false></el-option>
         </el-select>
-      </div> -->
+      </div> 
+      <div class="searchbox">
+        有无价格：
+        <el-select v-model="searchParams.hasPrice" :style="{width:'120px',height:'40px'}" >
+          <el-option label="所有" value=""></el-option>
+          <el-option label="有" value=true></el-option>
+          <el-option label="无" value=false></el-option>
+        </el-select>
+      </div> 
+      <br />
+      <div class="searchbox">
+        有无库存：
+        <el-select v-model="searchParams.hasStore" :style="{width:'120px',height:'40px'}" >
+          <el-option label="所有" value=""></el-option>
+          <el-option label="有" value=true></el-option>
+          <el-option label="无" value=false></el-option>
+        </el-select>
+      </div> 
+      <div class="searchbox">
+        有无净重：
+        <el-select v-model="searchParams.hasWeight" :style="{width:'120px',height:'40px'}" >
+          <el-option label="所有" value=""></el-option>
+          <el-option label="有" value=true></el-option>
+          <el-option label="无" value=false></el-option>
+        </el-select>
+      </div> 
       <!-- 按钮 -->
       <div class="searchbox">
         <el-button type="primary" @click="search()">
@@ -73,6 +94,7 @@
           </el-upload>
         </div>
       </div>
+      
     </div>
     <el-table
       v-loading="loading"
@@ -106,7 +128,8 @@
       <el-table-column prop="spec" label="规格"></el-table-column>
       <el-table-column prop="weight" label="净重/g">
         <template slot-scope="scope">
-          <span>{{scope.row.weight*1000}}</span>
+          <span v-if="scope.row.weight">{{scope.row.weight*1000}}</span>
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column prop="quantity" label="库存"></el-table-column>
@@ -162,7 +185,11 @@ export default {
       searchParams:{
         redeemFlag:false,
         keyword:"",
-        isShow:""
+        isShow:"",
+        hasPic:'',
+        hasStore:'',
+        hasWeight:'',
+        hasPrice:''
       },
       dataList: [],
       pagesize: 5, //页面一次展示多少数据
@@ -371,6 +398,10 @@ export default {
     reset(){
       this.searchParams.keyword = "";
       this.searchParams.isshow = "";
+      this.searchParams.hasPic = "";
+      this.searchParams.hasStore = "";
+      this.searchParams.hasWeight = "";
+      this.searchParams.hasPrice = "";
       this.getDataList();
     }
   }

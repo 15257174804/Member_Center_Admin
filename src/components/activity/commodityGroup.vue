@@ -51,7 +51,7 @@
       <el-table-column prop="name" label="名称" ></el-table-column>
       <el-table-column prop="price" label="图片" >
         <template slot-scope="scope">
-            <img style='width:100px;height:100px;' v-if="scope.row.pictureModels!=''" height="100" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.pictureModels[0].imgUrl">
+            <img style='width:80px;height:80px;' v-if="scope.row.pictureModels!=''" height="100" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.pictureModels[0].imgUrl">
             <span v-else>无</span>
           </template>
       </el-table-column>

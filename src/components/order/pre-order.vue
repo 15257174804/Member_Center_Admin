@@ -103,13 +103,13 @@
       style="width: 100%"
       stripe
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55"></el-table-column>
+      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
       <el-table-column prop="orderNo" label="订单编号"></el-table-column>
       <el-table-column prop="clientName" label="下单门店"></el-table-column>
       <el-table-column prop="createTime" label="下单时间"></el-table-column>
-      <el-table-column prop="creatorName" label="用户信息" width="150">
+      <el-table-column prop="customerName" label="用户信息" width="110">
         <template slot-scope="scope">
-          <p v-html="scope.row.creatorName"></p>
+          <p v-html="scope.row.customerName"></p>
           <!-- <p v-else>无</p> -->
         </template>
       </el-table-column>
@@ -124,6 +124,11 @@
           </span>
           <span v-if="scope.row.pickupWay =='1'">自提</span>
           
+        </template>
+      </el-table-column>
+      <el-table-column prop="receiver" label="收货地址" width="150">
+        <template slot-scope="scope">
+          <p v-html="scope.row.receiver"></p>
         </template>
       </el-table-column>
       <el-table-column prop="payType" label="支付方式"></el-table-column>
@@ -305,7 +310,7 @@ export default {
     var validatePass = (rule, value, callback) => {
       // console.log(this.searchParams.endTime)
         if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
-          callback(new Error('截止日期不能早于开始日期'));
+          return callback(new Error('截止日期不能早于开始日期'));
         }else{
           callback();
         }
@@ -840,11 +845,10 @@ export default {
           for(var i=0;i<this.preorderlist.length;i++){
             var item=this.preorderlist[i];
             if(item.receiver){
-              item.creatorName=item.receiver+'<br/>'+item.customerPhone+'<br/>'+item.city+item.county+item.address;
-            }else if(item.creatorName){
-              item.creatorName=item.creatorName+'<br/>'+item.customerPhone
-            }else{
-              item.creatorName='无'
+              item.receiver=item.receiver+'<br/>'+item.linkCall+'<br/>'+item.province+item.city+item.county+item.address;
+            }
+            if(item.customerName){
+              item.customerName=item.customerName+'<br/>'+item.customMobile
             }
             if(item.payType==0){
               item.payType='其他'

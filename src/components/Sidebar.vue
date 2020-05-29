@@ -38,7 +38,7 @@
           </el-submenu>
 
           <router-link to="/home">
-            <el-submenu index="1" v-if="deliver!=18012789838">
+            <el-submenu index="1">
               <template slot="title">
                 <i class="el-icon-s-home"></i>
                 首页
@@ -54,7 +54,7 @@
             </el-submenu>
           </router-link> -->
 
-          <el-submenu index="11" v-if="deliver!=18012789838">
+          <el-submenu index="11" >
             <template slot="title">
               <i class="el-icon-share"></i>组织架构管理
             </template>
@@ -65,13 +65,10 @@
               <router-link to="/employee">
                 <el-menu-item index="11-2">我的员工</el-menu-item>
               </router-link>
-              <!-- <router-link to="/audit">
-                <el-menu-item index="11-3">企业审核</el-menu-item>
-              </router-link> -->
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="12" v-if="deliver!=18012789838">
+          <el-submenu index="12">
             <template slot="title">
               <i class="el-icon-s-goods"></i>商品管理
             </template>
@@ -99,16 +96,16 @@
               <router-link to="/preorder">
                 <el-menu-item index="13-2">预约订单</el-menu-item>
               </router-link>
-              <router-link to="/count" v-if="deliver!=18012789838">
+              <router-link to="/count">
                 <el-menu-item index="13-3">预约汇总</el-menu-item>
               </router-link>
-              <router-link to="/refund" v-if="deliver!=18012789838">
+              <router-link to="/refund">
                 <el-menu-item index="13-4">退款管理</el-menu-item>
               </router-link>
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="14" v-if="deliver!=18012789838">
+          <el-submenu index="14">
             <template slot="title">
               <i class="el-icon-s-ticket"></i>营销活动
             </template>
@@ -128,7 +125,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="15" v-if="deliver!=18012789838">
+          <el-submenu index="15">
             <template slot="title">
               <i class="el-icon-s-shop"></i>积分商城
             </template>
@@ -145,7 +142,7 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="16" v-if="deliver!=18012789838">
+          <el-submenu index="16">
             <template slot="title">
               <i class="el-icon-s-tools"></i>基础设置
             </template>
@@ -165,16 +162,14 @@
               <router-link to="/markset">
                 <el-menu-item index="16-5">标签管理</el-menu-item>
               </router-link>
-              <router-link to="/floortype" v-if="this.$store.state.group_name=='平台管理员'">
+              <router-link to="/floortype">
                 <el-menu-item index="16-6">楼层类型</el-menu-item>
               </router-link>
-              <!-- <router-link to="/roleset">
-                <el-menu-item index="16-3">角色管理</el-menu-item>
-              </router-link> -->
+              
             </el-menu-item-group>
           </el-submenu>
 
-          <el-submenu index="17" v-if="deliver!=18012789838">
+          <el-submenu index="17">
             <template slot="title">
               <i class="el-icon-user-solid"></i>合伙人
             </template>
@@ -193,7 +188,17 @@
               </router-link>
             </el-menu-item-group>
           </el-submenu>
-
+          <el-submenu index="18">
+            <template slot="title">
+              <i class="el-icon-user-solid"></i>权限管理
+            </template>
+            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+              <router-link to="/power">
+                <el-menu-item index="16-7">菜单权限</el-menu-item>
+              </router-link>
+               
+            </el-menu-item-group>
+          </el-submenu>
           <router-link to="/complain" v-if="this.$store.state.group_name=='平台管理员'">
             <el-submenu index="18">
               <template slot="title">
@@ -322,7 +327,7 @@ export default {
 .el-menu {
   height: 100%;
   background: #fff;
-  padding-right:10px;
+  /* padding-right:10px; */
 }
 .el-menu .el-submenu {
   background: #fff;

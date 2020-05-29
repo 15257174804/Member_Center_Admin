@@ -35,22 +35,26 @@
           <el-form-item class="half-form" label="性别" prop="sex">
             <el-radio-group v-model="form.baseInfo.sex" disabled>
               <el-radio label='1'>男</el-radio>
-              <el-radio label='2'>女</el-radio>
+              <el-radio label='0'>女</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item class="half-form" label="会员卡号">
             <el-input v-model="form.cardNo" placeholder="请输入会员卡号" disabled></el-input>
           </el-form-item>
+          <el-form-item class="half-form" label="积分总数">
+            <el-input v-model="form.score" placeholder="请输入积分总数" disabled></el-input>
+          </el-form-item>
           <el-form-item class="half-form" label="是否启用">
             <el-switch active-color="#13ce66" v-model="form.baseInfo.isValid" disabled></el-switch>
+          </el-form-item>
+          <el-form-item class="half-form" label="积分余额">
+            <el-input v-model="form.scoreBalance" placeholder="请输入积分余额" disabled></el-input>
           </el-form-item>
           <!-- <el-form-item class="half-form" label="会员标签">
             <el-button type="text" @click="addLabel"><i class="el-icon-plus"></i>添加</el-button>
             <br/>
             <el-tag>标签一</el-tag>
           </el-form-item> -->
-          
-
         </el-tab-pane>
         <el-tab-pane label="积分明细" name="assistInfo">
           <el-table
@@ -87,8 +91,8 @@ export default {
       
       tabName: 'basicInfo',//默认选项卡
       details:[],  //积分明细
-      pageSize:5,
       curP:1,
+      pageSize:10,
       totalCount:0,
       form:{
         id:'',
@@ -101,7 +105,9 @@ export default {
           sex:'1',
           isValid:true
         },
-        cardNo:''
+        cardNo:'',
+        score:'',
+        scoreBalance:''
       },
       rules: {
         // username:[
@@ -117,7 +123,7 @@ export default {
     // 第几页
     handleCurrentChange(curP) {
       this.curP = curP;
-      this.getScore();
+      this.getScore(this.form.id);
     },
     onSubmit(form){
       // console.log('保存')
@@ -163,19 +169,20 @@ export default {
         // console.log('加载页面数据')
         // console.log(res.data)
         this.form=res.data.msg;
-        // console.log(this.form.baseInfo.sex)
+        this.form.baseInfo.sex=this.form.baseInfo.sex.toString();
       })
     },
     //获取积分明细
-    getScore(){
+    getScore(id){
       let params={
-        pageindex:this.curP,
-        pagesize:this.pageSize
+        customId:id,
       }
-      this.axios.get('crm/scoreRecord/my',{params})
+      params.pageindex = this.curP;
+      params.pagesize = this.pageSize;
+      this.axios.get('/crm/scoreRecord/list',{params})
       .then(res=>{
-        // console.log('积分列表')
-        // console.log(res.data)
+        console.log('积分列表')
+        console.log(res.data)
         this.details=res.data.msg.datas;
         for(var i=0;i<this.details.length;i++){
           if(this.details[i].recordType==1){
@@ -193,8 +200,8 @@ export default {
       this.form.id = this.$route.query.id;
       // this.title = this.$route.query.title;
       this.getDetailData(this.form.id);
+      this.getScore(this.form.id);
     }
-    this.getScore();
   }
 }
 </script>

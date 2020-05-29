@@ -1,31 +1,31 @@
 <template>
   <el-form ref="form" :rules="rules" :model="addrData" label-width="80px">
-    <el-row justify="start">
-      <el-col :span='8'>
+    <!-- <el-row justify="start"> -->
+      <!-- <el-col :span='8'> -->
         <el-form-item label="省" prop="province">
-          <el-select v-model="addrData.province" placeholder="请选择" class="address_select" @change="getcity(addrData.province,true)" >
+          <el-select v-model="addrData.province" placeholder="请选择" class="address_select" @change="getcity(addrData.province,true)">
             <el-option v-for="item in sheng" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
-      </el-col>
-      <el-col :span='8'>
+      <!-- </el-col> -->
+      <!-- <el-col :span='8'> -->
         <el-form-item label="市" prop="city">
-          <el-select v-model="addrData.city" placeholder="请选择" class="address_select" @change="getCounty(addrData.city,true)">
+          <el-select v-model="addrData.city" placeholder="请选择" class="address_select" @change="getCounty(addrData.city,true)" style="width:25%;">
             <el-option v-for="item in shi" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
-      </el-col>
-      <el-col :span='8'>
+      <!-- </el-col> -->
+      <!-- <el-col :span='8'> -->
         <el-form-item label="区" prop="county">
-          <el-select v-model="addrData.county" placeholder="请选择" class="address_select" @change="postData()">
+          <el-select v-model="addrData.county" placeholder="请选择" class="address_select" @change="postData()" style="width:25%;">
             <el-option v-for="item in qu" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
           </el-select>
         </el-form-item>
-      </el-col>
-    </el-row>
+      <!-- </el-col> -->
+    <!-- </el-row> -->
   </el-form> 
   <!-- <el-form-item label="省" :label-width="'80px'">
     <el-select v-model="addrData.province" placeholder="请选择省" class="address_select" @change="getcity(addrData.province,true)" >

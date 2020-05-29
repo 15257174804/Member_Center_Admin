@@ -96,13 +96,18 @@
       <el-table-column prop="orderNo" label="订单编号"></el-table-column>
       <el-table-column prop="clientName" label="下单门店"></el-table-column>
       <el-table-column prop="createTime" label="下单时间"></el-table-column>
-      <el-table-column prop="creatorName" label="用户信息" width="150">
+      <el-table-column prop="customerName" label="用户信息" width="110">
         <template slot-scope="scope">
-          <p v-html="scope.row.creatorName"></p>
+          <p v-html="scope.row.customerName"></p>
         </template>
       </el-table-column>
-      <el-table-column prop="pickUpStoreName" label="自提门店"></el-table-column>
-      <el-table-column prop="pickupWay" label="提货方式" width="120">
+      <el-table-column prop="pickUpStoreName" label="自提门店" align="center">
+        <template slot-scope="scope">
+          <span v-if="scope.row.pickUpStoreName">{{scope.row.pickUpStoreName}}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="pickupWay" label="提货方式">
         <template slot-scope="scope">
           <span v-if="scope.row.pickupWay =='2'">快递
             <!-- <el-button v-if="scope.row.status=='2'" style="padding-left:8px;" type="text" @click="delivery(scope.row)">发货</el-button>
@@ -111,8 +116,14 @@
           <span v-if="scope.row.pickupWay =='1'">客户自提</span>
         </template>
       </el-table-column>
-      <el-table-column prop="payType" label="支付方式"></el-table-column>
+      <el-table-column prop="receiver" label="收货地址" width="150">
+        <template slot-scope="scope">
+          <p v-html="scope.row.receiver"></p>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column prop="payType" label="支付方式"></el-table-column> -->
       <el-table-column prop="amount" label="金额"></el-table-column>
+      <el-table-column prop="fareAmount" label="运费"></el-table-column>
       <el-table-column prop="status" label="付款状态">
         <template slot-scope="scope">
           <span v-if="scope.row.payed ==true" disable-transitions>已付款</span>
@@ -290,7 +301,7 @@ export default {
     var validatePass = (rule, value, callback) => {
       // console.log(this.searchParams.endTime)
         if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
-          callback(new Error('截止日期不能早于开始日期'));
+          return callback(new Error('截止日期不能早于开始日期'));
         }else{
           callback();
         }
@@ -853,16 +864,11 @@ export default {
               //   item.receiver=item.receiver+'<br/>'+item.customMobile+'<br/>'+item.city+item.county+item.address;
               // }
               if(item.receiver){
-                if(item.linkCall){
-                  item.creatorName=item.receiver+'<br/>'+item.linkCall+'<br/>'+item.city+item.county+item.address;
-                }else{
-                  item.creatorName=item.receiver+'<br/>'+item.customerPhone+'<br/>'+item.city+item.county+item.address;
-                }
+                  item.receiver=item.receiver+'<br/>'+item.linkCall+'<br/>'+item.province+item.city+item.county+item.address;
                 
-              }else if(item.creatorName){
-                item.creatorName=item.creatorName+'<br/>'+item.customerPhone
-              }else{
-                item.creatorName=item.customerPhone
+              }
+              if(item.customerName){
+                item.customerName=item.customerName+'<br/>'+item.customMobile
               }
               item.amount=item.amount.toFixed(2);
             }

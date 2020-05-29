@@ -19,8 +19,10 @@
         <el-form-item label="预热时间"  prop='warmUpStartTime'>
           <el-date-picker
             v-model="ruleForm.warmUpStartTime"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            :picker-options='pickerOptions'
             placeholder="选择预热日期时间">
           </el-date-picker>
         </el-form-item>
@@ -28,8 +30,10 @@
         <el-form-item label="开始时间" required prop='startTime'>
           <el-date-picker
             v-model="ruleForm.startTime"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            :picker-options='pickerOptions'
             placeholder="选择开始日期时间">
           </el-date-picker>
         </el-form-item>
@@ -37,8 +41,10 @@
         <el-form-item label="结束时间" required prop='endTime'>
           <el-date-picker
             v-model="ruleForm.endTime"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            :picker-options='pickerOptions'
             placeholder="选择结束日期时间">
           </el-date-picker>
         </el-form-item>
@@ -48,6 +54,7 @@
             v-model="ruleForm.deliveryTime"
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
+            :picker-options='pickerOptions'
             placeholder="选择预计发货日期">
           </el-date-picker>
         </el-form-item>
@@ -66,13 +73,15 @@
         </el-form-item>
         <!-- <div class="tip"><span style="color:#F56C6C;">*</span> 如果是限购活动请填写间隔天数和下单次数，如果是非限购活动，请忽略</div> -->
         <!-- 间隔天数 -->
-        <el-form-item label="下单间隔天数" prop="intervalDays">
-          <el-input v-model="ruleForm.intervalDays" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入下单间隔天数" type='number'></el-input>
-        </el-form-item>
-        <!-- 单次 -->
-        <el-form-item label="间隔天数内下单次数" prop="orderNumber">
-          <el-input v-model="ruleForm.orderNumber" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入间隔天数内允许下单的次数" type='number'></el-input>
-        </el-form-item>
+        <div v-if='ruleForm.forPurchasing=="是"'>
+          <el-form-item label="下单间隔天数" prop="intervalDays">
+            <el-input v-model="ruleForm.intervalDays" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入下单间隔天数" type='number' :min='1'></el-input>
+          </el-form-item>
+          <!-- 单次 -->
+          <el-form-item label="间隔天数内下单次数" prop="orderNumber">
+            <el-input v-model="ruleForm.orderNumber" :disabled="ruleForm.forPurchasing=='否'" placeholder="请输入间隔天数内允许下单的次数" type='number' :min='1'></el-input>
+          </el-form-item>
+        </div>
       
       
 
@@ -117,7 +126,15 @@
               <el-table-column prop="goodCode" label="商品编号"></el-table-column>
               <el-table-column prop="goodName" label="商品名称"></el-table-column>
               <el-table-column prop="corpName" label="所属企业"></el-table-column>
-              <el-table-column prop="goodsClass" label="商品分类"></el-table-column>
+              <el-table-column prop="goodClassName" label="商品分类"></el-table-column>
+              <el-table-column width="120" prop="isShow" label="销售状态">
+                <template slot-scope="scope">
+                  <el-tag
+                    :type="scope.row.isShow =='1' ? 'success':'danger' "
+                    disable-transitions
+                  >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
+                </template>
+              </el-table-column>
               <el-table-column prop="spec" label="规格"></el-table-column>
               <!-- <el-table-column prop="useUnit" label="单位" width="60"></el-table-column> -->
               <el-table-column
@@ -151,13 +168,16 @@
           height="250"
           border
           style="width: 100%">
-          <el-table-column type="index" label="序号" width="60"></el-table-column>
+          <el-table-column prop="sort" label="序号" width="60"></el-table-column>
           <el-table-column prop="goodCode" label="商品编号" width="100"></el-table-column>
           <el-table-column prop="goodName" label="商品名称"></el-table-column>
-          <!-- 添加商品排序 -->
-          <el-table-column prop="sort" label="排序" ></el-table-column>
           <el-table-column prop="totalQuantity" label="预约总数量" ></el-table-column>
-          <el-table-column prop="purchasingQuantity" label="限购数量"></el-table-column>
+          <el-table-column prop="purchasingQuantity" label="限购数量">
+            <template slot-scope="scope">
+              <span v-if='scope.row.purchasingQuantity'>{{scope.row.purchasingQuantity}}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
           <!-- <el-table-column prop="remainingQuantity" label="剩余数量"></el-table-column> -->
           <el-table-column
             fixed="right"
@@ -177,14 +197,14 @@
           :before-close="handleClose">
           <el-form :model="numform" status-icon :rules="rules" ref="numform" label-width="200px" >
             <el-form-item label="产品序号" prop="sort">
-              <el-input v-model="numform.sort" autocomplete="off" type='number' placeholder="请输入该产品序号"></el-input>
+              <el-input v-model="numform.sort" autocomplete="off" type='number' :min='1' placeholder="请输入该产品序号"></el-input>
             </el-form-item>
             <el-form-item label="预约总数量" prop="totalQuantity">
-              <el-input v-model="numform.totalQuantity" autocomplete="off" type='number' placeholder="请输入该产品预约总数量"></el-input>
+              <el-input v-model="numform.totalQuantity" autocomplete="off" type='number' :min='1' placeholder="请输入该产品预约总数量"></el-input>
             </el-form-item>
             <!-- <div class="tip"><span style="color:#F56C6C;">*</span> 如果是限购活动请填写产品限购数量，如果是非限购活动，请忽略</div> -->
             <el-form-item label="产品限购数量" prop="purchasingQuantity">
-              <el-input :disabled="ruleForm.forPurchasing=='否'" v-model="numform.purchasingQuantity" autocomplete="off" type='number' placeholder="请输入该产品限购数量"></el-input>
+              <el-input :disabled="ruleForm.forPurchasing=='否'" v-model="numform.purchasingQuantity" autocomplete="off" type='number' :min='1' placeholder="请输入该产品限购数量"></el-input>
             </el-form-item>
             <el-form-item >
               <el-button type="primary" @click="submit2('numform')">保存</el-button>
@@ -212,11 +232,35 @@ export default {
       // if(!value){
       //   callback(new Error('请选择结束日期时间'))
       // }
-        if (Date.parse(this.ruleForm.endTime)<Date.parse(this.ruleForm.startTime)) {
-          callback(new Error('截止日期不能早于开始日期'));
+        if (Date.parse(value)<Date.parse(this.ruleForm.startTime)) {
+          return callback(new Error('截止日期不能早于开始日期'));
         }else{
           callback();
         }
+    };
+    var checkDay = (rule, value, callback) => {
+      if(!value){
+        callback()
+      }else{
+        let reg=/^[1-9]\d*$/;
+        if(reg.test(value)){
+          callback()
+        }else{
+          return callback(new Error('请输入正整数'))
+        }
+      }
+    };
+    var checkTotal = (rule, value, callback) => {
+      if(!value){
+        return callback(new Error('请输入预约总数量'))
+      }else{
+        let reg=/^[1-9]\d*$/;
+        if(reg.test(value)){
+          callback()
+        }else{
+          return callback(new Error('请输入正整数'))
+        }
+      }
     };
     return{
       title:'新建预售活动',
@@ -227,7 +271,7 @@ export default {
       numform:{   //点击修改弹出的表单的信息
         totalQuantity:0,
         sort:1,
-        purchasingQuantity:0
+        purchasingQuantity:0,
       },
       ruleForm:{
         status:0,
@@ -247,6 +291,11 @@ export default {
         details:[],  //保存详细的产品信息,
         // detailModel:[]
       },
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() < Date.now()- 8.64e7;
+        }
+      },
       rules:{
         name: [
           { required: true, message: '请输入活动名称', trigger: 'blur' }
@@ -258,9 +307,6 @@ export default {
           { required: true, message: '请选择结束日期时间', trigger: 'blur' },
           { validator: validatePass, trigger: 'change' }
         ],
-        // warmUpStartTime: [
-        //   { type: 'stdatetimering', required: true, message: '请选择预约日期时间', trigger: 'change' }
-        // ],
         deliveryTime: [
           { required: true, message: '请选择预计发货日期', trigger: 'blur' }
         ],
@@ -268,31 +314,45 @@ export default {
           { required: true, message: '请选择预约方式', trigger: 'change' }
         ],
         totalQuantity:[
-          { required: true, message: '请输入预约总数量', trigger: 'blur'}
+          { required: true,validator: checkTotal, trigger: 'blur'}
         ],
         forPurchasing:[
           { required: true, message: '请选择是否限购', trigger: 'change'}
+        ],
+        intervalDays:[
+          { validator: checkDay, trigger: 'blur'}
+        ],
+        orderNumber:[
+          { validator: checkDay, trigger: 'blur'}
+        ],
+        sort:[
+          { validator: checkDay, trigger: 'blur'}
+        ],
+        purchasingQuantity:[
+          { validator: checkDay, trigger: 'blur'} 
         ]
       },
       searchParams:{
         redeemFlag:false,
-        keyword:''
+        keyword:'',
+        isShow:'1'
       },
       //单个商品id
       pagesize: 5, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
-      loading: true
+      loading: true,
+      i:0
     }
   },
   methods:{
     // 是否限购改变时，控制下单天数和下单次数和产品限购数量
     isPurchasing(i){
       if(i=='否'){
-        this.ruleForm.intervalDays='';
-        this.ruleForm.orderNumber='';
+        this.ruleForm.intervalDays=0;
+        this.ruleForm.orderNumber=0;
         for(var item=0;item<this.ruleForm.details.length;item++){
-          this.ruleForm.details[item].purchasingQuantity='';
+          this.ruleForm.details[item].purchasingQuantity=0;
         }
       }
     },
@@ -338,7 +398,6 @@ export default {
               item.totalQuantity=Number(this.numform.totalQuantity);
               item.sort=this.numform.sort;
               item.purchasingQuantity=Number(this.numform.purchasingQuantity);
-              item.remainingQuantity=Number(this.numform.remainingQuantity);
               return
             }
           }
@@ -350,28 +409,19 @@ export default {
     },
     //添加商品
     add(row){
-      // console.log('点击添加')
-      // console.log(row)
-      
-      let params={
-        id:row.id
+      console.log('点击添加')
+      console.log(row)
+      this.i++;
+      let goodform={
+        goodId:row.id,
+        goodCode:row.goodCode,
+        goodName:row.goodName,
+        sort:this.i,
+        totalQuantity:'',
+        purchasingQuantity:''
       }
-      let goodform={}
-      // console.log('点击添加获取改行商品的信息')
-      // console.log(row)
-      this.axios.get('/b2c/product/good/findbyid',{params})
-      .then(res=>{
-        // console.log('这是添加商品查询出来的单个商品信息')
-        // console.log(res.data)
-        // goodform.id=this.ruleForm.id;
-        goodform.goodId=res.data.msg.id;
-        goodform.goodCode=res.data.msg.goodCode;
-        goodform.goodName=res.data.msg.goodName;
-        // console.log('这是保存到goodform中的单个商品的数据')
-        // console.log(this.goodform)
-        this.ruleForm.details=this.ruleForm.details.concat(goodform);
-        // console.log(this.ruleForm.details)
-      })
+      this.ruleForm.details=this.ruleForm.details.concat(goodform);
+      
     },
     // 搜索商品
     search(){

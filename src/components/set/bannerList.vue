@@ -126,8 +126,8 @@
               <div v-if="value.floorType==8">
                 <ul class="classtype">
                   <li v-for="(item,i) of value.cells" :key='i'>
-                    <img v-if='item.img' style='width:60px;heigth:60px;border-radius: 50%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
-                    <img v-else style='width:60px;heigth:60px;border-radius: 50%;' src="../../assets/nopicture.png" alt="">
+                    <img v-if='item.img' style='width:90%;border-radius: 50%;' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                    <img v-else style='width:90%;border-radius: 50%;' src="../../assets/nopicture.png" alt="">
                     <p style='margin:0;color: #666666;font-size:12px;'>{{item.cellName}}</p>
                   </li>
                 </ul>
@@ -173,9 +173,9 @@
                   <div style='color:#333;font-weight:700;'>{{value.floorName}}</div>
                 </div>
                 <div class='goodcontent'>
-                  <div style='width:160px;padding-bottom:15px;' v-for="(item,i) of value.cells" :key='i'>
-                    <img v-if='item.img' style='width:140px;height:140px;margin:10px' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
-                    <img v-else style='width:140px;height:140px;margin:10px' src="../../assets/nopicture.png" alt="">
+                  <div style='width:48%;padding-bottom:15px;' v-for="(item,i) of value.cells" :key='i'>
+                    <img v-if='item.img' style='width:99%;height:140px;margin:3%' :src="axios.defaults.baseURL + '/b2c/image/' +item.img" alt="">
+                    <img v-else style='width:99%;height:140px;margin:3%' src="../../assets/nopicture.png" alt="">
                     <p style='margin:0 0 0 10px;color:#333;font-size:15px'>{{item.cellName}}</p>
                     <p style='margin:0 0 0 10px;color:#EF4348;font-size:14px;font-weight:700;'>￥{{item.goodPrice.toFixed(2)}}</p>
                   </div>
@@ -320,21 +320,6 @@ export default {
         }else{
           this.dataList = res.data.msg.datas;
           this.totalCount = res.data.msg.totalCount;
-          // 循环自动生成
-          // for(var i=0;i<this.dataList.length;i++){
-          //   if(this.dataList[i].floorType==1){
-          //     this.bannerList=this.dataList[i].cells
-          //   }else if(this.dataList[i].floorType==8){
-          //     this.classList=this.dataList[i].cells
-          //   }else if(this.dataList[i].floorType==10){
-          //     this.newname=this.dataList[i].floorName
-          //   }else if(this.dataList[i].floorType==6){
-          //     this.timelimited=this.dataList[i].floorName
-          //   }else if(this.dataList[i].floorType==5){
-          //     this.goodList=this.goodList.concat(this.dataList[i])
-          //   }
-          // }
-          
         }
       })
     }
@@ -353,8 +338,8 @@ export default {
 }
 #showMobilePreview{
   z-index: 9999;
-  width:391px;
-  height:768px;
+  width:20%;
+  height:80%;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -367,29 +352,27 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  height: 40px;
-  width: 387px;
+  height: 7%;
+  width: 100%;
   background: #eeeff2;
   text-align: center;
-  line-height: 40px;
+  // line-height: 40px;
   border-top-right-radius: 50px;
   border-top-left-radius: 50px;
 }
 .mobile_preview_header_icon {
   display: inline-block;
-  width: 65px;
-  height: 10px;
+  width: 17%;
+  height: 20%;
   background: #c8c9cc;
   border-radius: 9px;
   vertical-align: middle;
-  margin-top: 18px; 
+  margin-top: 8%; 
 }
 .mobile_preview_frame {
-  width: 387px;
-  min-height: 294px;
-  height: 677px;
-  max-height: calc(100vh - 166px);
-  top: 40px;
+  width: 100%;
+  height: 85%;
+  top: 7%;
   left: 0;
   border: 6px solid #eeeff2;
   position: relative;
@@ -423,7 +406,7 @@ export default {
   border-radius: 50%;
 }
 .classtype{
-  width:350px;
+  width:100%;
   list-style: none;
   display: flex;
   flex-wrap: wrap;
@@ -431,13 +414,14 @@ export default {
   margin:0;
   padding: 20px 0 0 0;
   li{
-    width:75px;height:75px;
-    margin-bottom: 15px;
-    
+    width:25%;
+    // height:75px;
+    // margin-bottom: 15px;
+    padding: 10px;
   }
 }
 .newtype{
-  width:351px;
+  width:98% ;
   height:35px;
   display: flex;
   margin:15px 0;
@@ -446,7 +430,7 @@ export default {
     width:30%;
     height:35px;
     background: url(../../assets/notice.png) no-repeat left center;
-    background-size: 65px 20px;
+    background-size: 75% 70%;
     border-right:1px solid #c3c3c3;
   }
   .right{
@@ -460,7 +444,7 @@ export default {
   }
 }
 .timelimite{
-  width:351px;
+  width:98%;
   padding:15px 0;
   .timetitle{
     display: flex;
@@ -476,7 +460,7 @@ export default {
 }
 .goodsList{
   margin:15px 0;
-  width:351px;
+  width:98%;
   text-align: left;
   .goodtitle{
     padding-bottom: 10px;
@@ -488,7 +472,7 @@ export default {
   }
 }
 .groupPro{
-  width:351px;
+  width:98%;
   height:150px;
   margin:15px 0;
   img{
@@ -506,8 +490,8 @@ export default {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 52px;
-  width: 387px;
+  height: 9%;
+  width: 100%;
   background: #eeeff2;
   text-align: center;
   line-height: 45px;
@@ -516,8 +500,8 @@ export default {
 }
 .mobile_preview_footer_icon {
   display: inline-block;
-  width: 43px;
-  height: 43px;
+  width: 35px;
+  height: 35px;
   background: #c8c9cc;
   border-radius: 50%;
   vertical-align: middle;

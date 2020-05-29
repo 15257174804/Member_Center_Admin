@@ -105,7 +105,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
+        <el-button type="primary" @click="save('form')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -118,13 +118,13 @@ export default {
     var validatePass = (rule, value, callback) => {
       // console.log(this.searchParams.endTime)
       if(!value){
-        callback(new Error('请输入返利比例'))
+        return callback(new Error('请输入返利比例'))
       }else{
-        let reg=/^[0,1].\d{1,2}$/;
+        let reg=/^[0,1]\.\d{1,2}$/;
         if(reg.test(value)){
           callback()
         }else{
-          callback(new Error("请输入0~1之间的小数"))
+          return callback(new Error("请输入0~1之间的小数"))
         }
       }
       
@@ -168,29 +168,38 @@ export default {
       this.form.rebateRate=row.rebateRate;
       this.title='商品返利设置';
     },
-    save(){
-      this.dialogFormVisible=false;
-      if(this.form.rebateRate==''){
-        this.form.rebateRate=0;
-      }
-      let params=this.form;
-      
-      this.axios.post('/b2c/product/good/save',params)
-      .then(res=>{
-        // console.log('设置保存')
-        // console.log(res.data)
-        if(res.data.code > 0){
-          this.$message({
-            type: 'success',
-            message: '设置成功'
-          });
+    save(formName){
+      this.$refs[formName].validate((valid)=>{
+        if (valid){
+          this.dialogFormVisible=false;
+          if(this.form.rebateRate==''){
+            this.form.rebateRate=0;
+          }
+          let params=this.form;
+          
+          this.axios.post('/b2c/product/good/save',params)
+          .then(res=>{
+            // console.log('设置保存')
+            // console.log(res.data)
+            if(res.data.code > 0){
+              this.$message({
+                type: 'success',
+                message: '设置成功'
+              });
+            }else{
+              this.$message.error(res.data.msg);
+            }
+            this.getDataList();
+          }).catch(err=>{
+            console.log(err)
+          })
+
         }else{
-          this.$message.error(res.data.msg);
+          this.$message.error('请核对输入内容内容');
+          return false
         }
-        this.getDataList();
-      }).catch(err=>{
-        console.log(err)
       })
+      
     },
     // 获取数据
     getDataList() {

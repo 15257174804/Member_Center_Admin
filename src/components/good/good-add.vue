@@ -132,7 +132,7 @@
         if(reg.test(value)){
           callback()
         }else{
-          callback(new Error('请输入正数！'))
+          return callback(new Error('请输入正数！'))
         }
       };
       return {

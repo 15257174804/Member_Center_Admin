@@ -13,7 +13,7 @@
           <el-button type="primary" @click="onSubmit('form')" disabled>保存信息</el-button>
         </div>
       </el-tooltip>
-      <el-button v-else type="primary" @click="onSubmit('form')">保存信息</el-button>
+      <el-button v-else type="primary" @click="onSubmit('form')" :disabled="isDisabled">保存信息</el-button>
 
     </div>
     <el-form ref="form" :rules="rules" :model="form" label-width="100px" input-width="200px">
@@ -78,6 +78,14 @@
                 <el-table-column prop="goodName" label="商品名称"></el-table-column>
                 <el-table-column prop="retailPrice" label="金额"></el-table-column>
                 <el-table-column prop="spec" label="规格"></el-table-column>
+                <el-table-column width="120" prop="isShow" label="销售状态">
+                  <template slot-scope="scope">
+                    <el-tag
+                      :type="scope.row.isShow =='1' ? 'success':'danger' "
+                      disable-transitions
+                    >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   label="操作"
                   width="150">
@@ -167,12 +175,12 @@ export default {
     var checkPrice=(rule,value,callback)=>{
       let reg=/(^[1-9]\d*(\.\d{1,2})?$)|(^0(\.\d{1,2})?$)/;
       if(!value){
-        callback(new Error('内容不能为空'))
+        return callback(new Error('内容不能为空'))
       }else{
         if(reg.test(value)){
           callback()
         }else{
-          callback(new Error('请输入正确的价格格式:整数或者保留两位小数'))
+          return callback(new Error('请输入正确的价格格式:整数或者保留两位小数'))
         }
       }
     };
@@ -207,7 +215,7 @@ export default {
       token: localStorage.getItem('loginToken'),
       dialogImageUrl: '',
       dialogVisible: false,
-      fileList:[],
+      fileList:[],   //fileList只在点击编辑进来的时候有用，吧查询出来的图片列表push进来，显示出图片
       pictures:[],
       // 商品组产品
       dialogVisible2:false,
@@ -221,6 +229,7 @@ export default {
       pagesize: 5, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
+      isDisabled:false  //点击保存之后禁用5秒之后才能再次点击
     }
   },
   computed:{
@@ -232,7 +241,6 @@ export default {
         }else{
           result=0
         }
-        
       }
       return result.toFixed(2)
     }
@@ -254,7 +262,7 @@ export default {
       }
       this.axios.get('/b2c/cgPic/byCgID',{params})
       .then(res=>{
-        console.log(res.data)
+        // console.log(res.data)
       })
     },
     getData(){
@@ -268,26 +276,33 @@ export default {
           this.form.products=res.data.msg.productsModels;
           this.products=res.data.msg.productsModels;
           this.products.forEach(val=>{
-            val.innerMsg=''
+            // val.innerMsg=''
+            this.$set(val,'innerMsg','')
           })
-          for(var i=0;i<res.data.msg.pictureModels.length;i++){
-            this.fileList.push({
-              id:res.data.msg.pictureModels[i].id,
-              name:res.data.msg.pictureModels[i].imgUrl,
-              url:this.axios.defaults.baseURL + '/b2c/image/' +res.data.msg.pictureModels[i].imgUrl
-            })
-            this.pictures.push({
-              imgUrl:res.data.msg.pictureModels[i].imgUrl,
-              id:res.data.msg.pictureModels[i].id,
-            })
+          if(res.data.msg.pictureModels.length>0){
+            for(var i=0;i<res.data.msg.pictureModels.length;i++){
+              this.fileList.push({
+                id:res.data.msg.pictureModels[i].id,
+                name:res.data.msg.pictureModels[i].imgUrl,
+                url:this.axios.defaults.baseURL + '/b2c/image/' +res.data.msg.pictureModels[i].imgUrl,
+                imgUrl:res.data.msg.pictureModels[i].imgUrl,
+              })
+              this.pictures.push({
+                imgUrl:res.data.msg.pictureModels[i].imgUrl,
+                name:res.data.msg.pictureModels[i].imgUrl,
+                url:this.axios.defaults.baseURL + '/b2c/image/' +res.data.msg.pictureModels[i].imgUrl,
+                id:res.data.msg.pictureModels[i].id,
+              })
+            }
           }
-          console.log(this.fileList)
+          // console.log(this.fileList)
+          // console.log(this.pictures)
         }
       })
     },
     // 商品明细的删除操作
     edit(row){
-      console.log(row)
+      // console.log(row)
       let params={
         id:row.id
       }
@@ -346,7 +361,7 @@ export default {
         this.axios.post('/b2c/cgp/add',params)
         .then(res=>{
           if(res.data.code>0){
-            console.log(res.data)
+            // console.log(res.data)
             this.getData();
           }else{
             console.log(res.data.msg)
@@ -357,19 +372,21 @@ export default {
     },
     // 修改商品组时增加商品数量
     addcomfirm(row){
-      console.log(row)
+      // console.log(row)
       let reg=/^[1-9]\d*$/;
-      console.log()
       if(row.quantity==''){
-        row.innerMsg='商品数量不能为空';
+        this.$set(row,'innerMsg','商品数量不能为空')
+        // row.innerMsg='商品数量不能为空';
         // this.$refs.qty.style.border='1px solid #F56C6C';
         return
       }else if(!reg.test(row.quantity)){
-        row.innerMsg='请输入正整数，最小为1';
+        this.$set(row,'innerMsg','请输入正整数，最小为1')
+        // row.innerMsg='请输入正整数，最小为1';
         // this.$refs.qty.style.border='1px solid #F56C6C';
         return
       }else{
-        row.innerMsg=''
+        this.$set(row,'innerMsg','')
+        // row.innerMsg=''
         // this.$refs.qty.style.border='1px solid #DCDFE6';
       }
       if(this.flag){
@@ -380,7 +397,7 @@ export default {
         this.axios.post('/b2c/cgp/save',params)
         .then(res=>{
           if(res.data.code>0){
-            console.log(res.data)
+            // console.log(res.data)
           }else{
             console.log(res.data.msg)
           }
@@ -429,8 +446,9 @@ export default {
     },
     // 图片管理  移除  预览
     handleSuccess(file,fileList){
-      console.log('成功')
-      console.log(file,fileList)
+      // console.log('成功',this.flag)
+      // console.log(file,fileList)
+      // console.log(this.pictures)
       if(this.flag){
         let params={
           commodityGroupId:this.form.id,
@@ -440,54 +458,67 @@ export default {
         .then(res=>{
           if(res.data.code>0){
             this.$message.success('上传成功')
-            // this.getData();
-            // this.activeName='picture';
             this.pictures.push({
               id:res.data.msg.id,
-              imgUrl:res.data.msg.imgUrl
-            })
-            this.fileList.push({
-              id:res.data.msg.id,
+              imgUrl:res.data.msg.imgUrl,
               name:res.data.msg.imgUrl,
               url:this.axios.defaults.baseURL + '/b2c/image/' +res.data.msg.imgUrl,
-              imgUrl:res.data.msg.imgUrl
             })
           }else{
             this.$message.error(res.data.msg)
           }
         })
       }else{
+        // this.pictures是用来新建保存的时候赋值给对应的数据里
         this.pictures.push({
-          name:file.msg.originName,
+          name:file.msg.fileName,
           imgUrl:file.msg.fileName
         })
       }
-      // console.log(this.pictures)
+    },
+    beforeRemove(file, fileList){
+      this.$confirm('确定要删除该图片吗？','提示',{
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(()=>{
+        this.handleRemove(file, fileList)
+      }).catch(()=>{
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
+        });
+      })
     },
     handleRemove(file, fileList) {
-      console.log('移除')
-      console.log(file,fileList)
-      for(var i=0;i<this.pictures.length;i++){
-        if(this.pictures[i].name==file.name){
-          this.pictures.splice(i,1)
-        }
-      }
-      if(this.flag){
-        if(file.id){
-          let params={
-            id:file.id
-          }
-          this.axios.get('/b2c/cgPic/delete',{params})
-          .then(res=>{
-            if(res.data.code>0){
-              this.$message.success('删除成功')
-            }else{
-              this.$message.error(res.data.msg)
-            }
-          })
-        }
-      }
+      // console.log('移除',this.flag)
+      // console.log(file,fileList)
       // console.log(this.pictures)
+      if(this.flag){
+        let params={
+          id:file.id
+        }
+        this.axios.get('/b2c/cgPic/delete',{params})
+        .then(res=>{
+          if(res.data.code>0){
+            this.$message.success('删除成功')
+            for(let i=0;i<this.pictures.length;i++){
+              if(this.pictures[i].id==file.id){
+                this.pictures.splice(i,1)
+              }
+            }
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        })
+      }else{
+        for(let i=0;i<this.pictures.length;i++){
+          if(this.pictures[i].imgUrl==file.response.msg.fileName){
+            this.pictures.splice(i,1)
+          }
+        }
+      }
+      
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -497,7 +528,14 @@ export default {
     onSubmit(formName){
       this.$refs[formName].validate((valid) =>{
          if (valid){
+           this.isDisabled=true;
+            setTimeout(()=>{
+              this.isDisabled=false;
+            },5000)
+
             this.form.pictures=this.pictures;
+            // this.form.pictures=this.fileList;
+
             this.form.products=this.products;
             let params=this.form;
             this.axios.post('/b2c/commodityGroup/save',params)
