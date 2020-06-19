@@ -42,13 +42,13 @@
             <el-input v-model="form.cardNo" placeholder="请输入会员卡号" disabled></el-input>
           </el-form-item>
           <el-form-item class="half-form" label="积分总数">
-            <el-input v-model="form.score" placeholder="请输入积分总数" disabled></el-input>
+            <el-input v-model="form.scoreBalance" placeholder="请输入积分总数" disabled></el-input>
           </el-form-item>
           <el-form-item class="half-form" label="是否启用">
             <el-switch active-color="#13ce66" v-model="form.baseInfo.isValid" disabled></el-switch>
           </el-form-item>
           <el-form-item class="half-form" label="积分余额">
-            <el-input v-model="form.scoreBalance" placeholder="请输入积分余额" disabled></el-input>
+            <el-input v-model="form.score" placeholder="请输入积分余额" disabled></el-input>
           </el-form-item>
           <!-- <el-form-item class="half-form" label="会员标签">
             <el-button type="text" @click="addLabel"><i class="el-icon-plus"></i>添加</el-button>

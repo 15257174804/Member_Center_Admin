@@ -32,48 +32,86 @@
         </el-button>
       </div>
     </div>
+    <!-- 表格2 -->
+    <div v-if="groupId">
+      <el-table
+        v-loading="loading"
+        border
+        stripe
+        :data="dataList2"
+        style="width: 100%">
+        <el-table-column prop="menuSort" label="序号" width="100" align='center'></el-table-column>
+        <el-table-column prop="menuCode" label="编码" align='center'></el-table-column>
+        <el-table-column prop="menuGrade" label="等级" align='center'>
+          <template slot-scope="scope">
+            <span v-if="scope.row.menuGrade==1">一级菜单</span>
+            <span v-if="scope.row.menuGrade==2">二级菜单</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="menuName" label="菜单名称" align='center'></el-table-column>
+        <!-- <el-table-column prop="parentId" label="上级菜单">
+          <template slot-scope="scope">
+            <span v-if="scope.row.grade==1">-</span>
+            <span v-else>{{scope.row.parentId}}</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column prop="status" label="状态" align='center'>
+          <template slot-scope="scope">
+            <el-tag
+              :type="scope.row.status ==1 ? 'success':'danger' "
+              disable-transitions
+            >{{scope.row.status ==1 ? '正常':'停用'}}</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
     <!-- 表格 -->
-    <el-table
-      v-loading="loading"
-      border
-      stripe
-      :data="dataList"
-      style="width: 100%">
-      <el-table-column prop="sort" label="序号" width="100" align='center'></el-table-column>
-      <el-table-column prop="code" label="编码" align='center'></el-table-column>
-      <el-table-column prop="grade" label="等级" align='center'>
-        <template slot-scope="scope">
-          <span v-if="scope.row.grade==1">一级菜单</span>
-          <span v-if="scope.row.grade==2">二级菜单</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="name" label="菜单名称" align='center'></el-table-column>
-      <!-- <el-table-column prop="parentId" label="上级菜单">
-        <template slot-scope="scope">
-          <span v-if="scope.row.grade==1">-</span>
-          <span v-else>{{scope.row.parentId}}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column prop="status" label="状态" align='center'>
-        <template slot-scope="scope">
-          <el-tag
-            :type="scope.row.status ==1 ? 'success':'danger' "
-            disable-transitions
-          >{{scope.row.status ==1 ? '正常':'停用'}}</el-tag>
-        </template>
-      </el-table-column>
-      <!-- 操作 -->
-      <el-table-column
-        align='center'
-        label="操作"
-        width="200">
-        <template slot-scope="scope">
-          <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
-          <el-button v-if="scope.row.status ==1" type="text" @click="change(scope.row)"><i class="el-icon-refresh"></i>禁用</el-button>
-          <el-button v-if="scope.row.status ==0" type="text" @click="change(scope.row)"><i class="el-icon-refresh"></i>启用</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div v-else>
+      <el-table
+        v-loading="loading"
+        border
+        stripe
+        :data="dataList"
+        style="width: 100%">
+        <el-table-column prop="sort" label="序号" width="100" align='center'></el-table-column>
+        <el-table-column prop="code" label="编码" align='center'></el-table-column>
+        <el-table-column prop="grade" label="等级" align='center'>
+          <template slot-scope="scope">
+            <span v-if="scope.row.grade==1">一级菜单</span>
+            <span v-if="scope.row.grade==2">二级菜单</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="菜单名称" align='center'></el-table-column>
+        <!-- <el-table-column prop="parentId" label="上级菜单">
+          <template slot-scope="scope">
+            <span v-if="scope.row.grade==1">-</span>
+            <span v-else>{{scope.row.parentId}}</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column prop="status" label="状态" align='center'>
+          <template slot-scope="scope">
+            <el-tag
+              :type="scope.row.status ==1 ? 'success':'danger' "
+              disable-transitions
+            >{{scope.row.status ==1 ? '正常':'停用'}}</el-tag>
+          </template>
+        </el-table-column>
+        <!-- 操作 -->
+        <el-table-column
+          align='center'
+          label="操作"
+          width="200">
+          <template slot-scope="scope">
+            <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
+            <el-button v-if="scope.row.status ==1" type="text" @click="change(scope.row)"><i class="el-icon-refresh"></i>禁用</el-button>
+            <el-button v-if="scope.row.status ==0" type="text" @click="change(scope.row)"><i class="el-icon-refresh"></i>启用</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    
+    
+    
     <!-- 分页 -->
     <el-pagination
       @size-change="handleSizeChange"
@@ -102,15 +140,18 @@
         <el-form-item label="菜单名称" prop="name">
           <el-input v-model="menuForm.name" style='width:80%;' placeholder="请输入菜单名称"></el-input>
         </el-form-item>
+        <el-form-item label="菜单链接" prop="link">
+          <el-select v-model="menuForm.link" placeholder="请选择" style='width:80%;'>
+            <el-option v-for="(val,i) of menuLink" :key='i' :label="val.label" :value="val.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="菜单图标" prop="icon">
+          <el-input v-model="menuForm.icon" style='width:80%;' placeholder="请输入菜单图标"></el-input>
+        </el-form-item>
         <el-form-item label="菜单等级" prop="grade">
           <el-select v-model="menuForm.grade" placeholder="请选择" style='width:80%;'>
             <el-option label="一级菜单" value="1"></el-option>
             <el-option label="二级菜单" value="2"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="菜单链接" v-if="menuForm.grade==2" prop="link">
-          <el-select v-model="menuForm.link" placeholder="请选择" style='width:80%;'>
-            <el-option v-for="(val,i) of menuLink" :key='i' :label="val.label" :value="val.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="上级菜单" v-if="menuForm.grade==2" prop="parentId">
@@ -152,9 +193,13 @@ export default {
       }
     };
     return {
-      menuTitle:'123',
+      menuTitle:'',
       dialogFormVisible:false,
       menuLink:[
+        {
+          value: 'home',
+          label: '首页'
+        },
         {
           value: 'company',
           label: '我的企业'
@@ -259,6 +304,14 @@ export default {
           value: 'power',
           label: '菜单权限'
         },
+        {
+          value: 'rolePower',
+          label: '角色权限'
+        },
+        {
+          value: 'complain',
+          label: '意见反馈'
+        },
       ],
       parentLink:[],  //上级菜单列表
       menuForm:{
@@ -266,6 +319,7 @@ export default {
         sort:'',
         code:'',
         name:'',
+        icon:'',
         grade:"",
         link:'',
         parentId:'', 
@@ -274,13 +328,13 @@ export default {
       },
       rules:{
         sort: [
-          { required: true, validator: checkSort,  trigger: 'blur' }
+          { required: true,message: '请输入菜单序号' ,  trigger: 'blur' }   //validator: checkSort
         ],
         code: [
           { required: true, message: '请输入菜单编码', trigger: 'blur' }
         ],
         name: [
-          { required: true, message: '请输入菜单编名称', trigger: 'blur' }
+          { required: true, message: '请输入菜单名称', trigger: 'blur' }
         ],
         grade: [
           { required: true, message: '请选择菜单等级', trigger: 'blur' }
@@ -299,11 +353,18 @@ export default {
       totalCount: 0,
       searchParams:{
         status:""
-      }
+      },
+      dataList2:[],   //企业菜单
+      groupId:localStorage.getItem('groupId')
     }
   },
   mounted(){
-    this.getMenu();
+    if(localStorage.getItem('groupId')){
+      this.getCorpMeun();
+    }else{
+      this.getMenu();
+      this.gettreeMenu();
+    }
   },
   methods:{
     //    启用  禁用
@@ -392,9 +453,6 @@ export default {
         if (valid){
           // console.log(this.menuForm)
           let params=this.menuForm;
-          if(params.grade=='1'){
-            params.link='home'
-          }
           this.axios.post('/crm/menu/save',params)
           .then(res=>{
             if(res.data.code>0){
@@ -417,6 +475,20 @@ export default {
       this.$refs[formName].resetFields();
       this.dialogFormVisible=false;
     },
+    // 获取企业菜单列表
+    getCorpMeun(){
+      this.loading=true;
+      let params=this.searchParams;
+      params.pageindex = this.currentPage;
+      params.pagesize = this.pagesize;
+      params.groupId=localStorage.getItem('groupId');
+      this.axios.get('/crm/emac/list',{params})
+      .then(res=>{
+          this.loading=false;
+          this.dataList2=res.data.msg.datas;
+          this.totalCount=res.data.msg.totalCount;
+      })
+    },
     // 获取平台菜单列表
     getMenu(){
       this.loading=true;
@@ -434,24 +506,50 @@ export default {
         console.log(err)
       })
     },
+    // 获取树状图数据
+    gettreeMenu(){
+      let params={
+        grade:1
+      }
+      this.axios.get('/crm/menu/tree',{params})
+      .then(res=>{
+        // console.log(res.data)
+      })
+    },
     search(){
       this.currentPage = 1;
-      this.getMenu();
+      if(localStorage.getItem('groupId')){
+        this.getCorpMeun();
+      }else{
+        this.getMenu();
+      }
     },
     //重置
     reset(){
       this.searchParams.status = "";
-      this.getMenu();
+      if(localStorage.getItem('groupId')){
+        this.getCorpMeun();
+      }else{
+        this.getMenu();
+      }
     },
     // 每页展示多少条数据
     handleSizeChange(size) {
       this.pagesize = size;
-      this.getMenu();
+      if(localStorage.getItem('groupId')){
+        this.getCorpMeun();
+      }else{
+        this.getMenu();
+      }
     },
     // 第几页
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage;
-      this.getMenu();
+      if(localStorage.getItem('groupId')){
+        this.getCorpMeun();
+      }else{
+        this.getMenu();
+      }
     },
   }
 }

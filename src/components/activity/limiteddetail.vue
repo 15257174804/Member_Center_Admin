@@ -159,14 +159,15 @@
       <!-- 点击修改弹出对应产品数据的限售数量 -->
       <el-dialog
         :visible.sync="dialogVisible2"
-        width="45%"
-        :before-close="handleClose">
-        <el-form :model="numform" status-icon ref="numform" :rules="rules" label-width="200px" >
+        title="活动产品编辑"
+        width="40%"
+        append-to-body>
+        <el-form :model="numform" status-icon ref="numform" :rules="rules" label-width="100px" >
           <el-form-item label="产品序号" prop="sort">
-            <el-input v-model="numform.sort" autocomplete="off" placeholder="请输入产品序号"></el-input>
+            <el-input v-model="numform.sort" autocomplete="off" placeholder="请输入产品序号" style='width:85%;'></el-input>
           </el-form-item>
           <el-form-item label="抢购价" prop="discountPrice">
-            <el-input v-model="numform.discountPrice" autocomplete="off" placeholder="请输入抢购价"></el-input>
+            <el-input v-model="numform.discountPrice" autocomplete="off" placeholder="请输入抢购价" style='width:85%;'></el-input>
           </el-form-item>
           <el-form-item label="是否限购" prop="forPurchasingFlag">
             <el-radio-group v-model="numform.forPurchasingFlag">
@@ -175,13 +176,13 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="限购数量" prop="forPurchasingQuantity">
-            <el-input :disabled="numform.forPurchasingFlag=='否'" v-model="numform.forPurchasingQuantity" autocomplete="off" placeholder="请输入限购数量"></el-input>
+            <el-input :disabled="numform.forPurchasingFlag=='否'" v-model="numform.forPurchasingQuantity" autocomplete="off" placeholder="请输入限购数量" style='width:85%;'></el-input>
           </el-form-item>
           <el-form-item label="总数量" prop="quantity">
-            <el-input v-model="numform.quantity" autocomplete="off" placeholder="请输入总数量"></el-input>
+            <el-input v-model="numform.quantity" autocomplete="off" placeholder="请输入总数量" style='width:85%;'></el-input>
           </el-form-item>
           <el-form-item label="备注" prop="memo">
-            <el-input type="textarea" v-model="numform.memo"  placeholder="请输入备注信息"></el-input>
+            <el-input type="textarea" v-model="numform.memo"  placeholder="请输入备注信息" style='width:85%;'></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="submit2('numform')">保存</el-button>

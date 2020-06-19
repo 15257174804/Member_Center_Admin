@@ -964,5 +964,8 @@ export default {
   }
   .searchbox{
   font-size: 14px;
-}
+  }
+  .el-form-item{
+    margin-bottom:0;
+  }
 </style>

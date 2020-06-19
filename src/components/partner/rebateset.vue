@@ -16,10 +16,26 @@
         <el-input v-model="searchParams.keyword" placeholder="如名称、编码等" :style="{width:'180px',height:'40px'}"></el-input>
       </div>
       <div class="searchbox">
-        已设置的返利商品：
-        <el-select v-model="searchParams.isRebate" :style="{width:'120px',height:'40px'}">
+        销售状态：
+        <el-select v-model="searchParams.isShow" :style="{width:'120px',height:'40px'}">
           <el-option label="所有" value=""></el-option>
-          <el-option label="返利商品" value=true></el-option>
+          <el-option label="在售" value="1"></el-option>
+          <el-option label="已下架" value="0"></el-option>
+        </el-select>
+      </div> 
+      <div class="searchbox">
+        是否设置返利：
+        <el-select v-model="searchParams.isRebate" :style="{width:'120px',height:'40px'}">
+          <el-option label="是" :value='true'></el-option>
+          <el-option label="否" :value='false'></el-option>
+        </el-select>
+      </div> 
+      <div class="searchbox">
+        返利类型：
+        <el-select v-model="searchParams.rebateStrategy" :style="{width:'120px',height:'40px'}">
+          <el-option label="所有" value=""></el-option>
+          <el-option label="按金额" :value="2"></el-option>
+          <el-option label="按比率" :value="1"></el-option>
         </el-select>
       </div> 
       <!-- 按钮 -->
@@ -46,10 +62,10 @@
       >
       <el-table-column prop="goodCode" label="商品编号" width="100"></el-table-column>
       <el-table-column prop="goodName" label="商品名称"></el-table-column>
-      <el-table-column prop="goodsClass" label="商品分类"></el-table-column>
       <el-table-column prop="producer" label="厂家"></el-table-column> 
       <el-table-column prop="spec" label="规格"></el-table-column>
       <el-table-column prop="retailPrice" label="价格"></el-table-column>
+      
       <el-table-column width="120" prop="isShow" label="销售状态">
         <template slot-scope="scope">
           <el-tag
@@ -58,7 +74,24 @@
           >{{scope.row.isShow =='1' ? '在售':'已下架'}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="rebateRate" label="返利比例"></el-table-column>
+      <el-table-column prop="rebateStrategy" label="返利方式">
+        <template slot-scope="scope">
+          <span v-if="scope.row.rebateStrategy==1">按比率</span>
+          <span v-if="scope.row.rebateStrategy==2">按金额</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="rebateRate" label="返利比例/%" align="center">
+        <template slot-scope="scope">
+          <span v-if="scope.row.rebateStrategy==1">{{scope.row.rebateRate*100}}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="rebateAmount" label="返利金额/元" align="center">
+        <template slot-scope="scope">
+          <span v-if="scope.row.rebateStrategy==2">{{scope.row.rebateAmount}}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column
       fixed="right"
       label="操作"
@@ -81,26 +114,22 @@
     <!-- 返利的弹出框 -->
     <el-dialog :title="title" :visible.sync="dialogFormVisible">
       <el-form :model="form" ref="form" :rules="rules" label-width="150px">
-        <!-- <div :class="title=='按商品分类设置返利'?'':'isShow'">
-          <el-form-item label="商品分类">
-            <el-select v-model="form.fenlei" placeholder="请选择">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-        </div> -->
-        <!-- <el-form-item label="设置方式" :label-width="type">
-          <el-select v-model="form.type" placeholder="请选择">
-            <el-option label="金额" value="price"></el-option>
-            <el-option label="百分比" value="percent"></el-option>
+        <el-form-item label="返利方式" prop="rebateStrategy">
+          <el-select v-model="form.rebateStrategy" placeholder="请选择">
+            <el-option label="按金额" value="2"></el-option>
+            <el-option label="按比率" value="1"></el-option>
           </el-select>
-        </el-form-item> -->
-        <!-- <el-form-item label="金额" prop="price">
-          <el-input :disabled="form.type=='percent'" v-model="form.price"></el-input>
-        </el-form-item> -->
-        <el-form-item label="百分比(区间0~1)" prop="rebateRate">
-          <el-input v-model="form.rebateRate" type="number"></el-input>
         </el-form-item>
+        <div v-if="form.rebateStrategy=='2'">
+          <el-form-item label="返利金额/元" prop="rebateAmount">
+            <el-input v-model="form.rebateAmount" type="number"></el-input>
+          </el-form-item>
+        </div>
+        <div v-if="form.rebateStrategy=='1'">
+          <el-form-item label="返利比率/%" prop="rebateRate">
+            <el-input v-model="form.rebateRate" type="number"></el-input>
+          </el-form-item>
+        </div>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -118,13 +147,25 @@ export default {
     var validatePass = (rule, value, callback) => {
       // console.log(this.searchParams.endTime)
       if(!value){
-        return callback(new Error('请输入返利比例'))
+        return callback(new Error('请输入返利比率'))
       }else{
-        let reg=/^[0,1]\.\d{1,2}$/;
-        if(reg.test(value)){
+        if(value>0){
           callback()
         }else{
-          return callback(new Error("请输入0~1之间的小数"))
+          return callback(new Error("返利比率必须大于0"))
+        }
+      }
+      
+    };
+    var validateAmount= (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+      if(!value){
+        return callback(new Error('请输入返利金额'))
+      }else{
+        if(value>0){
+          callback()
+        }else{
+          return callback(new Error("返利金额必须大于0"))
         }
       }
       
@@ -132,8 +173,10 @@ export default {
     return {
       searchParams:{
         redeemFlag:false,
-        isRebate:'',
-        keyword:""
+        keyword:"",
+        isShow:'',
+        isRebate:true,
+        rebateStrategy:''
       },
       dataList: [],
       pagesize: 5, //页面一次展示多少数据
@@ -144,12 +187,20 @@ export default {
       title:'商品返利设置',
       form:{
         id:'',
-        rebateRate:0
+        rebateRate:'',
+        rebateStrategy:'1',
+        rebateAmount:''
       },
       rules: {
           rebateRate:[
             { validator: validatePass, trigger: 'blur' },
             // { min: 2, max: 8, message: '长度在 2 到 10 个字符', trigger: 'blur' }
+          ],
+          rebateStrategy:[
+            { required: true, message: '请选择返利方式', trigger: 'change' }
+          ],
+          rebateAmount:[
+            { validator: validateAmount, trigger: 'blur' }
           ]
         },
     }
@@ -165,17 +216,19 @@ export default {
       // console.log(row)
       this.dialogFormVisible=true;
       this.form.id=row.id;
-      this.form.rebateRate=row.rebateRate;
+      this.form.rebateRate=row.rebateRate*100;
+      this.form.rebateAmount=row.rebateAmount;
+      this.form.rebateStrategy=row.rebateStrategy.toString();
       this.title='商品返利设置';
     },
     save(formName){
       this.$refs[formName].validate((valid)=>{
         if (valid){
           this.dialogFormVisible=false;
-          if(this.form.rebateRate==''){
-            this.form.rebateRate=0;
-          }
           let params=this.form;
+          if(params.rebateRate!=''){
+            params.rebateRate=params.rebateRate/100
+          }
           
           this.axios.post('/b2c/product/good/save',params)
           .then(res=>{

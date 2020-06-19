@@ -31,10 +31,19 @@
           <el-tag v-if="form.status =='-1'" type="info">已取消</el-tag>
           <el-tag v-if="form.status =='0'" type="warning">待付款</el-tag>
           <el-tag v-if="form.status =='1'" type="success">已完成</el-tag>
-          <el-tag v-if="form.status =='2' && form.pickupWay=='2'" type="danger">待发货</el-tag>
+          <el-tag v-if="form.status =='2' && form.pickupWay=='2'" type="danger" @click='delivery' style='cursor: pointer;'>待发货</el-tag>
           <el-tag v-if="form.status =='2' && form.pickupWay=='1'" type="danger">待自提</el-tag>
           <el-tag v-if="form.status =='3'" type="brand">待收货</el-tag>
           <el-tag v-if="form.status =='4'" type="brand">待评价</el-tag>
+          <el-tag v-if="form.status =='8'" type="info">交易关闭</el-tag>
+        </p>
+        <p v-if='form.receiver'>
+          <label>收货地址：</label>
+          <span>{{form.receiver}}&nbsp;&nbsp;{{form.linkCall}}&nbsp;&nbsp;{{form.province+form.city+form.county+form.address}}</span>
+        </p>
+        <p v-if='form.expressCorp&&form.expressCode'>
+          <label>货运单信息：</label>
+          <span>{{form.expressCorp}}&nbsp;&nbsp;{{form.expressCode}}</span>
         </p>
       </div>
       <p class="tit">订单明细<el-button v-if="form.clientConfirm=='1' && form.pickupWay == '1'&&(form.status == '2') " type="primary" @click="cancelVerification()">提货确认</el-button></p>
@@ -50,6 +59,7 @@
         >
         </el-table-column>
         <el-table-column type="index" label="序号" width="60"></el-table-column>
+        <el-table-column prop="goodCode" label="商品编码" width="120"></el-table-column>
         <el-table-column prop="imgUrl" label="商品图片" width="100" align="center">
             <template slot-scope="scope">
               <img style="height:60px;width:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl" alt="">
@@ -70,6 +80,29 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 点击发货 -->
+    <el-dialog :title="deliverytitle" :visible.sync="dialogFormVisible2" :close-on-click-modal='false' :close-on-press-escape='false'>
+      <el-form :model="dform" :rules="rules" label-width="100px">
+        <el-form-item label="快递单号" prop="expressCode">
+          <el-input v-model="dform.expressCode" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="快递公司" prop="expressCorp">
+          <!-- <el-input v-model="dform.expressCorp" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></!--> 
+          <el-select v-model="dform.expressCorp" placeholder="请选择" :disabled="deliverytitle=='货运单信息'">
+            <el-option
+              v-for="item in deliveryoptions"
+              :key="item.id"
+              :label="item.label"
+              :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible2 = false">取 消</el-button>
+        <el-button type="primary" @click="submit2">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -78,13 +111,90 @@
   export default {
     name: "orderdetail",
     data() {
+      var validatePass = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请输入快递单号'));
+        }else{
+          let reg=/^\w+$/;
+          if(reg.test(value)){
+            callback();
+          }else{
+            return callback(new Error('请输入字母数字'))
+          }
+        }
+      };
       return {
         title:"订单详情",
         loading: true,
         dataList: [],
         form:{
           id: ''
-        }
+        },
+        deliverytitle:'',
+        dialogFormVisible2:false,
+        dform:{
+          orderId:'',
+          expressCode:'',
+          expressCorp:''
+        },
+        rules:{
+          expressCode: [
+            { required: true, validator: validatePass, trigger: "blur" }
+          ],
+          expressCorp: [
+            { required: true, message:'请输入快递公司名称', trigger: "blur" }
+          ],
+        },
+        deliveryoptions:[
+          {
+            id:1,
+            label:'顺丰快递'
+          },
+          {
+            id:2,
+            label:'EMS'
+          },
+          {
+            id:3,
+            label:'申通快递'
+          },
+          {
+            id:4,
+            label:'韵达快递'
+          },
+          {
+            id:5,
+            label:'中通快递'
+          },
+          {
+            id:6,
+            label:'圆通快递'
+          },
+          {
+            id:7,
+            label:'汇通快递'
+          },
+          {
+            id:8,
+            label:'天天快递'
+          },
+          {
+            id:9,
+            label:'宅急送'
+          },
+          {
+            id:10,
+            label:'丹鸟快递'
+          },
+          {
+            id:11,
+            label:'京东快递'
+          },
+          {
+            id:12,
+            label:'其他快递'
+          },
+        ],
       }
     },
     mounted(){
@@ -97,6 +207,37 @@
         }
     },
     methods: {
+      // 发货
+      delivery(){
+        if(this.form.expressCode && this.form.expressCorp){
+          this.deliverytitle='货运单信息'
+        }else{
+          this.deliverytitle='请输入货运单信息'
+        }
+        this.dialogFormVisible2 = true;
+        this.dform.orderId=this.form.orderId;
+        this.dform.expressCode=this.form.expressCode;
+        this.dform.expressCorp=this.form.expressCorp;
+      },
+      submit2(){
+        this.dialogFormVisible2=false;
+        let params=this.dform;
+        if(this.deliverytitle=='请输入货运单信息'){
+          this.axios.get('/b2c/order/delivery',{params})
+          .then(res=>{
+            if(res.data.code>0){
+              this.$message({
+                message: res.data.msg,
+                type: 'success'
+              })
+              this.getDetailData(this.form.id)
+            }else{
+              this.$message.error('请核运单信息是否正确');
+            }
+          })
+        }
+        
+      },
       getDetailData(id){
         let params = {id: id}
         this.axios

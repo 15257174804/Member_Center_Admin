@@ -155,7 +155,7 @@ a {
 
 #display >>> .el-form{
   /* width: 90%; */
-  margin-top: .7rem;
+  /* margin-top: .7rem; */
 }
 
 #display >>> .el-tabs{

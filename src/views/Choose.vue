@@ -65,7 +65,7 @@ export default {
               title: '错误',
               message: res.data.msg
             })
-            retrun
+            return
           }
           for(var i=0;i<this.options.length;i++){
             if(this.formData.value==this.options[i].value){
@@ -79,11 +79,21 @@ export default {
             this.$store.dispatch("setUserInfoFun",res.data.msg.emp.username);
           }
           localStorage.setItem("loginToken", token);
-          this.$router.push('/display');
-          this.$store.commit('setClientId',res.data.msg.emp.clientId)
+          if(res.data.msg.emp.clientId){
+            sessionStorage.setItem("pickupstoreid", res.data.msg.emp.clientId);
+            // this.$store.commit('setClientId',res.data.msg.emp.clientId)
+          }else if(res.data.msg.emp.corpId){
+            sessionStorage.setItem("pickupstoreid", res.data.msg.emp.corpId);
+            // this.$store.commit('setClientId',res.data.msg.emp.corpId)
+          }else{
+            sessionStorage.setItem("pickupstoreid", res.data.msg.emp.groupId);
+            // this.$store.commit('setClientId',res.data.msg.emp.groupId)
+          }
+          
           this.$store.commit('setGroupId',res.data.msg.emp.groupId)
-          // console.log(this.$store.state.clientId)
-          // console.log(this.$store.state.groupId)
+          localStorage.setItem("groupId", res.data.msg.emp.groupId);
+          // 获取企业菜单
+          this.getMeun(res.data.msg.emp.id)
         })
         .catch(err=>{
           console.log(err)
@@ -95,6 +105,19 @@ export default {
       // if(options){
       //   this.$router.push("/display")
       // }
+    },
+    getMeun(id){
+      let params={
+        employeeId:id
+      }
+      this.axios.get('/crm/permission/employeeMenu',{params})
+      .then(res=>{
+        // console.log(res.data)
+        if(res.data.code>0){
+          localStorage.setItem("menu", JSON.stringify(res.data.msg));
+          this.$router.push('/display');
+        }
+      })
     }
   },
   mounted(){

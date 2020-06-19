@@ -84,10 +84,10 @@
           <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
         </template>
       </el-table-column> 
-      <el-table-column prop="username" label="用户名"></el-table-column>
-      <el-table-column prop="workNo" label="工号"></el-table-column>
-      <el-table-column prop="mobilephone" label="手机号码"></el-table-column>
-      <el-table-column prop="enterDate" label="入职时间"></el-table-column>
+      <el-table-column prop="username" label="用户名" width="160"></el-table-column>
+      <el-table-column prop="workNo" label="工号" width="100"></el-table-column>
+      <el-table-column prop="mobilephone" label="手机号码" width="160"></el-table-column>
+      <el-table-column prop="enterDate" label="入职时间" width="160"></el-table-column>
       <el-table-column prop="lastOrgName" label="所属企业"></el-table-column>
       <!-- <el-table-column prop="role[0].roleName" label="角色"></el-table-column> -->
       <el-table-column width="120" prop="isValid" label="状态">
@@ -101,9 +101,10 @@
       <el-table-column
       fixed="right"
       label="操作"
-      width="150">
+      width="250">
         <template slot-scope="scope">
-          <el-button type="text" @click="edit(scope.row)" style="margin-right:13px;"><i class="el-icon-edit"></i>编辑</el-button>
+          <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
+          <el-button type="text" v-if="logingroupId" @click="role(scope.row)" style="margin-right:13px;"><i class="el-icon-bell"></i>角色权限</el-button>
           <el-dropdown trigger="click">
             <span class="el-dropdown-link" style="color: #409EFF;cursor: pointer;">
               更多<i class="el-icon-arrow-down el-icon--right"></i>
@@ -111,6 +112,9 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item >
                 <el-button type="text" @click="partner(scope.row)"><i class="el-icon-user"></i>成为合伙人</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item >
+                <!-- <el-button type="text" v-if="logingroupId" @click="role(scope.row)"><i class="el-icon-bell"></i>角色权限</el-button> -->
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -126,7 +130,40 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="totalCount"
     ></el-pagination>
-    <!-- total是总数据量 -->
+    <!-- 角色权限弹框 -->
+    <el-dialog
+      title="角色权限设置"
+      :visible.sync="roleDialogVisible"
+      append-to-body
+      :close-on-click-modal='false' 
+      :show-close="false"
+      width="60%">
+      <!-- <el-button type="primary" plain @click="addMenu()" style='margin:0 0 10px 0;'>新增菜单</el-button> -->
+      <el-table 
+        :data="roleData" 
+        border>
+        <el-table-column type='index' label="序号" width="100"></el-table-column>
+        <el-table-column property="roleCode" label="编码" ></el-table-column>
+        <el-table-column property="roleName" label="角色名称"></el-table-column>
+        <el-table-column
+          label="操作">
+          <template slot-scope="scope">
+            <!-- <el-button type="text" @click="delMenu(scope.row)"><i class="el-icon-edit"></i>删除</el-button> -->
+            <el-switch
+              v-model="scope.row.flag"
+              @change='changeRole(scope.row)'
+              active-color="#13ce66"
+              inactive-color="#DCDFE6">
+            </el-switch>
+          </template>
+        </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <!-- <el-button @click="roleDialogVisible = false">取 消</el-button> -->
+        <el-button type="primary" @click="roleDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -148,7 +185,11 @@ export default {
       pagesize: 5, //页面一次展示多少数据
       currentPage: 1, // 第几页
       totalCount: 0,
-      loading: true
+      loading: true,
+      roleDialogVisible:false,
+      roleData:[],
+      employeeId:'',
+      logingroupId:localStorage.getItem('groupId'),   //平台管理员不能操作角色权限
     };
   },
   // 页面渲染前拿到数据
@@ -157,6 +198,59 @@ export default {
     this.getGroup();
   },
   methods: {
+    // 角色权限点击打开弹框
+    role(row){
+      this.roleDialogVisible=true;
+      this.employeeId=row.id;
+      this.getRoleList();
+    },
+    // 查询员工角色列表
+    getRoleList(){
+      let params={
+        groupId:localStorage.getItem('groupId'),
+        employeeId:this.employeeId
+      }
+      this.axios.get('/crm/prac/list',{params})
+      .then(res=>{
+        // console.log(res.data)
+        if(res.data.code>0){
+          this.roleData=res.data.msg.datas;
+        }
+      })
+    },
+    // 改变角色绑定
+    changeRole(row){
+      if(row.flag){
+        // 绑定
+        let params={
+          employeeId:this.employeeId,
+          roleId:row.roleId
+        }
+        this.axios.post('/crm/prac/save',params)
+        .then(res=>{
+          if(res.data.code>0){
+            // console.log(res.data)
+            this.getRoleList();
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        })
+      }else{
+        // 解绑
+        let params={
+          id:row.id
+        }
+        this.axios.get('/crm/prac/delete',{params})
+        .then(res=>{
+          if(res.data.code>0){
+            // console.log(res.data)
+            this.getRoleList();
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        })
+      }
+    },
     // 成为合伙人
     partner(row){
       // console.log(row)
@@ -281,7 +375,7 @@ export default {
       .then(res=>{
         if(res.data.code>0){
           this.grouplink=res.data.msg.datas;
-          console.log(this.grouplink)
+          // console.log(this.grouplink)
         }
       })
     },

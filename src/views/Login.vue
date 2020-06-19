@@ -7,9 +7,10 @@
       ref="ruleForm"
       label-width="100px"
       class="demo-ruleForm"
-    >
+      >
       <div class="logo">
-        <img src="../assets/logo.png" width="142">
+        <!-- <img src="../assets/logo.png" width="142"> -->
+        <h2>登&nbsp;&nbsp;&nbsp;&nbsp;录</h2>
       </div>
       <el-form-item prop="username" :error="errorMsg1">
         <div class="icon">
@@ -150,8 +151,8 @@ export default {
                 })
                 return
               }
-              window.localStorage.setItem("deliver", res.data.msg.mobilephone);
-              console.log(res.data.msg.mobilephone)
+              // window.localStorage.setItem("deliver", res.data.msg.mobilephone);
+              // console.log(res.data.msg.mobilephone)
               this.$store.dispatch("setUserInfoFun",res.data.msg.username);
               localStorage.setItem("loginToken", token);
               localStorage.setItem("userInfo", JSON.stringify(res.data.msg));
@@ -220,6 +221,9 @@ export default {
   text-align: center;
   margin-bottom: 40px;
 }
+.logo h2{
+  margin:0;
+}
 .reg{
   margin-left:7%;
   font-size: 13px;
@@ -238,8 +242,11 @@ export default {
   /* background: #fff;
   border-radius: 20px;
   padding: 50px; */
-  height: 30%;
+  height: 50%;
   width:52%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 h1 {
   margin-left: -50px;

@@ -93,9 +93,15 @@
       style="width: 100%"
       @selection-change="handleSelectionChange">
       <!-- <el-table-column type="selection" width="55"></el-table-column> -->
-      <el-table-column prop="orderNo" label="订单编号"></el-table-column>
+      <el-table-column prop="orderNo" label="订单编号" width="100"></el-table-column>
       <el-table-column prop="clientName" label="下单门店"></el-table-column>
-      <el-table-column prop="createTime" label="下单时间"></el-table-column>
+      <el-table-column prop="createTime" label="下单时间" width="100"></el-table-column>
+      <el-table-column prop="partnerName" label="促销员" align="center">
+        <template  slot-scope="scope">
+          <span v-if="scope.row.partnerName">{{scope.row.partnerName}}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="customerName" label="用户信息" width="110">
         <template slot-scope="scope">
           <p v-html="scope.row.customerName"></p>
@@ -107,6 +113,7 @@
           <span v-else>-</span>
         </template>
       </el-table-column>
+      <el-table-column prop="pickUpTime" label="自提时间" width="100"></el-table-column>
       <el-table-column prop="pickupWay" label="提货方式">
         <template slot-scope="scope">
           <span v-if="scope.row.pickupWay =='2'">快递
@@ -124,13 +131,21 @@
       <!-- <el-table-column prop="payType" label="支付方式"></el-table-column> -->
       <el-table-column prop="amount" label="金额"></el-table-column>
       <el-table-column prop="fareAmount" label="运费"></el-table-column>
-      <el-table-column prop="status" label="付款状态">
+      <el-table-column prop="status" label="付款状态" align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.payed ==true" disable-transitions>已付款</span>
           <span v-if="scope.row.payed ==false" disable-transitions>未付款</span>
+          <br>
+          <el-tag v-if="scope.row.returnOrderFlag" type="danger" disable-transitions>有售后</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="订单状态">
+      <el-table-column prop="payBillCode" label="支付单号" align='center' width="110">
+        <template slot-scope="scope">
+          <span v-if="scope.row.payBillCode" disable-transitions style="text-align:left;">{{scope.row.payBillCode}}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="status" label="订单状态" align="center" width=''>
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status =='-1'" type="info" disable-transitions>已取消</el-tag>
             <el-tag v-if="scope.row.status =='0'" type="warning" disable-transitions>待付款</el-tag>
@@ -139,7 +154,7 @@
             <el-tag v-if="scope.row.status =='2' && scope.row.pickupWay=='1'" type="danger" disable-transitions>待自提</el-tag>
             <el-tag v-if="scope.row.status =='3'" type="brand" disable-transitions>待收货</el-tag>
             <el-tag v-if="scope.row.status =='4'" type="brand" disable-transitions>待评价</el-tag>
-            <el-tag v-if="scope.row.returnOrderFlag" type="info" disable-transitions>有售后</el-tag>
+            <el-tag v-if="scope.row.status =='8'" type="info" disable-transitions>交易关闭</el-tag>
           </template>
         </el-table-column>
         <!-- 自提待审核状态，0 待审核  1 确认接单 2 拒绝接单 没有分配门店默认没有值 -->
@@ -170,23 +185,23 @@
               更多<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item >
+              <!-- <el-dropdown-item >
                 <p class="pbutton" v-if="scope.row.pickupWay=='1'&& scope.row.clientConfirm!='1'  && (scope.row.status=='0'||scope.row.status=='2')" @click="manage(scope.row)">分配门店</p>
+              </el-dropdown-item> -->
+              <el-dropdown-item >
+                <p class="pbutton" v-if="scope.row.pickUpStore==clientid && scope.row.clientConfirm =='0'" @click="clientConfirm(scope.row)">自提门店确认</p> 
               </el-dropdown-item>
               <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.clientConfirm=='0'&& scope.row.pickUpStore==clientid && scope.row.status!='-1'" @click="clientConfirm(scope.row)">自提门店确认</p> 
-              </el-dropdown-item>
-              <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.pickupWay=='1' && (scope.row.status=='2'|| scope.row.status=='0')" @click="notice(scope.row)">自提通知</p>
+                <p class="pbutton" v-if="scope.row.pickupWay=='1' && scope.row.clientConfirm =='1'&&(scope.row.status=='2'|| scope.row.status=='0')" @click="notice(scope.row)">自提通知</p>
               </el-dropdown-item>
               <el-dropdown-item >
                 <p class="pbutton" v-if="scope.row.clientConfirm=='1' &&(scope.row.status == '2' && scope.row.pickupWay == '1')" @click="cancelVerification(scope.row)">确认提货</p>
               </el-dropdown-item>
               <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.status=='0' && scope.row.clientConfirm =='1'" @click="changepay(scope.row)">转线下支付</p>  
+                <p class="pbutton" v-if="scope.row.pickupWay=='1' && scope.row.payed ==false &&scope.row.clientConfirm =='1'&& scope.row.payType==1" @click="changepay(scope.row)">转线下支付</p>  
               </el-dropdown-item>
               <el-dropdown-item >
-                <p class="pbutton" v-if="scope.row.status=='2'" @click="delivery(scope.row)">发货</p> 
+                <p class="pbutton" v-if="scope.row.status=='2'&&scope.row.pickupWay=='2'" @click="delivery(scope.row)">发货</p> 
               </el-dropdown-item>
               <el-dropdown-item >
                 <p class="pbutton" v-if="scope.row.expressCode && scope.row.expressCorp" @click="delivery(scope.row)">发货信息</p>
@@ -216,11 +231,12 @@
     <!-- total是总数据量 -->
 
     <!-- 点击发货 -->
-    <el-dialog :title="deliverytitle" :visible.sync="dialogFormVisible2">
+    <el-dialog :title="deliverytitle" :visible.sync="dialogFormVisible2" :close-on-click-modal='false' :close-on-press-escape='false'>
       <el-form :model="dform" :rules="rules" label-width="100px">
         <el-form-item label="快递单号" prop="expressCode">
           <el-input v-model="dform.expressCode" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></el-input>
         </el-form-item>
+        <div style='height:20px;'></div>
         <el-form-item label="快递公司" prop="expressCorp">
           <!-- <el-input v-model="dform.expressCorp" :disabled="deliverytitle=='货运单信息'" autocomplete="off"></!--> 
           <el-select v-model="dform.expressCorp" placeholder="请选择" :disabled="deliverytitle=='货运单信息'">
@@ -374,7 +390,7 @@ export default {
       all4:0,
       all5:0,
       isCollapse: 0,   //导航按钮
-      clientid:this.$store.state.clientId,
+      clientid:sessionStorage.getItem("pickupstoreid"),
       searchParams:{
         orderTypeFlag:0,
         orderNo:"",
@@ -742,18 +758,21 @@ export default {
     submit2(){
       this.dialogFormVisible2=false;
       let params=this.dform;
-      this.axios.get('/b2c/order/delivery',{params})
-      .then(res=>{
-        if(res.data.code>0){
-          this.$message({
-            message: res.data.msg,
-            type: 'success'
-          })
-          this.getDataList();
-        }else{
-          this.$message.error('请核运单信息是否正确');
-        }
-      })
+      if(this.deliverytitle=='请输入货运单信息'){
+        this.axios.get('/b2c/order/delivery',{params})
+        .then(res=>{
+          if(res.data.code>0){
+            this.$message({
+              message: res.data.msg,
+              type: 'success'
+            })
+            this.getDataList();
+          }else{
+            this.$message.error('请核运单信息是否正确');
+          }
+        })
+      }
+      
     },
     // 指定门店信息保存提交
     submit(){
@@ -867,8 +886,10 @@ export default {
                   item.receiver=item.receiver+'<br/>'+item.linkCall+'<br/>'+item.province+item.city+item.county+item.address;
                 
               }
-              if(item.customerName){
-                item.customerName=item.customerName+'<br/>'+item.customMobile
+              if(item.customerName && item.customerPhone){
+                item.customerName=item.customerName+'<br/>'+item.customerPhone
+              }else if(item.customerPhone){
+                item.customerName=item.customerPhone
               }
               item.amount=item.amount.toFixed(2);
             }
@@ -929,6 +950,9 @@ td {
 }
 .searchbox{
   font-size: 14px;
+}
+.el-form-item{
+  margin-bottom:0;
 }
 </style>
 

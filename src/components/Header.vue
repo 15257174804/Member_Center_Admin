@@ -165,6 +165,9 @@ export default {
       // 清除token
       localStorage.removeItem("loginToken");
       localStorage.removeItem("userInfo");
+      localStorage.removeItem("groupId");
+      localStorage.removeItem("menu");
+      sessionStorage.removeItem("pickupstoreid");
       this.$router.push("/login");
     },
     // 面包屑

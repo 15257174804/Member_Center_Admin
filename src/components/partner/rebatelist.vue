@@ -140,6 +140,7 @@ export default {
           // console.log(res.data)
           if(res.data.code>0){
             this.$message.success('佣金核算成功')
+            this.getData();
           }
         })
       }).catch(()=>{

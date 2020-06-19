@@ -87,6 +87,7 @@ const router = new Router({
         { path: "/recordlist", name: "recordlist", meta: { title: '提现记录' ,keepAlive: false}, component: () => import('./components/partner/recordlist.vue') },
         // 权限管理
         { path: "/power",name: "power",meta: {title:"菜单权限"},component: () => import('./components/set/power.vue')},
+        { path: "/rolePower",name: "rolePower",meta: {title:"角色权限"},component: () => import('./components/set/rolePower.vue')},
       ]
     },
     { path: "/header", component: () => import('./components/Header.vue') },
@@ -128,15 +129,6 @@ router.beforeEach((to, from, next) => {
     to.meta.keepAlive = false;  // 让 列表页 即不缓存，刷新
     next();
   }
-  // 企业编辑->企业列表
-  // if(to.path === '/company' && from.path === '/companyadd'){
-  //   to.meta.keepAlive = true;  // 让 列表页 缓存，即不刷新
-  //   next();
-  // }else {
-  //   to.meta.keepAlive = false;  // 让 列表页 即不缓存，刷新
-  //   next();
-  // }
-
 
 })
 

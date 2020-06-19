@@ -3,211 +3,208 @@
     <el-container style="border: 1px solid #eee,width:220px;">
       <el-aside id="elaside" width="220px">
         <el-menu :default-openeds="['1', '1']">
-          <div v-for="(v,i) in menu" :key=i>
-            <!-- <template v-if="v.items.length == 0">
-              <router-link to="v.link">
-                <el-submenu index="i">
+          <div v-if='groupId'>
+            <el-submenu index="0">
+              <div style="height:5px;"></div>
+            </el-submenu>
+
+            <div v-for="(val,index) in menu" :key='index'>
+              <router-link :to="val.link">
+                <el-submenu :index="val.sort.toString()" >
                   <template slot="title">
-                    <i :class="v.icon"></i>
-                    {{v.title}}
+                    <i :class="val.icon"></i>{{val.name}}
                   </template>
+                  <el-menu-item-group v-if="flodKey != 1">
+                    <router-link v-for='(v,i) of val.childNotes' :key='i' :to="v.link">
+                      <el-menu-item :index="(val.sort+'-'+v.sort)">{{v.name}}</el-menu-item>
+                    </router-link>
+                  </el-menu-item-group>
                 </el-submenu>
               </router-link>
-            </template> -->
-            <!-- <template v-else>
-              <el-submenu index="11">
-                <template slot="title">
-                  <i class="el-icon-share"></i>组织架构管理
-                </template>
-                <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-                  <router-link to="/company">
-                    <el-menu-item index="11-1">我的企业</el-menu-item>
-                  </router-link>
-                  <router-link to="/employee">
-                    <el-menu-item index="11-2">我的员工</el-menu-item>
-                  </router-link>
-                  <router-link to="/customer">
-                    <el-menu-item index="11-3">我的会员</el-menu-item>
-                  </router-link>
-                </el-menu-item-group>
-              </el-submenu>
-            </template> -->
+            </div>
+
           </div>
-          <el-submenu index="0">
-            <div style="height:5px;"></div>
-          </el-submenu>
 
-          <router-link to="/home">
-            <el-submenu index="1">
-              <template slot="title">
-                <i class="el-icon-s-home"></i>
-                首页
-              </template>
+          <div v-else>
+
+            <el-submenu index="0">
+              <div style="height:5px;"></div>
             </el-submenu>
-          </router-link>
 
-          <!-- <router-link to="/driver">
-            <el-submenu index="2">
+            <router-link to="/home">
+              <el-submenu index="1">
+                <template slot="title">
+                  <i class="el-icon-s-home"></i>
+                  首页
+                </template>
+              </el-submenu>
+            </router-link>
+
+            <router-link to="/driver">
+              <el-submenu index="2">
+                <template slot="title">
+                  <i class="el-icon-s-flag"></i>引导指南
+                </template>
+              </el-submenu>
+            </router-link>
+
+            <el-submenu index="11" >
               <template slot="title">
-                <i class="el-icon-s-flag"></i>引导指南
+                <i class="el-icon-share"></i>组织架构管理
               </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/company">
+                  <el-menu-item index="11-1">我的企业</el-menu-item>
+                </router-link>
+                <router-link to="/employee">
+                  <el-menu-item index="11-2">我的员工</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
             </el-submenu>
-          </router-link> -->
 
-          <el-submenu index="11" >
-            <template slot="title">
-              <i class="el-icon-share"></i>组织架构管理
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/company">
-                <el-menu-item index="11-1">我的企业</el-menu-item>
-              </router-link>
-              <router-link to="/employee">
-                <el-menu-item index="11-2">我的员工</el-menu-item>
-              </router-link>
-            </el-menu-item-group>
-          </el-submenu>
+            <el-submenu index="12">
+              <template slot="title">
+                <i class="el-icon-s-goods"></i>商品管理
+              </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/good">
+                  <el-menu-item index="12-1">商品列表</el-menu-item>
+                </router-link>
+                <router-link to="/goodpresell">
+                  <el-menu-item index="12-2">预约管理</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
+            </el-submenu>
 
-          <el-submenu index="12">
-            <template slot="title">
-              <i class="el-icon-s-goods"></i>商品管理
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/good">
-                <el-menu-item index="12-1">商品列表</el-menu-item>
-              </router-link>
-              <!-- <router-link to="/presell">
-                <el-menu-item index="12-2">商品预售</el-menu-item>
-              </router-link> -->
-              <router-link to="/goodpresell">
-                <el-menu-item index="12-2">预约管理</el-menu-item>
-              </router-link>
-            </el-menu-item-group>
-          </el-submenu>
+            <el-submenu index="13">
+              <template slot="title">
+                <i class="el-icon-s-grid"></i>订单管理
+              </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/order">
+                  <el-menu-item index="13-1">订单列表</el-menu-item>
+                </router-link>
+                <router-link to="/preorder">
+                  <el-menu-item index="13-2">预约订单</el-menu-item>
+                </router-link>
+                <router-link to="/count">
+                  <el-menu-item index="13-3">预约汇总</el-menu-item>
+                </router-link>
+                <router-link to="/refund">
+                  <el-menu-item index="13-4">退款管理</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
+            </el-submenu>
 
-          <el-submenu index="13">
-            <template slot="title">
-              <i class="el-icon-s-grid"></i>订单管理
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/order">
-                <el-menu-item index="13-1">订单列表</el-menu-item>
-              </router-link>
-              <router-link to="/preorder">
-                <el-menu-item index="13-2">预约订单</el-menu-item>
-              </router-link>
-              <router-link to="/count">
-                <el-menu-item index="13-3">预约汇总</el-menu-item>
-              </router-link>
-              <router-link to="/refund">
-                <el-menu-item index="13-4">退款管理</el-menu-item>
-              </router-link>
-            </el-menu-item-group>
-          </el-submenu>
+            <el-submenu index="14">
+              <template slot="title">
+                <i class="el-icon-s-ticket"></i>营销活动
+              </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/timelimited">
+                  <el-menu-item index="14-1">限时抢购</el-menu-item>
+                </router-link>
+                <router-link to="/fulldiscount">
+                  <el-menu-item index="14-2">优惠券</el-menu-item>
+                </router-link>
+                <router-link to="/reduce">
+                  <el-menu-item index="14-3">满减满赠</el-menu-item>
+                </router-link>
+                <router-link to="/commodityGroup">
+                  <el-menu-item index="14-4">商品组</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
+            </el-submenu>
 
-          <el-submenu index="14">
-            <template slot="title">
-              <i class="el-icon-s-ticket"></i>营销活动
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/timelimited">
-                <el-menu-item index="14-1">限时抢购</el-menu-item>
-              </router-link>
-              <router-link to="/fulldiscount">
-                <el-menu-item index="14-2">优惠券</el-menu-item>
-              </router-link>
-              <router-link to="/reduce">
-                <el-menu-item index="14-3">满减满赠</el-menu-item>
-              </router-link>
-              <router-link to="/commodityGroup">
-                <el-menu-item index="14-4">商品组</el-menu-item>
-              </router-link>
-            </el-menu-item-group>
-          </el-submenu>
+            <el-submenu index="15">
+              <template slot="title">
+                <i class="el-icon-s-shop"></i>积分商城
+              </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/integralset">
+                  <el-menu-item index="15-1">积分设置</el-menu-item>
+                </router-link>
+                <router-link to="/integralgood">
+                  <el-menu-item index="15-2">兑换商品</el-menu-item>
+                </router-link>
+                <router-link to="/customlist">
+                  <el-menu-item index="15-3">会员列表</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
+            </el-submenu>
 
-          <el-submenu index="15">
-            <template slot="title">
-              <i class="el-icon-s-shop"></i>积分商城
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/integralset">
-                <el-menu-item index="15-1">积分设置</el-menu-item>
-              </router-link>
-              <router-link to="/integralgood">
-                <el-menu-item index="15-2">兑换商品</el-menu-item>
-              </router-link>
-              <router-link to="/customlist">
-                <el-menu-item index="15-3">会员列表</el-menu-item>
-              </router-link>
-            </el-menu-item-group>
-          </el-submenu>
+            <el-submenu index="16">
+              <template slot="title">
+                <i class="el-icon-s-tools"></i>基础设置
+              </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/classify">
+                  <el-menu-item index="16-1">商品分类</el-menu-item>
+                </router-link>
+                <router-link to="/freight">
+                  <el-menu-item index="16-2">运费管理</el-menu-item>
+                </router-link>
+                <router-link to="/bannerlist">
+                  <el-menu-item index="16-3">广告管理</el-menu-item>
+                </router-link>
+                <router-link to="/newslist">
+                  <el-menu-item index="16-4">公告管理</el-menu-item>
+                </router-link>
+                <router-link to="/markset">
+                  <el-menu-item index="16-5">标签管理</el-menu-item>
+                </router-link>
+                <router-link to="/floortype">
+                  <el-menu-item index="16-6">楼层类型</el-menu-item>
+                </router-link>
+                
+              </el-menu-item-group>
+            </el-submenu>
 
-          <el-submenu index="16">
-            <template slot="title">
-              <i class="el-icon-s-tools"></i>基础设置
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/classify">
-                <el-menu-item index="16-1">商品分类</el-menu-item>
-              </router-link>
-              <router-link to="/freight">
-                <el-menu-item index="16-2">运费管理</el-menu-item>
-              </router-link>
-              <router-link to="/bannerlist">
-                <el-menu-item index="16-3">广告管理</el-menu-item>
-              </router-link>
-              <router-link to="/newslist">
-                <el-menu-item index="16-4">公告管理</el-menu-item>
-              </router-link>
-              <router-link to="/markset">
-                <el-menu-item index="16-5">标签管理</el-menu-item>
-              </router-link>
-              <router-link to="/floortype">
-                <el-menu-item index="16-6">楼层类型</el-menu-item>
-              </router-link>
-              
-            </el-menu-item-group>
-          </el-submenu>
+            <el-submenu index="17">
+              <template slot="title">
+                <i class="el-icon-user-solid"></i>合伙人
+              </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/rebateset">
+                  <el-menu-item index="17-1">返利设置</el-menu-item>
+                </router-link>
+                <router-link to="/partnerlist">
+                  <el-menu-item index="17-2">合伙人列表</el-menu-item>
+                </router-link>
+                <router-link to="/recordlist">
+                  <el-menu-item index="17-3">提现管理</el-menu-item>
+                </router-link>
+                <router-link to="/rebatelist">
+                  <el-menu-item index="17-4">返利明细</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
+            </el-submenu>
 
-          <el-submenu index="17">
-            <template slot="title">
-              <i class="el-icon-user-solid"></i>合伙人
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/rebateset">
-                <el-menu-item index="17-1">返利设置</el-menu-item>
-              </router-link>
-               <router-link to="/partnerlist">
-                <el-menu-item index="17-2">合伙人列表</el-menu-item>
-              </router-link>
-              <router-link to="/recordlist">
-                <el-menu-item index="17-3">提现管理</el-menu-item>
-              </router-link>
-              <router-link to="/rebatelist">
-                <el-menu-item index="17-4">返利明细</el-menu-item>
-              </router-link>
-            </el-menu-item-group>
-          </el-submenu>
-          <el-submenu index="18">
-            <template slot="title">
-              <i class="el-icon-user-solid"></i>权限管理
-            </template>
-            <el-menu-item-group v-if="this.$store.state.flodKey != 1">
-              <router-link to="/power">
-                <el-menu-item index="16-7">菜单权限</el-menu-item>
-              </router-link>
-               
-            </el-menu-item-group>
-          </el-submenu>
-          <router-link to="/complain" v-if="this.$store.state.group_name=='平台管理员'">
             <el-submenu index="18">
               <template slot="title">
-                <i class="el-icon-s-comment"></i>意见反馈
+                <i class="el-icon-message-solid"></i>权限管理
               </template>
+              <el-menu-item-group v-if="this.$store.state.flodKey != 1">
+                <router-link to="/power">
+                  <el-menu-item index="18-1">菜单权限</el-menu-item>
+                </router-link>
+                <router-link to="/rolePower">
+                  <el-menu-item index="18-2">角色权限</el-menu-item>
+                </router-link>
+              </el-menu-item-group>
             </el-submenu>
-          </router-link>
 
-          <el-submenu index="15">
+            <router-link to="/complain">
+              <el-submenu index="18">
+                <template slot="title">
+                  <i class="el-icon-s-comment"></i>意见反馈
+                </template>
+              </el-submenu>
+            </router-link>
+
+          </div>
+
+          <el-submenu index="25">
             <div style="height:150px;"></div>
           </el-submenu>
           
@@ -229,52 +226,21 @@ export default {
   name: "sidebar",
   data() {
     return {
-      menu:[
-        {
-          title: '首页',
-          icon: 'el-icon-s-home',
-          link: '/home',
-          items: []
-        },
-        {
-          title: '引导指南',
-          icon: 'el-icon-s-flag',
-          link: '/driver',
-          items: []
-        },
-        {
-          title: '组织架构管理',
-          icon: 'el-icon-share',
-          link: '',
-          items: [
-            {title: '我的企业',link: '/company'},
-            {title: '我的员工',link: '/employee'},
-            {title: '我的会员',link: '/customer'}
-          ]
-        },
-        {
-          title: '商品管理',
-          icon: 'el-icon-s-goods',
-          link: '',
-          items: [
-            {title: '商品列表',link: '/good'},
-            {title: '商品预售',link: '/presell'}
-          ]
-        },
-        {
-          title: '订单管理',
-          icon: 'el-icon-s-goods',
-          items: [
-            {title: '订单列表',link: '/order'}
-          ]
-        },
-      ],
-      deliver:window.localStorage.getItem('deliver')
+      menu:JSON.parse(localStorage.getItem("menu")),
+      groupId:localStorage.getItem('groupId'),
+      flodKey:0,
     };
   },
   mounted() {
-    let d=window.localStorage.getItem('deliver')
-    console.log(d)
+    this.flodKey=this.$store.state.flodKey
+    // let d=window.localStorage.getItem('deliver')
+    // console.log(d)
+    // let meun=JSON.parse(localStorage.getItem("menu"));
+  },
+  watch:{
+    '$store.state.flodKey'(val,oldVal){
+      this.flodKey=this.$store.state.flodKey
+    }
   }
 };
 </script>
@@ -357,7 +323,7 @@ export default {
   bottom: 0;
   margin: auto;
   background: #ffffff;
-  width: calc(100% - 220px) !important;
+  /* width: calc(100% - 220px) !important; */
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   overflow-y: scroll;
   transition: 1s;

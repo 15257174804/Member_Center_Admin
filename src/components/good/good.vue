@@ -109,6 +109,7 @@
           <span>{{scope.$index+(currentPage - 1) * pagesize + 1}} </span>
         </template>
       </el-table-column> 
+      <el-table-column prop="goodCode" label="商品编码"></el-table-column>
       <el-table-column prop="backImg" label="图片" width="100" align="center" >
           <template slot-scope="scope">
             <img v-if="scope.row.imgUrl" style="width:60px;height:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl">
