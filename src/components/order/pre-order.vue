@@ -137,6 +137,8 @@
         <template slot-scope="scope">
           <el-tag v-if="scope.row.payed ==true" type="brand" disable-transitions>已付款</el-tag>
           <el-tag v-if="scope.row.payed ==false" type="brand" disable-transitions>未付款</el-tag>
+          <br>
+          <el-tag v-if="scope.row.returnOrderFlag" type="danger" disable-transitions>有售后</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="status" label="订单状态">
@@ -150,7 +152,6 @@
             <el-tag v-if="scope.row.status =='4'" type="warning" disable-transitions>待评价</el-tag>
             <el-tag v-if="scope.row.status =='5'" type="danger" disable-transitions>待审核</el-tag>
             <el-tag v-if="scope.row.status =='7'" type="info" disable-transitions>审核不通过</el-tag>
-            <el-tag v-if="scope.row.returnOrderFlag" type="info" disable-transitions>有售后</el-tag>
           </template>
       </el-table-column>
       <!-- 自提待审核状态，0 待审核  1 确认接单 2 拒绝接单 没有分配门店默认没有值 -->

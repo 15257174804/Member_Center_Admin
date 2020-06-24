@@ -214,7 +214,8 @@
       // 获取商品类别
       getClass(){
         let params={
-          status:1
+          status:1,
+          pagesize:0
         }
 
         this.axios.get('/b2c/classify/list',{params})
