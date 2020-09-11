@@ -103,7 +103,7 @@
       label="操作"
       width="250">
         <template slot-scope="scope">
-          <el-button type="text" @click="edit(scope.row)"><i class="el-icon-edit"></i>编辑</el-button>
+          <el-button type="text" @click="edit(scope.row)" style="margin-right:13px;"><i class="el-icon-edit"></i>编辑</el-button>
           <el-button type="text" v-if="logingroupId" @click="role(scope.row)" style="margin-right:13px;"><i class="el-icon-bell"></i>角色权限</el-button>
           <el-dropdown trigger="click">
             <span class="el-dropdown-link" style="color: #409EFF;cursor: pointer;">

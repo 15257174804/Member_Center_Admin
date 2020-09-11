@@ -61,6 +61,27 @@
         </template>
       </el-table-column> 
       <el-table-column prop="name" label="企业名称" width="250"></el-table-column>
+      <el-table-column prop="name" label="企业二维码" width="120">
+        <template slot-scope="scope">
+          <!-- <img style="display:block;cursor:pointer;" src="../../assets/qrcode.png" alt="" @mouseenter="showQr(scope.row)" @mouseleave="hidQr"> -->
+          
+          <el-dropdown  trigger="click" placement="bottom">
+            <span class="el-dropdown-link">
+              <img style="display:block;cursor:pointer;" src="../../assets/qrcode.png" alt="" @click="showQr(scope.row)">
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>
+                <img style="width:100px;height:100px;vertical-align: middle;" :src="qrUrl" alt="" :onerror='defaultImg'>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+          
+          <!-- <div style="width:100px;height:100px;background:#faa;display:none;float:left;z-index:999;" @mouseenter="showQr(scope.row)" @mouseleave="hidQr" v-show="qrimg===scope.row.id &&qrUrl">
+            <img style="width:100%;height:100%;" :src="qrUrl" alt="" :onerror='defaultImg'>
+          </div> -->
+          <!-- position:absolute;top: 72px;left: 54px; -->
+        </template>
+      </el-table-column>
       <el-table-column prop="type" label="企业类型" width="200">
         <template slot-scope="scope">
           <span v-if='scope.row.type==1'>集团</span>
@@ -108,9 +129,9 @@
         </template>
       </el-table-column>
       <el-table-column
-      fixed="right"
-      label="操作"
-      width="250">
+        fixed="right"
+        label="操作"
+        width="250">
         <template slot-scope="scope">
           <el-button type="text" @click="edit(scope.row,'basicInfo')"><i class="el-icon-edit"></i>编辑</el-button>
           <el-button type="text" @click="onBusiness(scope.row)" style="margin-right:13px;"><i class="el-icon-refresh"></i>营业修改</el-button>
@@ -243,6 +264,7 @@
 
 
 <script>
+import global_ from '../../api/global'
 export default {
   name: "company",
   data() {
@@ -276,9 +298,32 @@ export default {
       menuLink:[],
       loading2:false,
       logingroupId:localStorage.getItem('groupId'),
+      qrimg:-1,
+      qrUrl:'',
+      defaultImg:'this.src="'+require('../../assets/nopicture.png')+'"',
     };
   },
   methods: {
+    // 显示店铺二维码
+    showQr(row){
+      console.log(row)
+      // this.qrimg=row.id;
+      let params={
+        url:global_.baseURL+"/?source=clientIdQr&clientId="+row.id,
+        logoUrl:global_.baseURL +'/b2c/image/'+row.logo,
+        size:800
+      }
+      this.axios.post('/crm/qr',params)
+      .then(res=>{
+        console.log(res.data)
+        if(res.data.code>0){
+          this.qrUrl=res.data.msg;
+        }
+      })
+    },
+    hidQr(){
+      this.qrimg=-1;
+    },
     // 企业权限管理-平台
     power(row){
       // console.log(row)
@@ -613,6 +658,9 @@ td {
 }
 .searchbox{
   font-size: 14px;
+}
+.el-dropdown-menu__item{
+  padding:0 10px;
 }
 </style>
 

@@ -290,7 +290,7 @@ export default {
       }else if(val==3){
         this.$router.push({path:'/order',query: {flag:'3',pickupWay:'1'}})
       }else if(val==4){
-        this.$router.push({path:'/preorder',query: {flag:true,status:'5'}})
+        this.$router.push({path:'/preorder',query: {flag:'1',status:'5'}})
       }else if(val==5){
         this.$router.push({path:'/order',query: {flag:'4',clientConfirm:'0'}})
       }else{
@@ -774,7 +774,7 @@ export default {
       .rank{
         width:93%;height:400px;
         background-color: #fafafa;
-        padding:14px 0 0 14px;
+        padding:14px;
         border-radius: 13px;
         // 销量排行的标题栏
         div:first-child{

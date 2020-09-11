@@ -11,20 +11,6 @@
         商品名称：
         <el-input v-model="searchParams.goodName" placeholder="请输入商品名称" :style="{width:'180px',height:'40px'}"></el-input>
       </div>
-
-      <!-- <div class="searchbox">
-        <div class="block">
-          起始时间：
-          <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期"></el-date-picker>
-        </div>
-      </div>
-      <div class="searchbox">
-        <div class="block">
-          截止日期：
-          <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期"></el-date-picker> 
-        </div>
-      </div> -->
-
       <el-form status-icon :rules="rules2" style="display:inline-block;">
         <el-form-item  style="display:inline-block;">
           <div class="searchbox">

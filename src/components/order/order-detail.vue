@@ -65,17 +65,22 @@
               <img style="height:60px;width:60px;" :src="axios.defaults.baseURL + '/b2c/image/' + scope.row.imgUrl" alt="">
             </template>
         </el-table-column>
-        <el-table-column prop="goodName" label="商品名称"></el-table-column>
+        <el-table-column prop="goodName" label="商品名称">
+          <template slot-scope="scope">
+            <span style="margin-right:10px;display:inline-block;">{{scope.row.goodName}}</span>
+            <el-tag v-if="scope.row.giftsFlag" type="danger">赠品</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="spec" label="规格" width="120"></el-table-column>
         <el-table-column prop="price" label="单价" width="100"></el-table-column>
         <el-table-column prop="quantity" label="数量" width="100"></el-table-column>
         <!-- ************************************************************************************************** -->
         <el-table-column prop="orderDetailStatus" label="明细状态" width="160">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.orderDetailStatus==0">进行中</el-tag>
-            <el-tag v-if="scope.row.orderDetailStatus==1" type="success">已完成</el-tag>
-            <el-tag v-if="scope.row.orderDetailStatus==2" type="danger">售后中</el-tag>
-            <el-tag v-if="scope.row.orderDetailStatus==3" type="info">已退款</el-tag>
+            <el-tag v-if="scope.row.orderDetailStatus==0 && !scope.row.giftsFlag">进行中</el-tag>
+            <el-tag v-if="scope.row.orderDetailStatus==1 && !scope.row.giftsFlag" type="success">已完成</el-tag>
+            <el-tag v-if="scope.row.orderDetailStatus==2 && !scope.row.giftsFlag" type="danger">售后中</el-tag>
+            <el-tag v-if="scope.row.orderDetailStatus==3 && !scope.row.giftsFlag" type="info">已退款</el-tag>
           </template>
         </el-table-column>
       </el-table>

@@ -9,6 +9,20 @@
         会员信息：
         <el-input v-model="searchParams.cardNo" placeholder="如卡号、会员名、手机号等" :style="{width:'250px',height:'40px'}"></el-input>
       </div>
+      <el-form status-icon :rules="rules2">
+        <el-form-item  style="display:inline-block;">
+          <div class="searchbox">
+            起始时间：
+            <el-date-picker v-model="searchParams.startTime" type="date" placeholder="开始日期" :style="{width:'160px',height:'40px'}" :picker-options='pickerOptions'></el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item prop="endTime" style="display:inline-block;">
+          <div class="searchbox">
+            截止日期：
+            <el-date-picker v-model="searchParams.endTime" type="date" placeholder="结束日期" :style="{width:'160px',height:'40px'}"></el-date-picker> 
+          </div>
+        </el-form-item>
+      </el-form>
       <div class="searchbox">
         <el-button type="primary" @click="search()">
           <i class="el-icon-zoom-in"></i>
@@ -30,6 +44,8 @@
       :row-class-name="tableRowClassName">
       <el-table-column type="index" label="序号" width="60"></el-table-column>
       <el-table-column prop="cardNo" label="会员卡号" ></el-table-column>
+      <el-table-column prop="registTime" label="注册时间" width="105"></el-table-column>
+      <el-table-column prop="clientName" label="所属门店" ></el-table-column>
       <el-table-column prop="baseInfo.username" label="会员名"></el-table-column>  
       <el-table-column prop="baseInfo.sex" label="性别"></el-table-column>  
       <el-table-column prop="baseInfo.mobilephone" label="手机号"></el-table-column>
@@ -163,6 +179,14 @@
 export default {
   name:'customlist',
   data(){
+    var validatePass = (rule, value, callback) => {
+      // console.log(this.searchParams.endTime)
+        if (Date.parse(this.searchParams.endTime)<Date.parse(this.searchParams.startTime)) {
+          return callback(new Error('截止日期不能早于开始日期'));
+        }else{
+          callback();
+        }
+    };
     return {
       searchParams:{
         cardNo:"",
@@ -178,7 +202,10 @@ export default {
       totalCount:0,
       searchParams2:{
         keyword:"",
-        status:'1'
+        status:'1',
+        clientId:'',
+        startTime:'',
+        endTime:''
       },
       dataList2: [],
       pagesize2: 5, //页面一次展示多少数据
@@ -188,7 +215,17 @@ export default {
       dialogVisiblelook:false,
       labelList:[],
       customerUserId:'',
-      customerId:''
+      customerId:'',
+      rules2:{
+        endTime:[
+          { validator: validatePass, trigger: 'change' }
+        ]
+      },
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      },
     }
   },
   methods:{
@@ -354,6 +391,11 @@ export default {
     }
   },
   mounted(){
+    if(this.$route.query.flag=='2'){
+      this.searchParams.clientId=this.$route.query.clientId;
+      this.searchParams.startTime=this.$route.query.startTime;
+      this.searchParams.endTime=this.$route.query.endTime;
+    }
     this.getData();
   }
 }
@@ -362,5 +404,8 @@ export default {
 <style>
 .searchbox{
   font-size: 14px;
+}
+.el-form{
+  display: inline-block;
 }
 </style>

@@ -50,6 +50,7 @@ const router = new Router({
         // 预约商品统计汇总
         { path: "/count", name: "count", meta: { title: '预约产品统计汇总' ,keepAlive: false}, component: () => import('./components/order/count.vue') },
         { path: "/refund", name: "refund", meta: { title: '退款管理',keepAlive: false }, component: () => import('./components/order/refund.vue') },
+        { path: "/orderTotal", name: "orderTotal", meta: { title: '订单汇总' ,keepAlive: false}, component: () => import('./components/order/orderTotal.vue') },
         // 营销活动   限时抢购
         { path: "/timelimited", name: "timelimited", meta: { title: '限时抢购',keepAlive: true }, component: () => import('./components/activity/timeLimited.vue') },
         { path: "/limiteddetail", name: "limiteddetail", meta: { title: '限时抢购详情',keepAlive: false }, component: () => import('./components/activity/limiteddetail.vue') },
@@ -80,6 +81,8 @@ const router = new Router({
         //会员列表
         { path: "/customlist", name: "customlist", meta: { title: '会员列表',keepAlive: false }, component: () => import('./components/integral/customlist.vue') },
         { path: "/customdetial", name: "customdetial", meta: { title: '会员详情' ,keepAlive: false}, component: () => import('./components/integral/customdetial.vue') },
+        { path: "/integralList", name: "integralList", meta: { title: '积分订单列表' ,keepAlive: false}, component: () => import('./components/integral/integralList.vue') },
+        { path: "/customtotal", name: "customtotal", meta: { title: '会员统计',keepAlive: false }, component: () => import('./components/integral/customTotal.vue') },
         //合伙人
         { path: "/rebateset", name: "rebateset", meta: { title: '返利设置',keepAlive: false }, component: () => import('./components/partner/rebateset.vue') },
         { path: "/rebatelist", name: "rebatelist", meta: { title: '返利明细' ,keepAlive: false}, component: () => import('./components/partner/rebatelist.vue') },

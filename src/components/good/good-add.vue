@@ -292,7 +292,8 @@
         this.axios.get("/b2c/product/good/findbyid", {params})
           .then(res => {
             this.form = res.data.msg;
-            this.form.weight=this.form.weight*1000
+            this.form.weight=this.form.weight*1000;
+            this.form.goodsClass=Number(this.form.goodsClass);
             this.getfileList();
           })
           .catch(err => {

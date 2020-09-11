@@ -7,13 +7,13 @@
 
     <!-- 订单状态导航 -->
     <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;" @change="chooseOrderStatus">
-      <el-radio-button :label="0" >全部订单({{all}})</el-radio-button>
+      <el-radio-button :label="8" >全部订单({{all}})</el-radio-button>
       <el-radio-button :label="5" >待审核({{all1}})</el-radio-button>
       <!-- <el-radio-button :label="6" >审核完成</el-radio-button> -->
-      <el-radio-button :label="1" >待付款({{all2}})</el-radio-button>
+      <el-radio-button :label="0" >待付款({{all2}})</el-radio-button>
       <el-radio-button :label="2" >待发货/待自提({{all3}})</el-radio-button>
       <el-radio-button :label="3" >待收货({{all4}})</el-radio-button>
-      <el-radio-button :label="4" >交易成功({{all5}})</el-radio-button>
+      <el-radio-button :label="1" >交易成功({{all5}})</el-radio-button>
       <!-- <el-radio-button :label="6" >自提待确认{{all6}}</el-radio-button> -->
     </el-radio-group>
 
@@ -409,7 +409,7 @@ export default {
         pass:'是',
         opinion:''
       },
-      isCollapse: 0,   //导航按钮
+      isCollapse: 8,   //导航按钮
       searchParams:{  //保存搜索框中的内容
         orderTypeFlag:1,  //订单类型  1代表是预约订单
         orderNo:'',  //订单编号
@@ -779,13 +779,13 @@ export default {
     // 点击订单状态导航，获取对应状态的订单，全部订单  待付款  待发货  待收货
     chooseOrderStatus(value){
       // alert(value)
-      if(value==1){   //待付款
+      if(value==0){   //待付款
         this.searchParams.status=0;
       }else if(value==2){  //待发货
         this.searchParams.status=2;
       }else if(value==3){  //待收货
         this.searchParams.status=3;
-      }else if(value==4){  //交易完成
+      }else if(value==1){  //交易完成
         this.searchParams.status=1;
       }else if(value==5){  //待审核
         this.searchParams.status=5;
@@ -908,11 +908,16 @@ export default {
     },
   },
   mounted(){
-    if(this.$route.query.flag){
+    if(this.$route.query.flag=='1'){
       if(this.$route.query.status){
-        this.searchParams.status=this.$route.query.status
-        this.isCollapse=this.$route.query.status
+        this.searchParams.status=this.$route.query.status;
+        this.isCollapse=this.$route.query.status;
       }
+    }else if(this.$route.query.flag=='2'){
+      this.searchParams.status=this.$route.query.status;
+      this.isCollapse=this.$route.query.status;
+      this.searchParams.startTime=this.$route.query.startTime;
+      this.searchParams.endTime=this.$route.query.endTime;
     }
     this.getList();
     this.getAllNum();

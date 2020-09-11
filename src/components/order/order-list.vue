@@ -5,15 +5,16 @@
     </div>
     <!-- 订单状态导航 -->
     <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;" @change="chooseOrderStatus">
-      <el-radio-button :label="0" >全部订单({{all}})</el-radio-button>
+      <el-radio-button :label="8" >全部订单({{all}})</el-radio-button>
       <!-- <el-radio-button :label="5" >待审核{{all1}}</el-radio-button> -->
       <!-- <el-radio-button :label="6" >审核完成</el-radio-button> -->
-      <el-radio-button :label="1" >待付款({{all2}})</el-radio-button>
+      <el-radio-button :label="0" >待付款({{all2}})</el-radio-button>
       <el-radio-button :label="2" >待发货/待自提({{all3}})</el-radio-button>
       <el-radio-button :label="3" >待收货({{all4}})</el-radio-button>
-      <el-radio-button :label="4" >交易成功({{all5}})</el-radio-button>
+      <el-radio-button :label="1" >交易成功({{all5}})</el-radio-button>
       <!-- <el-radio-button :label="6" >自提待确认{{all6}}</el-radio-button> -->
     </el-radio-group>
+
      <!-- search -->
     <div class="search">
       <!-- 订单号 -->
@@ -174,9 +175,9 @@
       </el-table-column>
       <!-- <el-table-column prop="address" label="地址"></el-table-column> -->
       <el-table-column
-      fixed="right"
-      label="操作"
-      width="150">
+        fixed="right"
+        label="操作"
+        width="150">
         <template slot-scope="scope">
           <p class="pbutton" @click="showDetail(scope.row)" style="margin-right:13px;"><i class="el-icon-edit"></i>详情</p>
 
@@ -389,7 +390,7 @@ export default {
       all3:0,
       all4:0,
       all5:0,
-      isCollapse: 0,   //导航按钮
+      isCollapse: 8,   //导航按钮
       clientid:sessionStorage.getItem("pickupstoreid"),
       searchParams:{
         orderTypeFlag:0,
@@ -445,16 +446,23 @@ export default {
   mounted() {
     if(this.$route.query.flag=='1'){
       this.searchParams.status=this.$route.query.status;
+      this.isCollapse=this.$route.query.status;
       this.searchParams.pickupWay=this.$route.query.pickupWay;
       this.isCollapse=this.$route.query.status
     }else if(this.$route.query.flag=='2'){
       this.searchParams.status=this.$route.query.status;
+      this.isCollapse=this.$route.query.status;
       this.searchParams.pickupWay=this.$route.query.pickupWay;
       this.isCollapse=this.$route.query.status
     }else if(this.$route.query.flag=='3'){
       this.searchParams.pickupWay=this.$route.query.pickupWay;
     }else if(this.$route.query.flag=='4'){
       this.searchParams.clientConfirm=this.$route.query.clientConfirm;
+    }else if(this.$route.query.flag=='5'){
+      this.searchParams.status=this.$route.query.status;
+      this.isCollapse=this.$route.query.status;
+      this.searchParams.startTime=this.$route.query.startTime;
+      this.searchParams.endTime=this.$route.query.endTime;
     }
     this.getDataList();
     this.getAllNum();
@@ -619,13 +627,13 @@ export default {
     // 点击订单状态导航，获取对应状态的订单，全部订单  待付款  待发货  待收货
     chooseOrderStatus(value){
       // alert(value)
-      if(value==1){   //待付款
+      if(value==0){   //待付款
         this.searchParams.status=0;
       }else if(value==2){  //待发货
         this.searchParams.status=2;
       }else if(value==3){  //待收货
         this.searchParams.status=3;
-      }else if(value==4){  //交易完成
+      }else if(value==1){  //交易完成
         this.searchParams.status=1;
       }else if(value==5){  //待审核
         this.searchParams.status=5;
@@ -746,11 +754,56 @@ export default {
       // console.log('发货')
       // console.log(row)
       if(row.expressCode && row.expressCorp){
-        this.deliverytitle='货运单信息'
+        this.deliverytitle='货运单信息';
+        this.dialogFormVisible2 = true;
       }else{
-        this.deliverytitle='请输入货运单信息'
+        this.deliverytitle='请输入货运单信息';
+        if(row.returnOrderFlag){
+          let arr={};
+          let params={
+            keyword:row.orderNo
+          }
+          this.axios.get('/b2c/order/cancel/list',{params})
+          .then(res=>{
+            if(res.data.code>0){
+              arr=res.data.msg.datas[0];
+            if(arr.status=='-1'){
+              arr.status='退款关闭'
+            }else if(arr.status=='0'){
+              arr.status='待审核'
+            }else if(arr.status=='1'){
+              arr.status='审核通过'
+            }else if(arr.status=='2'){
+              arr.status='审核不通过'
+            }else if(arr.status=='3'){
+              arr.status='待买家发货'
+            }else if(arr.status=='4'){
+              arr.status='待卖家收货'
+            }else if(arr.status=='5'){
+              arr.status='待退款'
+            }else if(arr.status=='6'){
+              arr.status='已退款'
+            }
+
+              this.$confirm(`此订单(${arr.goodName}x${arr.quantity})有售后，售后状态：${arr.status},确定要继续发货吗？`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(()=>{
+                this.dialogFormVisible2 = true;
+              }).catch(() => {
+                this.$message({
+                  type: 'info',
+                  message: '已取消操作'
+                });          
+              });
+            }
+          })
+          
+        }else{
+          this.dialogFormVisible2 = true;
+        }
       }
-      this.dialogFormVisible2 = true;
       this.dform.orderId=row.orderId;
       this.dform.expressCode=row.expressCode;
       this.dform.expressCorp=row.expressCorp;
@@ -892,6 +945,7 @@ export default {
                 item.customerName=item.customerPhone
               }
               item.amount=item.amount.toFixed(2);
+              item.fareAmount=item.fareAmount.toFixed(2);
             }
           }
         })

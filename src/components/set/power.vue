@@ -109,9 +109,6 @@
         </el-table-column>
       </el-table>
     </div>
-    
-    
-    
     <!-- 分页 -->
     <el-pagination
       @size-change="handleSizeChange"
@@ -155,7 +152,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="上级菜单" v-if="menuForm.grade==2" prop="parentId">
-          <el-select v-model="menuForm.parentId" placeholder="请选择" style='width:80%;'>
+          <el-select v-model="menuForm.parentId" placeholder="请选择" style='width:80%;' :disabled="menuTitle=='菜单编辑'">
             <el-option v-for="(val,i) of parentLink" :key='i' :label="val.name" :value="val.id"></el-option>
           </el-select>
         </el-form-item>
@@ -229,6 +226,10 @@ export default {
           label: '预约汇总'
         },
         {
+          value: 'orderTotal',
+          label: '订单汇总'
+        },
+        {
           value: 'refund',
           label: '退款管理'
         },
@@ -259,6 +260,14 @@ export default {
         {
           value: 'customlist',
           label: '会员列表'
+        },
+        {
+          value: 'customtotal',
+          label: '会员统计'
+        },
+        {
+          value: 'integralList',
+          label: '积分订单'
         },
         {
           value: 'classify',

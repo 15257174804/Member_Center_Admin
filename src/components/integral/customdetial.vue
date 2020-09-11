@@ -169,7 +169,9 @@ export default {
         // console.log('加载页面数据')
         // console.log(res.data)
         this.form=res.data.msg;
-        this.form.baseInfo.sex=this.form.baseInfo.sex.toString();
+        if(this.form.baseInfo.sex){
+          this.form.baseInfo.sex=this.form.baseInfo.sex.toString();
+        }
       })
     },
     //获取积分明细

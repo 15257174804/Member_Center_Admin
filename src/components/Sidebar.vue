@@ -93,6 +93,12 @@
                 <router-link to="/refund">
                   <el-menu-item index="13-4">退款管理</el-menu-item>
                 </router-link>
+                <router-link to="/integralList">
+                  <el-menu-item index="13-5">积分订单</el-menu-item>
+                </router-link>
+                <router-link to="/orderTotal">
+                  <el-menu-item index="13-6">订单汇总</el-menu-item>
+                </router-link>
               </el-menu-item-group>
             </el-submenu>
 
@@ -129,6 +135,9 @@
                 </router-link>
                 <router-link to="/customlist">
                   <el-menu-item index="15-3">会员列表</el-menu-item>
+                </router-link>
+                <router-link to="/customtotal">
+                  <el-menu-item index="15-4">会员统计</el-menu-item>
                 </router-link>
               </el-menu-item-group>
             </el-submenu>
